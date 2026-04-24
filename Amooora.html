@@ -6,8 +6,8 @@
 <title>Amooora — Um mundo inteiro de acolhimento e liberdade</title>
 <template id="__bundler_thumbnail">
 <svg viewBox="0 0 80 56" xmlns="http://www.w3.org/2000/svg">
-  <rect width="80" height="56" fill="#932d6f"/>
-  <circle cx="40" cy="24" r="12" fill="#932d6f" opacity="0.7"/>
+  <rect width="80" height="56" fill="#9B417C"/>
+  <circle cx="40" cy="24" r="12" fill="#9B417C" opacity="0.7"/>
   <text x="40" y="48" text-anchor="middle" fill="white" font-size="8" font-family="sans-serif">amooora</text>
 </svg>
 </template>
@@ -20,9 +20,9 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --primary:    #932d6f;
-    --secondary:  #932d6f;
-    --accent:     #932d6f;
+    --primary:    #9B417C;
+    --secondary:  #9B417C;
+    --accent:     #9B417C;
     --tertiary:   #3a184f;
     --muted:      #F5F3F7;
     --muted-fg:   #717182;
@@ -96,7 +96,7 @@ const { useState, useEffect, useRef, useCallback } = React;
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "direction": "A",
   "heroLayout": "centered",
-  "accentColor": "#932d6f",
+  "accentColor": "#9B417C",
   "showParticles": true,
   "fontStyle": "serif-led"
 } /*EDITMODE-END*/;
@@ -1379,7 +1379,7 @@ function App() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 900);
   const dir = t.direction;
-  const accent = t.accentColor;
+  const accent = '#9B417C';
   const particles = t.showParticles;
 
   useEffect(() => {
@@ -1418,7 +1418,6 @@ function App() {
         }
         onChange={(v) => setTweak('direction', v)} />
         <TweakSection label="Visual" />
-        <TweakColor label="Cor de destaque" value={t.accentColor} onChange={(v) => setTweak('accentColor', v)} />
         <TweakToggle label="Partículas no hero" value={t.showParticles} onChange={(v) => setTweak('showParticles', v)} />
       </TweaksPanel>
     </div>);
