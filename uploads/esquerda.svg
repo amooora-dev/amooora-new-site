@@ -1,0 +1,17 @@
+<svg width="599" height="945" viewBox="0 0 599 945" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<rect width="599" height="945" fill="url(#pattern0_214_57)"></rect>
+<rect width="599" height="945" fill="url(#pattern1_214_57)"></rect>
+<rect width="599" height="945" fill="url(#pattern2_214_57)"></rect>
+<defs>
+<pattern id="pattern0_214_57" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image0_214_57" transform="matrix(0.00166945 0 0 0.0010582 0 -0.037037)"></use>
+</pattern>
+<pattern id="pattern1_214_57" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image0_214_57" transform="matrix(0.00166945 0 0 0.0010582 0 -0.037037)"></use>
+</pattern>
+<pattern id="pattern2_214_57" patternContentUnits="objectBoundingBox" width="1" height="1">
+<use xlink:href="#image0_214_57" transform="matrix(0.00166945 0 0 0.0010582 0 -0.037037)"></use>
+</pattern>
+<image id="image0_214_57" width="1920" height="980" preserveAspectRatio="none"></image>
+</defs>
+</svg>

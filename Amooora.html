@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amooora — Um mundo inteiro de acolhimento e liberdade</title>
+<template id="__bundler_thumbnail">
+<svg viewBox="0 0 80 56" xmlns="http://www.w3.org/2000/svg">
+  <rect width="80" height="56" fill="#932d6f"/>
+  <circle cx="40" cy="24" r="12" fill="#932d6f" opacity="0.7"/>
+  <text x="40" y="48" text-anchor="middle" fill="white" font-size="8" font-family="sans-serif">amooora</text>
+</svg>
+</template>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --primary:    #932d6f;
+    --secondary:  #932d6f;
+    --accent:     #932d6f;
+    --tertiary:   #3a184f;
+    --muted:      #F5F3F7;
+    --muted-fg:   #717182;
+    --white:      #ffffff;
+    --off-white:  #faf7fb;
+    --ink:        #1a1a1a;
+    --ink-mid:    #3a184f;
+    --ink-soft:   #717182;
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--sans);
+    background: var(--white);
+    color: var(--ink);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  #root { min-height: 100vh; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--off-white); }
+  ::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 2px; }
+
+  /* Canvas particles */
+  #particle-canvas {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    opacity: 0.6;
+    z-index: 0;
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; } to { opacity: 1; }
+  }
+  @keyframes floatY {
+    0%, 100% { transform: translateY(0px); }
+    50%       { transform: translateY(-12px); }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  @keyframes pulse-ring {
+    0%   { transform: scale(0.8); opacity: 0.6; }
+    100% { transform: scale(2);   opacity: 0; }
+  }
+
+  .animate-up { animation: fadeUp 0.8s ease both; }
+  .animate-in { animation: fadeIn 0.6s ease both; }
+
+  /* Utility */
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel">
+
+const { useState, useEffect, useRef, useCallback } = React;
+
+/* ── TWEAK DEFAULTS ── */
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "direction": "A",
+  "heroLayout": "centered",
+  "accentColor": "#932d6f",
+  "showParticles": true,
+  "fontStyle": "serif-led"
+} /*EDITMODE-END*/;
+
+/* ── PARTICLE CANVAS ── */
+function ParticleCanvas({ color, active }) {
+  const canvasRef = useRef(null);
+  const stateRef = useRef({ particles: [], raf: null });
+
+  useEffect(() => {
+    if (!active) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    const resize = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    const count = 60;
+    const particles = Array.from({ length: count }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 2.5 + 0.5,
+      dx: (Math.random() - 0.5) * 0.4,
+      dy: (Math.random() - 0.5) * 0.4,
+      opacity: Math.random() * 0.5 + 0.2
+    }));
+    stateRef.current.particles = particles;
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach((p) => {
+        p.x += p.dx;p.y += p.dy;
+        if (p.x < 0) p.x = canvas.width;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height;
+        if (p.y > canvas.height) p.y = 0;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = color + Math.round(p.opacity * 255).toString(16).padStart(2, '0');
+        ctx.fill();
+      });
+
+      // draw connecting lines
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 120) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = color + Math.round((1 - dist / 120) * 40).toString(16).padStart(2, '0');
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+      stateRef.current.raf = requestAnimationFrame(draw);
+    };
+    draw();
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      cancelAnimationFrame(stateRef.current.raf);
+    };
+  }, [color, active]);
+
+  if (!active) return null;
+  return <canvas ref={canvasRef} id="particle-canvas" style={{ width: '100%', height: '100%' }} />;
+}
+
+/* ── NAV ── */
+function Nav({ accent, dir, isMobile }) {
+  const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const navStyle = {
+    position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
+    padding: scrolled ? (isMobile ? '12px 16px' : '14px 48px') : (isMobile ? '16px 16px' : '24px 48px'),
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    background: scrolled ? 'rgba(254,252,255,0.92)' : 'transparent',
+    backdropFilter: scrolled ? 'blur(12px)' : 'none',
+    borderBottom: scrolled ? '1px solid rgba(109,40,217,0.1)' : 'none',
+    transition: 'all 0.4s ease'
+  };
+
+  const logoStyle = {
+    height: isMobile ? 34 : 44,
+    objectFit: 'contain',
+    cursor: 'pointer',
+    display: 'block'
+  };
+
+  const links = ['Manifesto', 'Aplicativo', 'Valores', 'Galeria', 'FAQ'];
+
+  return (
+    <nav style={navStyle}>
+      <img src="images/logo.png" alt="Amooora" style={logoStyle} />
+      <div style={{ display: 'flex', gap: isMobile ? 12 : 36, alignItems: 'center' }}>
+        {!isMobile && links.map((l) =>
+        <a key={l}
+        href={`#${l.toLowerCase()}`}
+        style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 14, fontWeight: 500,
+          color: scrolled ? '#1a1a1a' : '#1a1a1a', textDecoration: 'none',
+          opacity: 0.7, transition: 'opacity 0.2s'
+        }}
+        onMouseEnter={(e) => e.target.style.opacity = '1'}
+        onMouseLeave={(e) => e.target.style.opacity = '0.7'}>
+            {l}</a>
+        )}
+        <a href="#aplicativo" style={{
+          fontFamily: "'DM Sans',sans-serif", fontSize: isMobile ? 12 : 13, fontWeight: 600,
+          background: accent, color: 'white', padding: isMobile ? '9px 14px' : '10px 22px', borderRadius: 100,
+          textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s',
+          boxShadow: `0 4px 20px ${accent}44`
+        }}
+        onMouseEnter={(e) => {e.target.style.transform = 'translateY(-2px)';e.target.style.boxShadow = `0 8px 28px ${accent}66`;}}
+        onMouseLeave={(e) => {e.target.style.transform = '';e.target.style.boxShadow = `0 4px 20px ${accent}44`;}}>
+          Baixar App</a>
+      </div>
+    </nav>);
+
+}
+
+/* ── MARQUEE ── */
+function Marquee({ accent }) {
+  const words = ['acolhimento', 'liberdade', 'sáficas', 'amor', 'comunidade', 'pertencimento', 'força', 'ternura', 'orgulho', 'encontro'];
+  const doubled = [...words, ...words];
+  return (
+    <div style={{ overflow: 'hidden', borderTop: `1px solid ${accent}22`, borderBottom: `1px solid ${accent}22`,
+      padding: '14px 0', background: '#faf7fb' }}>
+      <div style={{ display: 'flex', gap: 48, animation: 'marquee 18s linear infinite', whiteSpace: 'nowrap', width: 'max-content' }}>
+        {doubled.map((w, i) =>
+        <span key={i} style={{ fontFamily: "'Playfair Display',serif", fontSize: 15, fontWeight: 400,
+          color: i % 2 === 0 ? accent : '#717182', fontStyle: i % 3 === 0 ? 'italic' : 'normal', letterSpacing: '0.04em' }}>
+            {w} <span style={{ color: accent, opacity: 0.4 }}>✦</span>
+          </span>
+        )}
+      </div>
+    </div>);
+
+}
+
+/* ── HERO - Direction A: Editorial clean ── */
+function HeroA({ accent, particles, isMobile }) {
+  const [offset, setOffset] = useState(0);
+  useEffect(() => {
+    const onScroll = () => setOffset(window.scrollY);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  return (
+    <section style={{
+      position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column',
+      justifyContent: 'center', alignItems: 'center', overflow: 'hidden',
+      backgroundColor: 'var(--white)',
+      backgroundImage: 'url(images/hero-bg.png)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      paddingTop: 80
+    }}>
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: 'linear-gradient(to bottom, rgba(255,255,255,0.68) 0%, rgba(255,255,255,0.74) 100%)',
+        zIndex: 1,
+        pointerEvents: 'none'
+      }} />
+      <ParticleCanvas color={accent} active={particles} />
+
+      {/* background blob */}
+      <div style={{
+        position: 'absolute', top: '10%', right: '-10%', width: '55vw', height: '55vw',
+        borderRadius: '50%', background: `radial-gradient(circle, ${accent}0f 0%, transparent 70%)`,
+        transform: `translateY(${offset * 0.15}px)`,
+        pointerEvents: 'none', zIndex: 0
+      }} />
+      <div style={{
+        position: 'absolute', bottom: '5%', left: '-8%', width: '40vw', height: '40vw',
+        borderRadius: '50%', background: `radial-gradient(circle, ${accent}08 0%, transparent 70%)`,
+        transform: `translateY(${offset * -0.1}px)`,
+        pointerEvents: 'none', zIndex: 0
+      }} />
+
+      {/* Editorial eyebrow */}
+      <div style={{ position: 'relative', zIndex: 5, textAlign: 'center', maxWidth: 640, padding: '0 32px' }}>
+        {/* Logo acima do eyebrow */}
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20, animation: 'fadeIn 0.8s ease both' }}>
+          <img src="images/logo-hero.png" alt="Amooora" style={{ objectFit: 'contain', width: "200px", height: "200px" }} />
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 24,
+          animation: 'fadeUp 0.6s ease both' }}>
+          <div style={{ width: 32, height: 1, background: accent, opacity: 0.5 }} />
+          <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 600,
+            letterSpacing: '0.2em', textTransform: 'uppercase', color: accent, opacity: 0.8 }}>
+            Para sáficas, com amor
+          </span>
+          <div style={{ width: 32, height: 1, background: accent, opacity: 0.5 }} />
+        </div>
+
+        <h1 style={{
+          fontFamily: "'Playfair Display',serif",
+          fontWeight: 900, lineHeight: 1.0, letterSpacing: '-0.03em',
+          color: 'var(--ink)', marginBottom: 12,
+          animation: 'fadeUp 0.8s 0.1s ease both', fontSize: isMobile ? '44px' : "70px"
+        }}>
+          Um mundo inteiro<br />
+          <em style={{ color: accent, fontStyle: 'italic' }}>de acolhimento</em><br />
+          e liberdade
+        </h1>
+
+        <p style={{
+          fontFamily: "'DM Sans',sans-serif", fontSize: 'clamp(14px,1.2vw,16px)',
+          color: '#717182', fontWeight: 300, lineHeight: 1.7,
+          maxWidth: 460, margin: '20px auto 0',
+          animation: 'fadeUp 0.8s 0.25s ease both'
+        }}>
+          A Amooora é o espaço que sempre deveria ter existido — feito por sáficas,
+          para sáficas. Aqui você encontra comunidade, histórias e pertencimento.
+        </p>
+
+        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 28,
+          animation: 'fadeUp 0.8s 0.4s ease both', flexWrap: 'wrap' }}>
+          <a href="#aplicativo" style={{
+            fontFamily: "'DM Sans',sans-serif", fontSize: 15, fontWeight: 600,
+            background: accent, color: 'white', padding: '12px 28px', borderRadius: 100,
+            textDecoration: 'none', boxShadow: `0 8px 32px ${accent}44`,
+            transition: 'all 0.25s'
+          }}
+          onMouseEnter={(e) => {e.currentTarget.style.transform = 'translateY(-3px)';e.currentTarget.style.boxShadow = `0 16px 48px ${accent}55`;}}
+          onMouseLeave={(e) => {e.currentTarget.style.transform = '';e.currentTarget.style.boxShadow = `0 8px 32px ${accent}44`;}}>
+            Conhecer o App
+          </a>
+          <a href="#manifesto" style={{
+            fontFamily: "'DM Sans',sans-serif", fontSize: 15, fontWeight: 500,
+            color: accent, padding: '12px 28px', borderRadius: 100,
+            textDecoration: 'none', border: `1.5px solid ${accent}44`,
+            transition: 'all 0.25s'
+          }}
+          onMouseEnter={(e) => {e.currentTarget.style.background = `${accent}0d`;e.currentTarget.style.borderColor = accent;}}
+          onMouseLeave={(e) => {e.currentTarget.style.background = '';e.currentTarget.style.borderColor = `${accent}44`;}}>
+            Nosso Manifesto
+          </a>
+        </div>
+
+        {/* floating badge */}
+        <div style={{ marginTop: 36, display: 'flex', justifyContent: 'center', gap: 24, flexWrap: 'wrap',
+          animation: 'fadeIn 1s 0.8s ease both' }}>
+          {['10k+ usuárias', 'Comunidade ativa', '100% seguro'].map((item, i) =>
+          <div key={i} style={{
+            fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: '#717182',
+            display: 'flex', alignItems: 'center', gap: 8
+          }}>
+              <div style={{ width: 6, height: 6, borderRadius: '50%', background: accent, opacity: 0.6 }} />
+              {item}
+            </div>
+          )}
+        </div>
+      </div>
+
+    </section>);
+
+}
+
+/* ── HERO - Direction B: Immersive split ── */
+function HeroB({ accent, particles }) {
+  const [offset, setOffset] = useState(0);
+  useEffect(() => {
+    const onScroll = () => setOffset(window.scrollY);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  return (
+    <section style={{
+      position: 'relative', minHeight: '100vh', display: 'grid',
+      gridTemplateColumns: '1fr 1fr', overflow: 'hidden'
+    }}>
+      {/* Left - purple block */}
+      <div style={{
+        background: `linear-gradient(160deg, ${accent} 0%, #3a184f 100%)`,
+        display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+        padding: '120px 56px 80px',
+        position: 'relative', overflow: 'hidden'
+      }}>
+        <ParticleCanvas color="#ffffff" active={particles} />
+        <div style={{ position: 'absolute', top: '15%', right: '-20%', width: '80%', height: '80%',
+          borderRadius: '50%', border: '1px solid rgba(255,255,255,0.1)', pointerEvents: 'none',
+          transform: `translateY(${offset * 0.08}px)` }} />
+        <div style={{ position: 'relative', zIndex: 2 }}>
+          <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, letterSpacing: '0.2em',
+            textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', marginBottom: 20 }}>
+            Para sáficas, com amor
+          </p>
+          <h1 style={{
+            fontFamily: "'Playfair Display',serif", fontSize: 'clamp(42px,4.5vw,76px)',
+            fontWeight: 900, lineHeight: 1.05, color: 'white', marginBottom: 24
+          }}>
+            Um mundo<br /><em>inteiro</em><br />de liberdade
+          </h1>
+          <a href="#aplicativo" style={{
+            display: 'inline-block', fontFamily: "'DM Sans',sans-serif", fontSize: 14, fontWeight: 600,
+            background: 'white', color: accent, padding: '14px 32px', borderRadius: 100,
+            textDecoration: 'none', marginTop: 8,
+            transition: 'all 0.25s'
+          }}
+          onMouseEnter={(e) => {e.currentTarget.style.transform = 'translateY(-2px)';e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.2)';}}
+          onMouseLeave={(e) => {e.currentTarget.style.transform = '';e.currentTarget.style.boxShadow = '';}}>
+            Baixar App
+          </a>
+        </div>
+      </div>
+
+      {/* Right - white editorial */}
+      <div style={{
+        background: 'var(--white)', display: 'flex', flexDirection: 'column',
+        justifyContent: 'center', padding: '120px 56px 80px',
+        transform: `translateY(${offset * 0.05}px)`
+      }}>
+        <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 'clamp(100px,12vw,180px)',
+          fontWeight: 900, lineHeight: 0.9, color: `${accent}0d`, letterSpacing: '-0.04em',
+          position: 'absolute', top: '20%', right: '-5%', userSelect: 'none', pointerEvents: 'none' }}>
+          ✦
+        </div>
+        <div style={{ marginBottom: 40 }}>
+          <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, letterSpacing: '0.15em',
+            textTransform: 'uppercase', color: accent, opacity: 0.7, marginBottom: 16 }}>
+            Acolhimento
+          </p>
+          <p style={{ fontFamily: "'Playfair Display',serif", fontSize: 'clamp(20px,2vw,28px)',
+            fontWeight: 400, fontStyle: 'italic', color: 'var(--ink)', lineHeight: 1.5 }}>
+            "Um espaço feito por sáficas,<br />para sáficas."
+          </p>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          {['Comunidade segura e ativa', 'Aplicativo gratuito', 'Conteúdo autêntico'].map((item, i) =>
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <div style={{ width: 36, height: 36, borderRadius: '50%',
+              background: `${accent}12`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: accent }} />
+              </div>
+              <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 15, color: '#3a184f', fontWeight: 400 }}>
+                {item}
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div style={{ marginTop: 48, paddingTop: 32, borderTop: `1px solid ${accent}22`,
+          display: 'flex', gap: 40 }}>
+          {[['10k+', 'usuárias'], ['98%', 'satisfação'], ['∞', 'histórias']].map(([num, label], i) =>
+          <div key={i}>
+              <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 32, fontWeight: 700, color: accent }}>
+                {num}
+              </div>
+              <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: '#717182', marginTop: 2 }}>
+                {label}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>);
+
+}
+
+/* ── VIDEO PARALLAX SECTION ── */
+function VideoSection() {
+  const [offset, setOffset] = useState(0);
+  const [muted, setMuted] = useState(true);
+  const [ready, setReady] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const ref = useRef(null);
+  const playerRef = useRef(null);
+  const divRef = useRef(null);
+
+  // Parallax
+  useEffect(() => {
+    const onScroll = () => {
+      if (!ref.current) return;
+      setOffset(-ref.current.getBoundingClientRect().top * 0.3);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Init YouTube IFrame API
+  useEffect(() => {
+    const init = () => {
+      if (!divRef.current) return;
+      playerRef.current = new window.YT.Player(divRef.current, {
+        videoId: 'PHO5TkLfpKg',
+        playerVars: {
+          autoplay: 1, mute: 1, loop: 1,
+          playlist: 'PHO5TkLfpKg', controls: 0,
+          disablekb: 1, rel: 0, playsinline: 1,
+          modestbranding: 1, iv_load_policy: 3
+        },
+        events: {
+          onReady: (e) => {e.target.mute();e.target.playVideo();setReady(true);},
+          onStateChange: (e) => {
+            if (e.data === 0) e.target.playVideo();
+            if (e.data === 1) setPaused(false);
+            if (e.data === 2) setPaused(true);
+          }
+        }
+      });
+    };
+
+    if (window.YT && window.YT.Player) {
+      init();
+    } else {
+      if (!document.getElementById('yt-api')) {
+        const s = document.createElement('script');
+        s.id = 'yt-api';
+        s.src = 'https://www.youtube.com/iframe_api';
+        document.head.appendChild(s);
+      }
+      window.onYouTubeIframeAPIReady = init;
+    }
+    return () => {if (playerRef.current?.destroy) playerRef.current.destroy();};
+  }, []);
+
+  // React to mute state
+  useEffect(() => {
+    if (!ready || !playerRef.current) return;
+    if (muted) {
+      playerRef.current.mute();
+    } else {
+      playerRef.current.unMute();
+      playerRef.current.setVolume(80);
+    }
+  }, [muted, ready]);
+
+  const toggleMute = (e) => {
+    e.stopPropagation();
+    setMuted((m) => !m);
+  };
+
+  const togglePlay = (e) => {
+    e.stopPropagation();
+    if (!ready || !playerRef.current) return;
+    if (paused) {
+      playerRef.current.playVideo();
+      setPaused(false);
+    } else {
+      playerRef.current.pauseVideo();
+      setPaused(true);
+    }
+  };
+
+  return (
+    <section ref={ref} style={{
+      position: 'relative', height: '70vh', overflow: 'hidden',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      userSelect: 'none'
+    }}>
+      {/* Video layer — pointer-events: none so clicks never reach iframe */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        transform: `translateY(${offset}px)`,
+        pointerEvents: 'none',
+        zIndex: 0
+      }}>
+        <div ref={divRef} style={{
+          position: 'absolute',
+          top: '-20%', left: '-10%',
+          width: '120%', height: '140%',
+          border: 'none'
+        }} />
+      </div>
+
+      {/* Overlay — also blocks clicks to iframe */}
+      <div style={{
+        position: 'absolute', inset: 0, zIndex: 1,
+        background: 'linear-gradient(to bottom, rgba(26,15,46,0.55) 0%, rgba(147,45,111,0.35) 50%, rgba(26,15,46,0.7) 100%)',
+        pointerEvents: 'none'
+      }} />
+
+      {/* Text */}
+      <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', padding: '0 32px', pointerEvents: 'none' }}>
+        <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, letterSpacing: '0.22em',
+          textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)', marginBottom: 16 }}>
+          Nossa comunidade
+        </p>
+        <h2 style={{ fontFamily: "'Playfair Display',serif",
+          fontSize: 'clamp(32px,5vw,72px)', fontWeight: 900,
+          color: 'white', lineHeight: 1.1, textShadow: '0 4px 32px rgba(0,0,0,0.4)' }}>
+          Existir com coragem,<br /><em>afeto e liberdade.</em>
+        </h2>
+      </div>
+
+      {/* Video controls */}
+      <div style={{
+        position: 'absolute', bottom: 28, right: 28, zIndex: 10,
+        display: 'flex', gap: 10, pointerEvents: 'auto'
+      }}>
+        <button onClick={togglePlay} style={{
+          width: 48, height: 48, borderRadius: '50%',
+          background: 'rgba(255,255,255,0.18)',
+          backdropFilter: 'blur(8px)',
+          border: '1.5px solid rgba(255,255,255,0.35)',
+          cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          transition: 'background 0.2s', color: 'white'
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.3)'}
+        onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.18)'}
+        title={paused ? 'Reproduzir' : 'Pausar'}>
+          {paused ?
+          <span style={{
+            width: 0, height: 0,
+            borderTop: '8px solid transparent',
+            borderBottom: '8px solid transparent',
+            borderLeft: '12px solid white',
+            marginLeft: 2
+          }} /> :
+          <span style={{ display: 'flex', gap: 4 }}>
+              <span style={{ width: 3, height: 14, background: 'white', borderRadius: 2 }} />
+              <span style={{ width: 3, height: 14, background: 'white', borderRadius: 2 }} />
+            </span>
+          }
+        </button>
+
+        <button onClick={toggleMute} style={{
+          width: 48, height: 48, borderRadius: '50%',
+          background: 'rgba(255,255,255,0.18)',
+          backdropFilter: 'blur(8px)',
+          border: '1.5px solid rgba(255,255,255,0.35)',
+          cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          transition: 'background 0.2s', color: 'white', fontSize: 16
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.3)'}
+        onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.18)'}
+        title={muted ? 'Ativar som' : 'Silenciar'}>
+          {muted ? 'MUTE' : 'SOM'}
+        </button>
+      </div>
+    </section>);
+
+}
+
+
+function Manifesto({ accent, dir, isMobile }) {
+  const sectionRef = useRef(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => {if (e.isIntersecting) setVisible(true);}, { threshold: 0.2 });
+    if (sectionRef.current) obs.observe(sectionRef.current);
+    return () => obs.disconnect();
+  }, []);
+
+  const paragraphs = [
+  { big: true, text: "UM SONHO, UM IDEAL" },
+  { big: false, text: "Nós somos Amooora. Nascemos da urgência e do desejo de construir um mundo onde a comunidade sáfica — mulheres lésbicas, bissexuais, pansexuais, pessoas trans e não binárias que se relacionam com outras identidades femininas — possa se sentir livre, segura e pertencente." },
+  { big: false, text: "Somos uma plataforma feita por nós, para nós — um espaço onde existências plurais não apenas cabem, mas são celebradas, validadas e conectadas." },
+  { big: true, text: "Mais do que uma plataforma." },
+  { big: false, text: "A Amooora é a resposta a um vazio histórico de visibilidade, cuidado e recursos voltados para a comunidade sáfica. É onde você pode ser quem é — sem medo, sem julgamentos, com acolhimento." },
+  { big: false, text: "É onde a gente se encontra para existir com coragem, afeto e em todo o nosso potencial." }];
+
+
+  return (
+    <section id="manifesto" ref={sectionRef} style={{
+      padding: isMobile ? '80px 0' : '120px 0', background: dir === 'B' ? '#faf7fb' : 'var(--white)',
+      position: 'relative', overflow: 'hidden'
+    }}>
+      {/* Side images */}
+      <div style={{
+        position: 'absolute', left: 0, top: 0, bottom: 0, width: 'clamp(160px,18vw,280px)',
+        pointerEvents: 'none', zIndex: 1, overflow: 'hidden',
+        opacity: visible ? 1 : 0, transition: 'opacity 1s ease'
+      }}>
+        <img src="images/esquerda.png" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center', display: 'block' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, transparent 60%, var(--white))' }} />
+      </div>
+      <div style={{
+        position: 'absolute', right: 0, top: 0, bottom: 0, width: 'clamp(160px,18vw,280px)',
+        pointerEvents: 'none', zIndex: 1, overflow: 'hidden',
+        opacity: visible ? 1 : 0, transition: 'opacity 1s 0.2s ease'
+      }}>
+        <img src="images/direita.png" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center', display: 'block' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to left, transparent 60%, var(--white))' }} />
+      </div>
+      {/* Decorative element */}
+      <div style={{ position: 'absolute', top: 60, right: 80,
+        fontFamily: "'Playfair Display',serif", fontSize: 200, fontWeight: 900,
+        color: `${accent}06`, lineHeight: 1, userSelect: 'none', pointerEvents: 'none',
+        transform: visible ? 'translateX(0)' : 'translateX(60px)',
+        transition: 'transform 1s 0.3s ease'
+      }}>M</div>
+
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: isMobile ? '0 20px' : '0 48px', position: 'relative', zIndex: 2 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 64,
+          opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(20px)',
+          transition: 'all 0.7s ease' }}>
+          <div style={{ width: 48, height: 1.5, background: accent }} />
+          <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 600,
+            letterSpacing: '0.2em', textTransform: 'uppercase', color: accent }}>
+            Manifesto
+          </span>
+        </div>
+
+        {paragraphs.map((p, i) =>
+        <div key={i} style={{
+          marginBottom: p.big ? 40 : 24,
+          opacity: visible ? 1 : 0,
+          transform: visible ? 'none' : 'translateY(30px)',
+          transition: `all 0.8s ${0.1 + i * 0.12}s ease`
+        }}>
+            {p.big ?
+          <p style={{ fontFamily: "'Playfair Display',serif",
+            fontSize: 'clamp(28px,4vw,54px)', fontWeight: 700,
+            lineHeight: 1.15, color: 'var(--ink)', letterSpacing: '-0.02em' }}>
+                {p.text}
+              </p> :
+
+          <p style={{ fontFamily: "'DM Sans',sans-serif",
+            fontSize: 'clamp(16px,1.5vw,20px)', fontWeight: 300,
+            lineHeight: 1.8, color: '#717182', maxWidth: 680 }}>
+                {p.text}
+              </p>
+          }
+          </div>
+        )}
+
+        <div style={{
+          marginTop: 64, padding: '40px 48px', background: `${accent}08`,
+          borderLeft: `3px solid ${accent}`, borderRadius: '0 12px 12px 0',
+          opacity: visible ? 1 : 0, transition: 'all 0.8s 0.8s ease'
+        }}>
+          <p style={{ fontFamily: "'Playfair Display',serif", fontSize: 'clamp(18px,2vw,26px)',
+            fontStyle: 'italic', color: accent, lineHeight: 1.5 }}>
+            "Aqui, sáficas não precisam se esconder.<br />Aqui, sáficas são o centro do mundo."
+          </p>        </div>
+      </div>
+    </section>);
+
+}
+
+/* ── APP SECTION ── */
+function AppSection({ accent, isMobile }) {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+  const [open, setOpen] = useState(null);
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => {if (e.isIntersecting) setVisible(true);}, { threshold: 0.1 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
+
+  const items = [
+  {
+    label: 'Locais Seguros',
+    blocks: [
+    { q: 'Tem um estabelecimento que é a nossa cara?', a: 'É um barzinho, um restaurante, uma loja de bicicleta ou qualquer estabelecimento simpatizante à nossa causa? Corre aqui e faça um perfil do seu espaço! Queremos promover estabelecimentos onde a comunidade sáfica se sinta segura e acolhida para ser quem é e amar quem quiser.' },
+    { q: 'Quer encontrar locais seguros e acolhedores?', a: 'Procurando locais onde se sinta bem-vinda e acolhida e ainda de quebra se divertir? Aqui você encontra estabelecimentos inclusivos e avaliados pela nossa comunidade.' }]
+
+  },
+  {
+    label: 'Serviços',
+    blocks: [
+    { q: 'Prestadora de serviço?', a: 'É uma lésbica que oferece serviços de pequenos reparos residenciais? É uma pessoa não binária que oferece serviços gráficos? Se é alguém da nossa comunidade que quer ofertar serviços profissionais, conte conosco. Somos uma por todas e todas por uma!' },
+    { q: 'Quer contratar sáficas capacitadas?', a: 'Procurando ginecologista, psicóloga ou uma sáfica descolada para pregar um quadro na sua parede? Acesse o catálogo de serviços oferecidos pela nossa comunidade. Juntas vamos fomentar a economia sáfica.' }]
+
+  },
+  {
+    label: 'Eventos',
+    blocks: [
+    { q: 'O que tem para hoje?', a: 'Encontre os rolês mais legais perto de você com a agenda da Amooora: festas, shows, palestras, workshops, encontros esportivos e muito mais. Se é bom e é para gente, tá aqui.' },
+    { q: 'Quer divulgar um evento?', a: 'Tem um evento do seu projeto ou empresa? Cadastre aqui e espalhe para a comunidade! Um espaço feito para promover o que importa para o nosso público, do jeitinho que a gente gosta.' }]
+
+  },
+  {
+    label: 'Comunidades',
+    blocks: [
+    { q: 'Grupos para todo tipo de sáfica', a: 'Aqui a gente fala de tudo: do crush ao drama da mãe do pet gourmet comedor de cocô. Sempre tem um cantinho com a sua cara! Tem amor sáfico, astrologia, cuidados com a saúde, literatura queer, jogos e até o clássico "não sei o que tô fazendo, mas tamo junta". Faça parte dos nossos grupos!' }]
+
+  },
+  {
+    label: 'E muito mais',
+    blocks: [
+    { q: 'Conexões', a: 'Pode ser um crush, uma amizade de rolê, uma parceria de projeto ou tudo isso junto. No nosso mapa, você encontra gente que vibra como você, para dar match nas ideias, nas conversas, nos sonhos (e quem sabe nos beijos também).' },
+    { q: 'Saúde Íntima', a: 'Falamos sem rodeios sobre saúde íntima — uma pauta muitas vezes negligenciada, mas que merece atenção, acolhimento e troca segura. Porque saúde íntima é direito, não tabu.' }]
+
+  }];
+
+
+  return (
+    <section id="aplicativo" ref={ref} style={{
+      padding: isMobile ? '80px 0' : '120px 0', background: '#faf7fb',
+      position: 'relative', overflow: 'hidden'
+    }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 48px',
+        display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 48 : 80, alignItems: 'center',
+        paddingInline: isMobile ? 20 : 48 }}>
+
+        {/* LEFT — content */}
+        <div style={{ opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(24px)', transition: 'all 0.7s ease' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+            <div style={{ width: 36, height: 1.5, background: accent }} />
+            <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 600,
+              letterSpacing: '0.2em', textTransform: 'uppercase', color: accent }}>O Aplicativo</span>
+          </div>
+          <h2 style={{ fontFamily: "'Playfair Display',serif",
+            fontSize: 'clamp(28px,3.5vw,50px)', fontWeight: 900, color: 'var(--ink)',
+            lineHeight: 1.1, marginBottom: 12 }}>
+            AMOOORA
+          </h2>
+          <p style={{ fontFamily: "'Playfair Display',serif",
+            fontSize: 'clamp(18px,2vw,28px)', fontStyle: 'italic', color: accent,
+            marginBottom: 40, fontWeight: 400 }}>
+            Mi brejo, su brejo
+          </p>
+
+          {/* Accordion items */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+            {items.map((item, i) => {
+              const isOpen = open === i;
+              return (
+                <div key={i} style={{
+                  borderTop: `1px solid ${accent}20`,
+                  borderBottom: i === items.length - 1 ? `1px solid ${accent}20` : 'none'
+                }}>
+                  <button onClick={() => setOpen(isOpen ? null : i)} style={{
+                    width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    padding: '18px 0', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', gap: 12
+                  }}>
+                    <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 16, fontWeight: 600,
+                      color: isOpen ? accent : 'var(--ink)', transition: 'color 0.2s' }}>
+                      {item.label}
+                    </span>
+                    <span style={{
+                      width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
+                      background: isOpen ? accent : `${accent}14`,
+                      color: isOpen ? 'white' : accent,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 18, fontWeight: 300,
+                      transition: 'all 0.22s',
+                      transform: isOpen ? 'rotate(45deg)' : 'none'
+                    }}>+</span>
+                  </button>
+
+                  {isOpen &&
+                  <div style={{ paddingBottom: 20, animation: 'fadeUp 0.3s ease both' }}>
+                      {item.blocks.map((b, bi) =>
+                    <div key={bi} style={{
+                      padding: '14px 0 14px 16px',
+                      borderLeft: `2px solid ${accent}`,
+                      marginBottom: bi < item.blocks.length - 1 ? 12 : 0
+                    }}>
+                          <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, fontWeight: 600,
+                        color: 'var(--ink)', marginBottom: 6 }}>{b.q}</p>
+                          <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: '#717182',
+                        lineHeight: 1.7, fontWeight: 300 }}>{b.a}</p>
+                        </div>
+                    )}
+                    </div>
+                  }
+                </div>);
+
+            })}
+          </div>
+
+          {/* Download buttons */}
+          <div style={{ display: 'flex', gap: 12, marginTop: 36, flexWrap: 'wrap' }}>
+            {['App Store', 'Google Play'].map((s, i) =>
+            <a key={i} href="#" style={{
+              fontFamily: "'DM Sans',sans-serif", fontSize: 13, fontWeight: 600,
+              background: i === 0 ? accent : '#1a1a1a', color: 'white',
+              padding: '12px 24px', borderRadius: 100, textDecoration: 'none',
+              transition: 'all 0.2s', boxShadow: `0 4px 20px ${i === 0 ? accent : '#1a1a1a'}33`
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+            onMouseLeave={(e) => e.currentTarget.style.transform = ''}>
+                {s}
+              </a>
+            )}
+          </div>
+        </div>
+
+        {/* RIGHT — app mockup image */}
+        <div style={{
+          display: 'flex', justifyContent: 'center', alignItems: 'center',
+          opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateX(40px)',
+          transition: 'all 1s 0.2s ease'
+        }}>
+          <img
+            src="images/app-mockup.png"
+            alt="Amooora App"
+            style={{
+              width: '100%', maxWidth: 520,
+              objectFit: 'contain',
+              filter: 'drop-shadow(0 32px 64px rgba(147,45,111,0.25))',
+              animation: 'floatY 5s ease-in-out infinite'
+            }} />
+          
+        </div>
+      </div>
+    </section>);
+
+}
+
+/* ── VALUES ── */
+function Values({ accent, isMobile }) {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+  const [hovered, setHovered] = useState(null);
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => {if (e.isIntersecting) setVisible(true);}, { threshold: 0.1 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
+
+  const vals = [
+  { title: 'Segurança essencial', desc: 'Cada decisão parte do compromisso com a segurança. Um espaço protegido para navegar, se expressar e se relacionar com tranquilidade e confiança.' },
+  { title: 'Representatividade', desc: 'Nossos conteúdos refletem as vozes e histórias da comunidade sáfica. Valorizamos a pluralidade e rejeitamos qualquer forma de apagamento.' },
+  { title: 'Liberdade de ser e amar', desc: 'O amor sáfico é legítimo, belo e político. Defendemos o direito de viver identidade e afetos de forma plena, sem medo ou censura.' },
+  { title: 'Conexões com propósito', desc: 'Facilitamos encontros reais e significativos — pessoais, profissionais ou coletivos — baseados no respeito e cuidado mútuo.' },
+  { title: 'Saúde íntima', desc: 'Falamos sobre saúde íntima como autocuidado e empoderamento, com informações e serviços que respeitam corpos e desejos sáficos.' },
+  { title: 'Economia do cuidado', desc: 'Incentivamos saberes, serviços e talentos dentro da comunidade — apoio jurídico, de saúde, psicológico e criativo com confiança.' },
+  { title: 'Construção coletiva', desc: 'Valorizamos escuta ativa, participação e autonomia como formas de construir colaborativamente o futuro que queremos viver.' },
+  { title: 'Talento em movimento', desc: 'Damos visibilidade a talentos e conectamos pessoas a oportunidades reais. Acreditamos no trabalho como ferramenta de autonomia, crescimento e transformação.' }];
+
+
+  return (
+    <section id="valores" ref={ref} style={{ padding: isMobile ? '80px 0' : '120px 0', background: 'var(--white)', overflow: 'hidden' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '0 20px' : '0 48px' }}>
+
+        {/* Header row */}
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 24 : 60, alignItems: 'flex-end', marginBottom: 72,
+          opacity: visible ? 1 : 0, transition: 'all 0.7s ease' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+              <div style={{ width: 36, height: 1.5, background: accent }} />
+              <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 600,
+                letterSpacing: '0.2em', textTransform: 'uppercase', color: accent }}>Nossos Valores</span>
+            </div>
+            <h2 style={{ fontFamily: "'Playfair Display',serif",
+              fontSize: 'clamp(32px,4vw,56px)', fontWeight: 900, color: 'var(--ink)', lineHeight: 1.1 }}>
+              No que<br /><em style={{ color: accent }}>acreditamos</em>
+            </h2>
+          </div>
+          <div>
+            <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 17, color: '#717182',
+              lineHeight: 1.8, fontWeight: 300 }}>
+              A Amooora é construída sobre princípios claros. São eles que guiam cada funcionalidade, cada decisão e cada conexão dentro da plataforma.
+            </p>
+          </div>
+        </div>
+
+        {/* Values grid — 2 columns */}
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 0 }}>
+          {vals.map((v, i) => {
+            const isHov = hovered === i;
+            return (
+              <div key={i}
+              onMouseEnter={() => setHovered(i)}
+              onMouseLeave={() => setHovered(null)}
+              style={{
+                display: 'grid', gridTemplateColumns: '72px 1fr',
+                gap: 0,
+                padding: '32px 40px 32px 0',
+                borderTop: `1px solid ${accent}18`,
+                borderRight: !isMobile && i % 2 === 0 ? `1px solid ${accent}18` : 'none',
+                paddingRight: !isMobile && i % 2 === 0 ? 40 : 0,
+                paddingLeft: !isMobile && i % 2 === 1 ? 40 : 0,
+                background: isHov ? `${accent}06` : 'transparent',
+                transition: 'background 0.25s',
+                cursor: 'default',
+                opacity: visible ? 1 : 0,
+                transform: visible ? 'none' : 'translateY(20px)',
+                transitionDelay: `${0.05 * i}s`,
+                transitionProperty: 'opacity, transform, background',
+                transitionDuration: '0.6s, 0.6s, 0.25s'
+              }}>
+                {/* Number */}
+                <div style={{
+                  fontFamily: "'Playfair Display',serif",
+                  fontSize: 48, fontWeight: 900, lineHeight: 1,
+                  color: isHov ? accent : `${accent}22`,
+                  transition: 'color 0.25s',
+                  paddingTop: 4, userSelect: 'none',
+                  letterSpacing: '-0.04em'
+                }}>
+                  {String(i + 1).padStart(2, '0')}
+                </div>
+                {/* Content */}
+                <div>
+                  <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: 20, fontWeight: 700,
+                    color: 'var(--ink)', marginBottom: 10, lineHeight: 1.2,
+                    transition: 'color 0.25s', ...(isHov ? { color: accent } : {}) }}>
+                    {v.title}
+                  </h3>
+                  <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 14, color: '#717182',
+                    lineHeight: 1.75, fontWeight: 300 }}>{v.desc}</p>
+                </div>
+              </div>);
+
+          })}
+        </div>
+      </div>
+    </section>);
+
+}
+
+/* ── FAQ ── */
+function FAQ({ accent, isMobile }) {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+  const [open, setOpen] = useState(null);
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => {if (e.isIntersecting) setVisible(true);}, { threshold: 0.1 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
+
+  const items = [
+  { q: 'A Amooora é uma rede social?', a: 'Não exatamente. A Amooora é uma plataforma comunitária feita por e para a comunidade sáfica. Aqui, você encontra conexões, serviços, informações e acolhimento — tudo pensado para fortalecer a nossa existência coletiva.' },
+  { q: 'Qual é o público da Amooora?', a: 'A Amooora é prioritariamente voltada para a comunidade sáfica — mulheres lésbicas, bissexuais, pansexuais, pessoas trans e não binárias que se relacionam com outras identidades femininas. Se você se reconhece nesse espaço, ele também é seu.' },
+  { q: 'Homens cis são bem-vindos na plataforma?', a: 'A Amooora é um espaço seguro e afetivo construído especificamente para pessoas sáficas. Homens cis não fazem parte do público-alvo da plataforma e não podem se cadastrar.' },
+  { q: 'Mulheres héteros são bem-vindas?', a: 'Em um primeiro momento, a Amooora é voltada apenas para a comunidade sáfica. Mas em breve abriremos nosso portal de serviços para que mulheres héteros possam acessar nosso catálogo.' },
+  { q: 'A Amooora é um app de namoro?', a: 'Você quer namorar alguém? A Amooora possibilita matches, mas a proposta vai além. Sugerimos lugares seguros para encontros, conteúdos educativos e espaços de escuta e pertencimento.' },
+  { q: 'É seguro usar a Amooora?', a: 'Sim. Segurança é um valor inegociável para nós. Cuidamos da proteção de dados, investimos em moderação e criamos ambientes pensados para minimizar riscos e violências digitais.' },
+  { q: 'Preciso pagar para usar a plataforma?', a: 'Não. É só chegar! Mas teremos alguns serviços que só poderão ser acessados mediante assinatura.' },
+  { q: 'Posso divulgar meus serviços na plataforma?', a: 'Sim! A Amooora conta com um espaço onde é possível divulgar seus trabalhos, avaliar experiências e contratar com segurança dentro da comunidade.' }];
+
+
+  return (
+    <section id="faq" ref={ref} style={{ padding: isMobile ? '80px 0' : '120px 0', background: 'var(--white)' }}>
+      <div style={{ maxWidth: 860, margin: '0 auto', padding: isMobile ? '0 20px' : '0 48px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24,
+          opacity: visible ? 1 : 0, transition: 'all 0.7s ease' }}>
+          <div style={{ width: 36, height: 1.5, background: accent }} />
+          <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 600,
+            letterSpacing: '0.2em', textTransform: 'uppercase', color: accent }}>FAQ</span>
+        </div>
+        <h2 style={{ fontFamily: "'Playfair Display',serif",
+          fontSize: 'clamp(28px,3.5vw,48px)', fontWeight: 900, color: 'var(--ink)',
+          marginBottom: 56, opacity: visible ? 1 : 0, transition: 'all 0.7s 0.1s ease' }}>
+          Perguntas frequentes
+        </h2>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {items.map((item, i) => {
+            const isOpen = open === i;
+            return (
+              <div key={i} style={{
+                borderTop: `1px solid ${accent}22`,
+                borderBottom: i === items.length - 1 ? `1px solid ${accent}22` : 'none',
+                opacity: visible ? 1 : 0, transition: `all 0.6s ${0.05 * i}s ease`
+              }}>
+                <button onClick={() => setOpen(isOpen ? null : i)} style={{
+                  width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  padding: '20px 0', background: 'none', border: 'none', cursor: 'pointer',
+                  textAlign: 'left', gap: 16
+                }}>
+                  <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 16, fontWeight: 500,
+                    color: isOpen ? accent : 'var(--ink)', transition: 'color 0.2s' }}>
+                    {item.q}
+                  </span>
+                  <span style={{
+                    width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
+                    background: isOpen ? accent : `${accent}14`,
+                    color: isOpen ? 'white' : accent,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 18, fontWeight: 300, transition: 'all 0.25s',
+                    transform: isOpen ? 'rotate(45deg)' : 'none'
+                  }}>+</span>
+                </button>
+                {isOpen &&
+                <div style={{
+                  fontFamily: "'DM Sans',sans-serif", fontSize: 15, color: '#717182',
+                  lineHeight: 1.8, paddingBottom: 24, fontWeight: 300,
+                  animation: 'fadeUp 0.3s ease both'
+                }}>
+                    {item.a}
+                  </div>
+                }
+              </div>);
+
+          })}
+        </div>
+      </div>
+    </section>);
+
+}
+
+/* ── GALLERY ── */
+function Gallery({ accent, isMobile }) {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(([e]) => {if (e.isIntersecting) setVisible(true);}, { threshold: 0.1 });
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
+
+  const posts = [
+  { type: 'img', src: 'images/galeria-astro.png' },
+  { type: 'quote', text: '"Encontrei minha tribo aqui. Finalmente."', user: '@mariela_s' },
+  { type: 'img', src: 'images/galeria-amoras.png' },
+  { type: 'quote', text: '"Acolhimento de verdade muda tudo."', user: '@isa.afeto' },
+  { type: 'img', src: 'images/galeria-apoio.png' },
+  { type: 'img', src: 'images/pessoas.jpg' },
+  { type: 'quote', text: '"Aqui eu posso ser eu mesma sem medo."', user: '@luna_livre' },
+  { type: 'img', src: 'images/galeria-contato.png' },
+  { type: 'img', src: 'images/relacoes.jpg' },
+  { type: 'quote', text: '"Rede segura, viva e cheia de potência."', user: '@bia.coletiva' },
+  { type: 'img', src: 'images/suporte.jpg' },
+  { type: 'img', src: 'images/servicos.jpg' }];
+
+
+  const stripeStyle = (label) => ({
+    width: '100%', height: '100%',
+    backgroundImage: `repeating-linear-gradient(45deg, #F5EBFF 0, #F5EBFF 1px, #F5F3F7 0, #F5F3F7 50%)`,
+    backgroundSize: '12px 12px',
+    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+    color: '#717182', fontFamily: "'DM Sans',sans-serif", fontSize: 11,
+    textAlign: 'center', padding: 12, gap: 6
+  });
+
+  return (
+    <section id="galeria" ref={ref} style={{ padding: isMobile ? '80px 0' : '120px 0', background: '#faf7fb' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '0 20px' : '0 48px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24,
+          opacity: visible ? 1 : 0, transition: 'all 0.7s ease' }}>
+          <div style={{ width: 36, height: 1.5, background: accent }} />
+          <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 600,
+            letterSpacing: '0.2em', textTransform: 'uppercase', color: accent }}>Galeria</span>
+        </div>
+        <h2 style={{ fontFamily: "'Playfair Display',serif",
+          fontSize: 'clamp(28px,3.5vw,48px)', fontWeight: 900, color: 'var(--ink)',
+          marginBottom: 56, opacity: visible ? 1 : 0, transition: 'all 0.7s 0.1s ease' }}>
+          Nossas histórias
+        </h2>
+
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)', gridTemplateRows: isMobile ? 'repeat(6, 190px)' : 'repeat(3, 240px)', gap: 12 }}>
+          {posts.map((p, i) =>
+          <div key={i} style={{
+            borderRadius: 16, overflow: 'hidden', position: 'relative',
+            background: p.type === 'quote' ? `linear-gradient(140deg,${accent} 0%,#3a184f 100%)` : '#F5EBFF',
+            opacity: visible ? 1 : 0, transform: visible ? 'none' : 'scale(0.96)',
+            transition: `all 0.7s ${0.05 * i}s ease`, cursor: 'pointer'
+          }}
+          onMouseEnter={(e) => {e.currentTarget.style.transform = 'scale(1.02)';e.currentTarget.style.zIndex = '2';e.currentTarget.style.boxShadow = `0 20px 60px ${accent}33`;}}
+          onMouseLeave={(e) => {e.currentTarget.style.transform = '';e.currentTarget.style.zIndex = '';e.currentTarget.style.boxShadow = '';}}>
+              {p.type === 'quote' ?
+            <div style={{ padding: '40px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                  <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 'clamp(16px,2vw,22px)',
+                fontStyle: 'italic', color: 'white', lineHeight: 1.5 }}>{p.text}</div>
+                  <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12,
+                color: 'rgba(255,255,255,0.7)' }}>{p.user}</div>
+                </div> :
+
+            <div style={{
+              width: '100%', height: '100%',
+              backgroundImage: `url(${p.src})`,
+              backgroundSize: 'cover', backgroundPosition: 'center'
+            }} />
+            }
+            </div>
+          )}
+        </div>
+
+        <div style={{ textAlign: 'center', marginTop: 40,
+          opacity: visible ? 1 : 0, transition: 'all 0.7s 0.5s ease' }}>
+          <a href="#" style={{
+            fontFamily: "'DM Sans',sans-serif", fontSize: 14, fontWeight: 500,
+            color: accent, textDecoration: 'none', borderBottom: `1px solid ${accent}44`,
+            paddingBottom: 2, transition: 'border-color 0.2s'
+          }}
+          onMouseEnter={(e) => e.target.style.borderColor = accent}
+          onMouseLeave={(e) => e.target.style.borderColor = `${accent}44`}>
+            Ver todas as histórias →
+          </a>
+        </div>
+      </div>
+    </section>);
+
+}
+
+/* ── FOOTER ── */
+function Newsletter({ accent, isMobile }) {
+  return (
+    <section style={{ background: 'var(--white)', padding: '48px 48px 36px' }}>
+      <div style={{
+        maxWidth: 1200, margin: '0 auto',
+        display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.1fr 1.9fr', gap: 24, alignItems: 'center'
+      }}>
+        <h3 style={{
+          fontFamily: "'DM Sans',sans-serif", fontSize: isMobile ? '22px' : 'clamp(14px,1.6vw,21px)',
+          lineHeight: 1.2, fontWeight: 700, color: '#0f1b3d'
+        }}>
+          Cadastre o seu email para saber as novidades em primeira mão!
+        </h3>
+
+        <form onSubmit={(e) => e.preventDefault()} style={{ display: 'flex', gap: 10, alignItems: 'center', flexDirection: isMobile ? 'column' : 'row' }}>
+          <input
+            type="email"
+            placeholder="Seu melhor email"
+            aria-label="Seu melhor email"
+            style={{
+              flex: 1,
+              minHeight: 54,
+              borderRadius: 8,
+              border: '1px solid #e8eaf2',
+              padding: '0 16px',
+              fontFamily: "'DM Sans',sans-serif",
+              fontSize: 18,
+              color: '#0f1b3d',
+              outline: 'none',
+              width: '100%'
+            }}
+          />
+          <button type="submit" style={{
+            minHeight: 54,
+            padding: '0 20px',
+            borderRadius: 8,
+            border: 'none',
+            background: accent,
+            color: 'white',
+            fontFamily: "'DM Sans',sans-serif",
+            fontSize: 15,
+            fontWeight: 700,
+            letterSpacing: '0.02em',
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
+            width: isMobile ? '100%' : 'auto'
+          }}>
+            INSCREVER-SE
+          </button>
+        </form>
+      </div>
+    </section>
+  );
+}
+
+function Footer({ accent, isMobile }) {
+  return (
+    <footer style={{ background: accent, color: 'white', padding: isMobile ? '56px 20px 28px' : '80px 48px 40px' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr 1fr', gap: isMobile ? 36 : 60, marginBottom: 64 }}>
+          <div>
+            <img src="images/logo.png" alt="Amooora" style={{ height: 52, objectFit: 'contain', marginBottom: 16, filter: 'brightness(0) invert(1)' }} />
+            <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.5)',
+              lineHeight: 1.8, maxWidth: 320, fontWeight: 300 }}>
+              Um mundo inteiro de acolhimento e liberdade para a comunidade sáfica.
+            </p>
+            <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
+              <a href="https://instagram.com/n.amooora" style={{
+                fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: accent,
+                textDecoration: 'none', opacity: 0.8 }}>@n.amooora</a>
+              <span style={{ color: 'rgba(255,255,255,0.2)' }}>·</span>
+              <a href="mailto:amooora@amooora.com.br" style={{
+                fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.5)',
+                textDecoration: 'none' }}>amooora@amooora.com.br</a>
+            </div>
+          </div>
+          <div>
+            <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 600,
+              letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 20 }}>
+              Navegação
+            </div>
+            {['Manifesto', 'Aplicativo', 'Valores', 'Galeria', 'Quem Somos', 'FAQ'].map((l) => <a key={l} href="#" style={{ display: 'block', fontFamily: "'DM Sans',sans-serif",
+              fontSize: 14, color: 'rgba(255,255,255,0.6)', textDecoration: 'none',
+              marginBottom: 12, transition: 'color 0.2s' }}
+            onMouseEnter={(e) => e.target.style.color = 'white'}
+            onMouseLeave={(e) => e.target.style.color = 'rgba(255,255,255,0.6)'}>
+                {l}
+              </a>
+            )}
+          </div>
+          <div>
+            <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 600,
+              letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 20 }}>
+              App
+            </div>
+            {['App Store', 'Google Play', 'Política de Privacidade', 'Termos de Uso'].map((l) =>
+            <a key={l} href="#" style={{ display: 'block', fontFamily: "'DM Sans',sans-serif",
+              fontSize: 14, color: 'rgba(255,255,255,0.6)', textDecoration: 'none',
+              marginBottom: 12, transition: 'color 0.2s' }}
+            onMouseEnter={(e) => e.target.style.color = 'white'}
+            onMouseLeave={(e) => e.target.style.color = 'rgba(255,255,255,0.6)'}>
+                {l}
+              </a>
+            )}
+          </div>
+        </div>
+
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 32,
+          display: 'flex', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', flexDirection: isMobile ? 'column' : 'row', flexWrap: 'wrap', gap: 12 }}>
+          <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>
+            © 2025 Amooora. Todos os direitos reservados.
+          </span>
+          <span style={{ fontFamily: "'Playfair Display',serif", fontSize: 12, color: accent, fontStyle: 'italic', opacity: 0.6 }}>
+            feito com amor ✦
+          </span>
+        </div>
+      </div>
+    </footer>);
+
+}
+
+/* ── MAIN APP ── */
+function App() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 900);
+  const dir = t.direction;
+  const accent = t.accentColor;
+  const particles = t.showParticles;
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 900);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  return (
+    <div>
+      <Nav accent={accent} dir={dir} isMobile={isMobile} />
+
+      {dir === 'A' ?
+      <HeroA accent={accent} particles={particles} isMobile={isMobile} /> :
+
+      <HeroB accent={accent} particles={particles} />
+      }
+
+      <Marquee accent={accent} />
+      <VideoSection />
+      <Manifesto accent={accent} dir={dir} isMobile={isMobile} />
+      <AppSection accent={accent} isMobile={isMobile} />
+      <Values accent={accent} isMobile={isMobile} />
+      <Gallery accent={accent} isMobile={isMobile} />
+      <FAQ accent={accent} isMobile={isMobile} />
+      <Newsletter accent={accent} isMobile={isMobile} />
+      <Footer accent={accent} isMobile={isMobile} />
+
+      <TweaksPanel>
+        <TweakSection label="Direção de Design" />
+        <TweakRadio label="Estilo"
+        value={t.direction}
+        options={[
+        { value: 'A', label: 'A — Editorial Clean' },
+        { value: 'B', label: 'B — Split Imersivo' }]
+        }
+        onChange={(v) => setTweak('direction', v)} />
+        <TweakSection label="Visual" />
+        <TweakColor label="Cor de destaque" value={t.accentColor} onChange={(v) => setTweak('accentColor', v)} />
+        <TweakToggle label="Partículas no hero" value={t.showParticles} onChange={(v) => setTweak('showParticles', v)} />
+      </TweaksPanel>
+    </div>);
+
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
