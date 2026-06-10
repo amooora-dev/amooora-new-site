@@ -4,7 +4,7 @@ Este guia consolida os padroes visuais atuais do site para manter consistencia e
 
 ## 1) Cores (tokens oficiais)
 
-- Primaria: `#9B417C`
+- Primaria: `#93296F`
 - Terciaria (apoio escuro): `#3a184f`
 - Fundo claro principal: `#ffffff`
 - Fundo suave: `#faf7fb`
@@ -16,7 +16,7 @@ Este guia consolida os padroes visuais atuais do site para manter consistencia e
 - Elementos de destaque (CTA, links de destaque, titulos com enfase, bordas de destaque): usar a cor primaria.
 - Rodape: usar sempre a cor primaria.
 - Textos longos: preferir texto secundario para conforto de leitura.
-- Evitar criar novos tons sem necessidade; usar opacidade do token primario quando precisar de variacao (ex.: `#9B417C22`, `#9B417C44`).
+- Evitar criar novos tons sem necessidade; usar opacidade do token primario quando precisar de variacao (ex.: `#93296F22`, `#93296F44`).
 
 ## 2) Tipografia
 
@@ -62,6 +62,8 @@ Padrao observado no site:
   - Intercalacao entre imagem e quote
 
 ## 6) Checklist rapido de consistencia
+
+Checklist para voce revisar antes de publicar alteracoes no site (nao e avaliacao automatica):
 
 Antes de publicar:
 
