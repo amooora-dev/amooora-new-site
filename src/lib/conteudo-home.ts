@@ -21,13 +21,6 @@ export const CONTEUDO_HOME = {
     ctaDownload: 'Baixar App'
   },
 
-  marquee: {
-    words: [
-      'acolhimento', 'liberdade', 'sáficas', 'amor', 'comunidade',
-      'pertencimento', 'força', 'ternura', 'orgulho', 'encontro'
-    ]
-  },
-
   hero: {
     background: '/images/0_header_grande2.png',
     eyebrow: 'Por nós e para nós',
@@ -219,7 +212,7 @@ export const CONTEUDO_HOME = {
     title: 'LOJA AMOOORA',
     subtitle: 'Vista sua identidade sáfica com muito mais orgulho',
     cta: 'Acesse Nossa Loja',
-    ctaUrl: '#',
+    ctaUrl: '/loja',
     // Fotos do mosaico — troque os arquivos em public/images/loja/ mantendo os mesmos nomes
     photos: [
       '/images/loja/loja-1.png',

@@ -26,8 +26,6 @@ export type HeroBProps = AccentProps & {
   particles: boolean;
 };
 
-export type MarqueeProps = AccentProps;
-
 export type ParticleCanvasProps = {
   color: string;
   active: boolean;

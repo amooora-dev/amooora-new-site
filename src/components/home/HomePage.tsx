@@ -13,14 +13,14 @@ import {
   TweakToggle,
 } from '@/components/tweaks/tweaks-panel';
 import { PilotSignup } from '@/components/home/PilotSignup';
+import { SiteNav } from '@/components/layout/SiteNav';
+import { SiteFooter } from '@/components/layout/SiteFooter';
 import type {
   HeroBProps,
   HeroProps,
   ManifestoParagraph,
   ManifestoProps,
-  MarqueeProps,
   MobileProps,
-  NavProps,
   ParticleCanvasProps,
   SectionProps,
 } from '@/components/home/types';
@@ -118,182 +118,6 @@ function ParticleCanvas({ color, active }: ParticleCanvasProps) {
   return <canvas ref={canvasRef} id="particle-canvas" style={{ width: '100%', height: '100%' }} />;
 }
 
-/* ── NAV ── */
-function Nav({ accent, dir, isMobile, layout = 'default' }: NavProps & { layout?: 'default' | 'hero' }) {
-  const [scrolled, setScrolled] = useState(false);
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
-  const navStyle: CSSProperties = {
-    position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-    background: scrolled ? 'rgba(255,255,255,0.95)' : '#ffffff',
-    backdropFilter: scrolled ? 'blur(12px)' : 'none',
-    borderBottom: scrolled ? '1px solid rgba(109,40,217,0.1)' : 'none',
-    transition: 'all 0.4s ease'
-  };
-
-  const logoStyle: CSSProperties = {
-    height: isMobile ? 34 : 44,
-    objectFit: 'contain',
-    cursor: 'pointer',
-    display: 'block'
-  };
-
-  const links = C.nav.links;
-
-  const ctaButton = !isMobile ? (
-    <Link href="#aplicativo" style={{
-      fontFamily: "'DM Sans',sans-serif", fontSize: 13, fontWeight: 600,
-      background: accent, color: 'white', padding: '10px 22px', borderRadius: 100,
-      textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s',
-      boxShadow: `0 4px 20px ${accent}44`, whiteSpace: 'nowrap'
-    }}
-    onMouseEnter={(e) => {e.currentTarget.style.transform = 'translateY(-2px)';e.currentTarget.style.boxShadow = `0 8px 28px ${accent}66`;}}
-    onMouseLeave={(e) => {e.currentTarget.style.transform = '';e.currentTarget.style.boxShadow = `0 4px 20px ${accent}44`;}}>
-      {C.nav.ctaDownload}
-    </Link>
-  ) : (
-    <button
-      onClick={() => setOpen((v) => !v)}
-      aria-label="Abrir menu"
-      style={{
-        width: 40, height: 40, borderRadius: '50%',
-        border: `1px solid ${accent}44`,
-        background: 'rgba(255,255,255,0.85)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        color: accent, cursor: 'pointer'
-      }}>
-      <span style={{ fontSize: 20, lineHeight: 1 }}>{open ? '×' : '☰'}</span>
-    </button>
-  );
-
-  return (
-    <nav style={navStyle}>
-      <div style={{
-        maxWidth: 1200,
-        margin: '0 auto',
-        padding: scrolled
-          ? (isMobile ? '12px 16px' : '14px 48px')
-          : (isMobile ? '16px 16px' : '20px 48px'),
-        display: 'grid',
-        gridTemplateColumns: isMobile ? '1fr auto' : 'auto 1fr auto',
-        alignItems: 'center',
-        gap: isMobile ? 12 : 32,
-        position: 'relative',
-      }}>
-        <Link href="#" style={{ justifySelf: 'start' }} onClick={(e) => e.preventDefault()}>
-          <Image
-            src="/images/logo-header.png"
-            alt="Amooora"
-            width={1024}
-            height={404}
-            priority
-            style={{ ...logoStyle, width: 'auto' }}
-          />
-        </Link>
-
-        {!isMobile && layout === 'hero' && (
-          <div style={{
-            display: 'flex',
-            gap: 28,
-            alignItems: 'center',
-            justifyContent: 'center',
-            justifySelf: 'center',
-          }}>
-            {links.map((link) =>
-              <Link key={link.id}
-                href={`#${link.id}`}
-                style={{
-                  fontFamily: "'DM Sans',sans-serif", fontSize: 14, fontWeight: 500,
-                  color: '#1a1a1a', textDecoration: 'none',
-                  opacity: 0.7, transition: 'opacity 0.2s', whiteSpace: 'nowrap'
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7'; }}>
-                {link.label}
-              </Link>
-            )}
-          </div>
-        )}
-
-        {!isMobile && layout === 'default' && (
-          <div style={{ display: 'flex', gap: 28, alignItems: 'center', justifySelf: 'end', gridColumn: '2 / -1' }}>
-            {links.map((link) =>
-              <Link key={link.id}
-                href={`#${link.id}`}
-                style={{
-                  fontFamily: "'DM Sans',sans-serif", fontSize: 14, fontWeight: 500,
-                  color: '#1a1a1a', textDecoration: 'none',
-                  opacity: 0.7, transition: 'opacity 0.2s'
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7'; }}>
-                {link.label}
-              </Link>
-            )}
-            {ctaButton}
-          </div>
-        )}
-
-        {(isMobile || layout === 'hero') && (
-          <div style={{ justifySelf: 'end' }}>{ctaButton}</div>
-        )}
-      </div>
-
-      {isMobile && open &&
-      <div style={{
-        position: 'absolute', top: 'calc(100% + 8px)', right: 16,
-        background: 'rgba(255,255,255,0.98)',
-        border: `1px solid ${accent}22`,
-        borderRadius: 14,
-        padding: '12px 14px',
-        display: 'flex', flexDirection: 'column', gap: 10,
-        boxShadow: '0 10px 30px rgba(0,0,0,0.12)'
-      }}>
-          {links.map((link) =>
-        <Link key={link.id}
-        href={`#${link.id}`}
-        onClick={() => setOpen(false)}
-        style={{
-          fontFamily: "'DM Sans',sans-serif",
-          fontSize: 14,
-          fontWeight: 600,
-          color: '#1a1a1a',
-          textDecoration: 'none'
-        }}>
-              {link.label}
-            </Link>
-        )}
-        </div>
-      }
-    </nav>);
-
-}
-
-/* ── MARQUEE ── */
-function Marquee({ accent }: MarqueeProps) {
-  const words = C.marquee.words;
-  const doubled = [...words, ...words];
-  return (
-    <div style={{ overflow: 'hidden', borderTop: `1px solid ${accent}22`, borderBottom: `1px solid ${accent}22`,
-      padding: '14px 0', background: '#faf7fb' }}>
-      <div style={{ display: 'flex', gap: 48, animation: 'marquee 18s linear infinite', whiteSpace: 'nowrap', width: 'max-content' }}>
-        {doubled.map((w, i) =>
-        <span key={i} style={{ fontFamily: "'Playfair Display',serif", fontSize: 15, fontWeight: 400,
-          color: i % 2 === 0 ? accent : '#717182', fontStyle: i % 3 === 0 ? 'italic' : 'normal', letterSpacing: '0.04em' }}>
-            {w} <span style={{ color: accent, opacity: 0.4 }}>✦</span>
-          </span>
-        )}
-      </div>
-    </div>);
-
-}
-
 /* ── HERO - Direction A: Editorial clean ── */
 function HeroA({ accent, particles, isMobile, dir }: HeroProps & { dir: 'A' | 'B' }) {
   const navOffset = isMobile ? 72 : 84;
@@ -313,21 +137,21 @@ function HeroA({ accent, particles, isMobile, dir }: HeroProps & { dir: 'A' | 'B
       backgroundPosition: 'center',
       backgroundRepeat: 'no-repeat',
     }}>
-      <Nav accent={accent} dir={dir} isMobile={isMobile} layout="hero" />
+      <SiteNav accent={accent} dir={dir} isMobile={isMobile} layout="hero" />
 
       <div style={{
         position: 'relative', zIndex: 5, textAlign: 'center',
         maxWidth: 560, width: '100%',
-        padding: isMobile ? '32px 20px 48px' : '40px 32px 64px',
+        padding: isMobile ? '0 20px 48px' : '0 32px 64px',
         margin: '0 auto',
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
       }}>
         <div style={{
-          display: 'flex', justifyContent: 'center', marginBottom: 16,
+          display: 'flex', justifyContent: 'center', marginBottom: 12,
           animation: 'fadeIn 0.8s ease both'
         }}>
           <Image
@@ -359,7 +183,7 @@ function HeroA({ accent, particles, isMobile, dir }: HeroProps & { dir: 'A' | 'B
           color: 'var(--ink)', marginBottom: 12,
           animation: 'fadeUp 0.8s 0.1s ease both', fontSize: isMobile ? '44px' : "70px"
         }}>
-          {C.hero.titleLine1}<br />
+          <span style={{ whiteSpace: 'nowrap' }}>{C.hero.titleLine1}</span><br />
           <em style={{ color: accent, fontStyle: 'italic' }}>{C.hero.titleHighlight}</em><br />
           {C.hero.titleLine3}
         </h1>
@@ -707,6 +531,8 @@ function Manifesto({ accent, dir, isMobile }: ManifestoProps) {
   }, []);
 
   const paragraphs = C.manifesto.paragraphs;
+  const leadingParagraphs = paragraphs.slice(0, -1);
+  const closingParagraph = paragraphs[paragraphs.length - 1];
 
   const renderParagraph = (p: ManifestoParagraph, i: number, delayOffset = 0, isLast = false) =>
     <div key={i} style={{
@@ -784,7 +610,12 @@ function Manifesto({ accent, dir, isMobile }: ManifestoProps) {
         }}>
           <div>
             {labelBlock}
-            {paragraphs.map((p, i) => renderParagraph(p, i, 0, i === paragraphs.length - 1))}
+            {leadingParagraphs.map((p, i) => renderParagraph(p, i))}
+            <div style={{
+              width: 'calc(100% + 56px + (100% * 0.95 / 1.05))'
+            }}>
+              {renderParagraph(closingParagraph, paragraphs.length - 1, 0, true)}
+            </div>
           </div>
           {imageBlock}
         </div>
@@ -1179,7 +1010,7 @@ function Gallery({ accent, isMobile }: SectionProps) {
 
         <div style={{ textAlign: 'center', marginTop: 48,
           opacity: visible ? 1 : 0, transition: 'all 0.7s 0.5s ease' }}>
-          <a href={C.gallery.ctaUrl} style={{
+          <Link href={C.gallery.ctaUrl} style={{
             display: 'inline-block',
             fontFamily: "'DM Sans',sans-serif", fontSize: 15, fontWeight: 600,
             background: accent, color: 'white', padding: '14px 32px', borderRadius: 100,
@@ -1189,7 +1020,7 @@ function Gallery({ accent, isMobile }: SectionProps) {
           onMouseEnter={(e) => {e.currentTarget.style.transform = 'translateY(-2px)';e.currentTarget.style.boxShadow = `0 12px 40px ${accent}55`;}}
           onMouseLeave={(e) => {e.currentTarget.style.transform = '';e.currentTarget.style.boxShadow = `0 8px 32px ${accent}44`;}}>
             {C.gallery.cta}
-          </a>
+          </Link>
         </div>
       </div>
     </section>);
@@ -1252,89 +1083,6 @@ function Newsletter({ accent, isMobile }: SectionProps) {
   );
 }
 
-function Footer({ accent, isMobile }: SectionProps) {
-  return (
-    <footer style={{ background: accent, color: 'white', padding: isMobile ? '56px 20px 28px' : '80px 48px 40px' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr 1fr', gap: isMobile ? 36 : 60, marginBottom: 64 }}>
-          <div>
-            <Image
-              src="/images/logo.png"
-              alt="Amooora"
-              width={1984}
-              height={1467}
-              style={{ height: 52, width: 'auto', objectFit: 'contain', marginBottom: 16, filter: 'brightness(0) invert(1)' }}
-            />
-            <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 14, color: 'rgba(255,255,255,0.5)',
-              lineHeight: 1.8, maxWidth: 320, fontWeight: 300 }}>
-              {C.footer.description}
-            </p>
-            <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
-              <a href={C.footer.instagramUrl} style={{
-                fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: 'white',
-                textDecoration: 'none', opacity: 0.8 }}>{C.footer.instagram}</a>
-              <span style={{ color: 'rgba(255,255,255,0.2)' }}>·</span>
-              <a href={`mailto:${C.footer.email}`} style={{
-                fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.5)',
-                textDecoration: 'none' }}>{C.footer.email}</a>
-            </div>
-          </div>
-          <div>
-            <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 600,
-              letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 20 }}>
-              {C.footer.navLabel}
-            </div>
-            {C.footer.navLinks.map((link) =>
-              link.id ? (
-                <Link key={link.label} href={`#${link.id}`} style={{ display: 'block', fontFamily: "'DM Sans',sans-serif",
-                  fontSize: 14, color: 'rgba(255,255,255,0.6)', textDecoration: 'none',
-                  marginBottom: 12, transition: 'color 0.2s' }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = 'white'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}>
-                  {link.label}
-                </Link>
-              ) : (
-                <a key={link.label} href="#" style={{ display: 'block', fontFamily: "'DM Sans',sans-serif",
-                  fontSize: 14, color: 'rgba(255,255,255,0.6)', textDecoration: 'none',
-                  marginBottom: 12, transition: 'color 0.2s' }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = 'white'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}>
-                  {link.label}
-                </a>
-              )
-            )}
-          </div>
-          <div>
-            <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 600,
-              letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 20 }}>
-              {C.footer.appLabel}
-            </div>
-            {C.footer.appLinks.map((l) =>
-            <a key={l} href="#" style={{ display: 'block', fontFamily: "'DM Sans',sans-serif",
-              fontSize: 14, color: 'rgba(255,255,255,0.6)', textDecoration: 'none',
-              marginBottom: 12, transition: 'color 0.2s' }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = 'white'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}>
-                {l}
-              </a>
-            )}
-          </div>
-        </div>
-
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 32,
-          display: 'flex', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', flexDirection: isMobile ? 'column' : 'row', flexWrap: 'wrap', gap: 12 }}>
-          <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>
-            {C.footer.copyright}
-          </span>
-          <span style={{ fontFamily: "'Playfair Display',serif", fontSize: 12, color: accent, fontStyle: 'italic', opacity: 0.6 }}>
-            {C.footer.signature}
-          </span>
-        </div>
-      </div>
-    </footer>);
-
-}
-
 /* ── MAIN APP ── */
 export default function HomePage() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
@@ -1361,12 +1109,11 @@ export default function HomePage() {
       {dir === 'A' ?
       <HeroA accent={accent} particles={particles} isMobile={isMobile} dir={dir} /> :
       <>
-        <Nav accent={accent} dir={dir} isMobile={isMobile} />
+        <SiteNav accent={accent} dir={dir} isMobile={isMobile} />
         <HeroB accent={accent} particles={particles} />
       </>
       }
 
-      <Marquee accent={accent} />
       <VideoSection isMobile={isMobile} />
       <Manifesto accent={accent} dir={dir} isMobile={isMobile} />
       <AppSection accent={accent} isMobile={isMobile} />
@@ -1374,7 +1121,7 @@ export default function HomePage() {
       <Gallery accent={accent} isMobile={isMobile} />
       <FAQ accent={accent} isMobile={isMobile} />
       <Newsletter accent={accent} isMobile={isMobile} />
-      <Footer accent={accent} isMobile={isMobile} />
+      <SiteFooter accent={accent} isMobile={isMobile} />
 
       <TweaksPanel>
         <TweakSection label="Direção de Design" />
