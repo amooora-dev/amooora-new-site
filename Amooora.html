@@ -201,7 +201,7 @@ function Nav({ accent, dir, isMobile }) {
     position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
     padding: scrolled ? (isMobile ? '12px 16px' : '14px 48px') : (isMobile ? '16px 16px' : '24px 48px'),
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    background: scrolled ? 'rgba(254,252,255,0.92)' : 'transparent',
+    background: scrolled ? 'rgba(255,255,255,0.95)' : '#ffffff',
     backdropFilter: scrolled ? 'blur(12px)' : 'none',
     borderBottom: scrolled ? '1px solid rgba(109,40,217,0.1)' : 'none',
     transition: 'all 0.4s ease'
@@ -963,6 +963,24 @@ function Values({ accent, isMobile }) {
     <section id="valores" ref={ref} style={{ padding: isMobile ? '80px 0' : '120px 0', background: 'var(--white)', overflow: 'hidden' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '0 20px' : '0 48px' }}>
 
+        {C.values.image &&
+        <div style={{
+          display: 'flex', justifyContent: 'center', marginBottom: isMobile ? 40 : 56,
+          opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(20px)',
+          transition: 'all 0.8s ease'
+        }}>
+          <img
+            src={C.values.image}
+            alt="Nossos Valores Amooora"
+            style={{
+              width: '100%',
+              maxWidth: isMobile ? 280 : 360,
+              objectFit: 'contain'
+            }}
+          />
+        </div>
+        }
+
         {/* Header row */}
         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 24 : 60, alignItems: 'flex-end', marginBottom: 72,
           opacity: visible ? 1 : 0, transition: 'all 0.7s ease' }}>
@@ -1115,7 +1133,7 @@ function FAQ({ accent, isMobile }) {
 
 }
 
-/* ── GALLERY ── */
+/* ── LOJA (ex-Galeria) ── */
 function Gallery({ accent, isMobile }) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
@@ -1126,70 +1144,59 @@ function Gallery({ accent, isMobile }) {
     return () => obs.disconnect();
   }, []);
 
-  const posts = C.gallery.posts;
-
-
-  const stripeStyle = (label) => ({
-    width: '100%', height: '100%',
-    backgroundImage: `repeating-linear-gradient(45deg, #F5EBFF 0, #F5EBFF 1px, #F5F3F7 0, #F5F3F7 50%)`,
-    backgroundSize: '12px 12px',
-    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-    color: '#717182', fontFamily: "'DM Sans',sans-serif", fontSize: 11,
-    textAlign: 'center', padding: 12, gap: 6
-  });
+  const photos = C.gallery.photos;
 
   return (
     <section id="galeria" ref={ref} style={{ padding: isMobile ? '80px 0' : '120px 0', background: '#faf7fb' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '0 20px' : '0 48px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24,
-          opacity: visible ? 1 : 0, transition: 'all 0.7s ease' }}>
-          <div style={{ width: 36, height: 1.5, background: accent }} />
-          <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 600,
-            letterSpacing: '0.2em', textTransform: 'uppercase', color: accent }}>{C.gallery.label}</span>
+        <div style={{ marginBottom: 48, opacity: visible ? 1 : 0, transition: 'all 0.7s ease' }}>
+          <h2 style={{ fontFamily: "'Playfair Display',serif",
+            fontSize: 'clamp(28px,3.5vw,50px)', fontWeight: 900, color: 'var(--ink)',
+            lineHeight: 1.1, marginBottom: 12 }}>
+            {C.gallery.title}
+          </h2>
+          <p style={{ fontFamily: "'Playfair Display',serif",
+            fontSize: 'clamp(18px,2vw,28px)', fontStyle: 'italic', color: accent,
+            fontWeight: 400, maxWidth: 720 }}>
+            {C.gallery.subtitle}
+          </p>
         </div>
-        <h2 style={{ fontFamily: "'Playfair Display',serif",
-          fontSize: 'clamp(28px,3.5vw,48px)', fontWeight: 900, color: 'var(--ink)',
-          marginBottom: 56, opacity: visible ? 1 : 0, transition: 'all 0.7s 0.1s ease' }}>
-          {C.gallery.title}
-        </h2>
 
-        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)', gridTemplateRows: isMobile ? 'repeat(6, 190px)' : 'repeat(3, 240px)', gap: 12 }}>
-          {posts.map((p, i) =>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: isMobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)',
+          gridTemplateRows: isMobile ? 'repeat(2, 200px)' : '280px',
+          gap: 12
+        }}>
+          {photos.map((src, i) =>
           <div key={i} style={{
             borderRadius: 16, overflow: 'hidden', position: 'relative',
-            background: p.type === 'quote' ? `linear-gradient(140deg,${accent} 0%,#3a184f 100%)` : '#F5EBFF',
+            background: '#F5EBFF',
             opacity: visible ? 1 : 0, transform: visible ? 'none' : 'scale(0.96)',
-            transition: `all 0.7s ${0.05 * i}s ease`, cursor: 'pointer'
+            transition: `all 0.7s ${0.05 * i}s ease`
           }}
           onMouseEnter={(e) => {e.currentTarget.style.transform = 'scale(1.02)';e.currentTarget.style.zIndex = '2';e.currentTarget.style.boxShadow = `0 20px 60px ${accent}33`;}}
           onMouseLeave={(e) => {e.currentTarget.style.transform = '';e.currentTarget.style.zIndex = '';e.currentTarget.style.boxShadow = '';}}>
-              {p.type === 'quote' ?
-            <div style={{ padding: '40px', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                  <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 'clamp(16px,2vw,22px)',
-                fontStyle: 'italic', color: 'white', lineHeight: 1.5 }}>{p.text}</div>
-                  <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12,
-                color: 'rgba(255,255,255,0.7)' }}>{p.user}</div>
-                </div> :
-
-            <div style={{
-              width: '100%', height: '100%',
-              backgroundImage: `url(${p.src})`,
-              backgroundSize: 'cover', backgroundPosition: 'center'
-            }} />
-            }
+              <div style={{
+                width: '100%', height: '100%',
+                backgroundImage: `url(${src})`,
+                backgroundSize: 'cover', backgroundPosition: 'center'
+              }} />
             </div>
           )}
         </div>
 
-        <div style={{ textAlign: 'center', marginTop: 40,
+        <div style={{ textAlign: 'center', marginTop: 48,
           opacity: visible ? 1 : 0, transition: 'all 0.7s 0.5s ease' }}>
-          <a href="#" style={{
-            fontFamily: "'DM Sans',sans-serif", fontSize: 14, fontWeight: 500,
-            color: accent, textDecoration: 'none', borderBottom: `1px solid ${accent}44`,
-            paddingBottom: 2, transition: 'border-color 0.2s'
+          <a href={C.gallery.ctaUrl} style={{
+            display: 'inline-block',
+            fontFamily: "'DM Sans',sans-serif", fontSize: 15, fontWeight: 600,
+            background: accent, color: 'white', padding: '14px 32px', borderRadius: 100,
+            textDecoration: 'none', boxShadow: `0 8px 32px ${accent}44`,
+            transition: 'all 0.25s'
           }}
-          onMouseEnter={(e) => e.target.style.borderColor = accent}
-          onMouseLeave={(e) => e.target.style.borderColor = `${accent}44`}>
+          onMouseEnter={(e) => {e.currentTarget.style.transform = 'translateY(-2px)';e.currentTarget.style.boxShadow = `0 12px 40px ${accent}55`;}}
+          onMouseLeave={(e) => {e.currentTarget.style.transform = '';e.currentTarget.style.boxShadow = `0 8px 32px ${accent}44`;}}>
             {C.gallery.cta}
           </a>
         </div>
