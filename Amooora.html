@@ -218,7 +218,7 @@ function Nav({ accent, dir, isMobile }) {
 
   return (
     <nav style={navStyle}>
-      <img src="images/logo.png" alt="Amooora" style={logoStyle} />
+      <img src="images/logo-header.png" alt="Amooora" style={logoStyle} />
       <div style={{ display: 'flex', gap: isMobile ? 12 : 36, alignItems: 'center' }}>
         {!isMobile && links.map((l) =>
         <a key={l}
@@ -325,7 +325,7 @@ function HeroA({ accent, particles, isMobile }) {
       <div style={{ position: 'relative', zIndex: 5, textAlign: 'center', maxWidth: 640, padding: '0 32px' }}>
         {/* Logo acima do eyebrow */}
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20, animation: 'fadeIn 0.8s ease both' }}>
-          <img src="images/logo-hero.png" alt="Amooora" style={{ objectFit: 'contain', width: "200px", height: "200px" }} />
+          <img src="images/logo-hero.png" alt="Amooora" style={{ objectFit: 'contain', width: "260px", height: "260px" }} />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 24,
           animation: 'fadeUp 0.6s ease both' }}>
@@ -705,53 +705,84 @@ function Manifesto({ accent, dir, isMobile }) {
 
   const paragraphs = C.manifesto.paragraphs;
 
+  const renderParagraph = (p, i, delayOffset = 0, isLast = false) =>
+    <div key={i} style={{
+      marginBottom: isLast ? 0 : (p.big ? 28 : 16),
+      opacity: visible ? 1 : 0,
+      transform: visible ? 'none' : 'translateY(30px)',
+      transition: `all 0.8s ${0.1 + delayOffset + i * 0.12}s ease`
+    }}>
+      {p.big ?
+      <p style={{ fontFamily: "'Playfair Display',serif",
+        fontSize: 'clamp(28px,4vw,54px)', fontWeight: 700,
+        lineHeight: 1.15, color: 'var(--ink)', letterSpacing: '-0.02em' }}>
+          <TextWithBreaks text={p.text} />
+        </p> :
+      <p style={{ fontFamily: "'DM Sans',sans-serif",
+        fontSize: 'clamp(16px,1.5vw,20px)', fontWeight: 300,
+        lineHeight: 1.8, color: '#717182' }}>
+          <TextWithBreaks text={p.text} />
+        </p>
+      }
+    </div>;
+
+  const labelBlock =
+    <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 32,
+      opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(20px)',
+      transition: 'all 0.7s ease' }}>
+      <div style={{ width: 48, height: 1.5, background: accent }} />
+      <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 600,
+        letterSpacing: '0.2em', textTransform: 'uppercase', color: accent }}>
+        {C.manifesto.label}
+      </span>
+    </div>;
+
+  const imageBlock =
+    <div style={{
+      display: 'flex', justifyContent: isMobile ? 'center' : 'flex-end', alignItems: 'flex-start',
+      opacity: visible ? 1 : 0,
+      transform: visible ? 'none' : 'translateX(24px)',
+      transition: 'all 0.9s 0.2s ease',
+      marginBottom: isMobile ? 32 : 0
+    }}>
+      <img
+        src={C.manifesto.image}
+        alt="Manifesto Amooora"
+        style={{
+          width: '100%',
+          maxWidth: isMobile ? 320 : 440,
+          objectFit: 'contain',
+          borderRadius: 4
+        }}
+      />
+    </div>;
+
 
   return (
     <section id="manifesto" ref={sectionRef} style={{
       padding: isMobile ? '80px 0' : '120px 0', background: dir === 'B' ? '#faf7fb' : 'var(--white)',
       position: 'relative', overflow: 'hidden'
     }}>
-      {/* Decorative element */}
-      <div style={{ position: 'absolute', top: 60, right: 80,
-        fontFamily: "'Playfair Display',serif", fontSize: 200, fontWeight: 900,
-        color: `${accent}06`, lineHeight: 1, userSelect: 'none', pointerEvents: 'none',
-        transform: visible ? 'translateX(0)' : 'translateX(60px)', display: isMobile ? 'none' : 'block',
-        transition: 'transform 1s 0.3s ease'
-      }}>M</div>
-
-      <div style={{ maxWidth: 900, margin: '0 auto', padding: isMobile ? '0 20px' : '0 48px', position: 'relative', zIndex: 2 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 64,
-          opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(20px)',
-          transition: 'all 0.7s ease' }}>
-          <div style={{ width: 48, height: 1.5, background: accent }} />
-          <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 600,
-            letterSpacing: '0.2em', textTransform: 'uppercase', color: accent }}>
-            {C.manifesto.label}
-          </span>
-        </div>
-
-        {paragraphs.map((p, i) =>
-        <div key={i} style={{
-          marginBottom: p.big ? 40 : 24,
-          opacity: visible ? 1 : 0,
-          transform: visible ? 'none' : 'translateY(30px)',
-          transition: `all 0.8s ${0.1 + i * 0.12}s ease`
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '0 20px' : '0 48px', position: 'relative', zIndex: 2 }}>
+        {isMobile ?
+        <>
+          {imageBlock}
+          {labelBlock}
+          {paragraphs.map((p, i) => renderParagraph(p, i, 0, i === paragraphs.length - 1))}
+        </> :
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1.05fr 0.95fr',
+          gap: 56,
+          alignItems: 'start'
         }}>
-            {p.big ?
-          <p style={{ fontFamily: "'Playfair Display',serif",
-            fontSize: 'clamp(28px,4vw,54px)', fontWeight: 700,
-            lineHeight: 1.15, color: 'var(--ink)', letterSpacing: '-0.02em' }}>
-                <TextWithBreaks text={p.text} />
-              </p> :
-
-          <p style={{ fontFamily: "'DM Sans',sans-serif",
-            fontSize: 'clamp(16px,1.5vw,20px)', fontWeight: 300,
-            lineHeight: 1.8, color: '#717182', maxWidth: 680 }}>
-                <TextWithBreaks text={p.text} />
-              </p>
-          }
+          <div>
+            {labelBlock}
+            {paragraphs.map((p, i) => renderParagraph(p, i, 0, i === paragraphs.length - 1))}
           </div>
-        )}
+          {imageBlock}
+        </div>
+        }
       </div>
     </section>);
 

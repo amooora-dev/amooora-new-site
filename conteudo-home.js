@@ -47,15 +47,31 @@ window.CONTEUDO_HOME = {
 
   manifesto: {
     label: 'Manifesto',
+    image: 'images/manifesto.png',
     paragraphs: [
       { big: true, text: 'Nós somos Amooora.' },
       {
         big: false,
         text:
-          'Nascemos da urgência e do desejo de construir um mundo onde a comunidade sáfica — mulheres lésbicas, bissexuais, pansexuais, pessoas trans e não binárias que se relacionam com outras identidades femininas — possa se sentir livre, segura e pertencente. \n\n Somos uma plataforma feita por nós, para nós — um espaço onde existências plurais não apenas cabem, mas são celebradas, validadas e conectadas. \n\nA Amooora é mais do que uma plataforma online! É a resposta a um vazio histórico de visibilidade, cuidado e recursos voltados para a comunidade sáfica. \n\nÉ onde você pode ser quem é — sem medo, sem julgamentos, com acolhimento.É onde a gente se encontra para existir com coragem, afeto e em todo o nosso potencial.'
+          'Nascemos da urgência e do desejo de construir um mundo onde a comunidade sáfica — mulheres lésbicas, bissexuais, pansexuais, pessoas trans e não binárias que se relacionam com outras identidades femininas — possa se sentir livre, segura e pertencente.'
+      },
+      {
+        big: false,
+        text:
+          'Somos uma plataforma feita por nós, para nós — um espaço onde existências plurais não apenas cabem, mas são celebradas, validadas e conectadas.'
+      },
+      {
+        big: false,
+        text:
+          'A Amooora é mais do que uma plataforma online! É a resposta a um vazio histórico de visibilidade, cuidado e recursos voltados para a comunidade sáfica.'
+      },
+      {
+        big: false,
+        text:
+          'É onde você pode ser quem é — sem medo, sem julgamentos, com acolhimento. É onde a gente se encontra para existir com coragem, afeto e em todo o nosso potencial.'
       }
     ]
-    // Use \n para quebrar linha em qualquer parágrafo
+    // Use \n para quebrar linha em qualquer parágrafo do manifesto (ex.: 'texto linha 1\nlinha 2')
   },
 
   app: {
