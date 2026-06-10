@@ -29,6 +29,7 @@ export const CONTEUDO_HOME = {
   },
 
   hero: {
+    background: '/images/0_header_grande2.png',
     eyebrow: 'Por nós e para nós',
     titleLine1: 'Um mundo inteiro',
     titleHighlight: 'de acolhimento',
@@ -84,7 +85,13 @@ export const CONTEUDO_HOME = {
       'As conexões aqui vão além do virtual! O virtual é a porta de entrada, mas incentivamos as conexões no mundo real. Ou seja, o olho no olho, o toque na pele e a conversa ao pé de uma mesa sem hora para acabar!',
       'Porque existem muitos brejos, e sempre vai ter um com a sua cara. A Amooora oferece:'
     ],
-    downloadButtons: ['App Store', 'Google Play'],
+    pilot: {
+      text: 'Gostaria de me cadastrar para fazer parte do grupo piloto para uso da Amooora.',
+      cta: 'Quero me cadastrar!',
+      placeholder: 'Seu melhor email',
+      submit: 'Enviar',
+      success: 'Recebemos seu interesse! Em breve entraremos em contato.',
+    },
     items: [
       {
         label: 'Locais Seguros',
@@ -290,7 +297,7 @@ export const CONTEUDO_HOME = {
       { label: 'FAQ', id: 'faq' }
     ],
     appLabel: 'App',
-    appLinks: ['App Store', 'Google Play', 'Política de Privacidade', 'Termos de Uso'],
+    appLinks: ['Política de Privacidade', 'Termos de Uso'],
     copyright: '© 2025 Amooora. Todos os direitos reservados.',
     signature: 'feito com amor ✦'
   }

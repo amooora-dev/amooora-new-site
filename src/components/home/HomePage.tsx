@@ -12,6 +12,7 @@ import {
   TweakRadio,
   TweakToggle,
 } from '@/components/tweaks/tweaks-panel';
+import { PilotSignup } from '@/components/home/PilotSignup';
 import type {
   HeroBProps,
   HeroProps,
@@ -118,7 +119,7 @@ function ParticleCanvas({ color, active }: ParticleCanvasProps) {
 }
 
 /* ── NAV ── */
-function Nav({ accent, dir, isMobile }: NavProps) {
+function Nav({ accent, dir, isMobile, layout = 'default' }: NavProps & { layout?: 'default' | 'hero' }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -130,8 +131,6 @@ function Nav({ accent, dir, isMobile }: NavProps) {
 
   const navStyle: CSSProperties = {
     position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-    padding: scrolled ? (isMobile ? '12px 16px' : '14px 48px') : (isMobile ? '16px 16px' : '24px 48px'),
-    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     background: scrolled ? 'rgba(255,255,255,0.95)' : '#ffffff',
     backdropFilter: scrolled ? 'blur(12px)' : 'none',
     borderBottom: scrolled ? '1px solid rgba(109,40,217,0.1)' : 'none',
@@ -147,52 +146,105 @@ function Nav({ accent, dir, isMobile }: NavProps) {
 
   const links = C.nav.links;
 
+  const ctaButton = !isMobile ? (
+    <Link href="#aplicativo" style={{
+      fontFamily: "'DM Sans',sans-serif", fontSize: 13, fontWeight: 600,
+      background: accent, color: 'white', padding: '10px 22px', borderRadius: 100,
+      textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s',
+      boxShadow: `0 4px 20px ${accent}44`, whiteSpace: 'nowrap'
+    }}
+    onMouseEnter={(e) => {e.currentTarget.style.transform = 'translateY(-2px)';e.currentTarget.style.boxShadow = `0 8px 28px ${accent}66`;}}
+    onMouseLeave={(e) => {e.currentTarget.style.transform = '';e.currentTarget.style.boxShadow = `0 4px 20px ${accent}44`;}}>
+      {C.nav.ctaDownload}
+    </Link>
+  ) : (
+    <button
+      onClick={() => setOpen((v) => !v)}
+      aria-label="Abrir menu"
+      style={{
+        width: 40, height: 40, borderRadius: '50%',
+        border: `1px solid ${accent}44`,
+        background: 'rgba(255,255,255,0.85)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: accent, cursor: 'pointer'
+      }}>
+      <span style={{ fontSize: 20, lineHeight: 1 }}>{open ? '×' : '☰'}</span>
+    </button>
+  );
+
   return (
     <nav style={navStyle}>
-      <Image
-        src="/images/logo-header.png"
-        alt="Amooora"
-        width={1024}
-        height={404}
-        priority
-        style={{ ...logoStyle, width: 'auto' }}
-      />
-      <div style={{ display: 'flex', gap: isMobile ? 12 : 36, alignItems: 'center' }}>
-        {!isMobile && links.map((link) =>
-        <Link key={link.id}
-        href={`#${link.id}`}
-        style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 14, fontWeight: 500,
-          color: scrolled ? '#1a1a1a' : '#1a1a1a', textDecoration: 'none',
-          opacity: 0.7, transition: 'opacity 0.2s'
-        }}
-        onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }}
-        onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7'; }}>
-            {link.label}</Link>
-        )}
-        {!isMobile && <Link href="#aplicativo" style={{
-          fontFamily: "'DM Sans',sans-serif", fontSize: isMobile ? 12 : 13, fontWeight: 600,
-          background: accent, color: 'white', padding: isMobile ? '9px 14px' : '10px 22px', borderRadius: 100,
-          textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s',
-          boxShadow: `0 4px 20px ${accent}44`
-        }}
-        onMouseEnter={(e) => {e.currentTarget.style.transform = 'translateY(-2px)';e.currentTarget.style.boxShadow = `0 8px 28px ${accent}66`;}}
-        onMouseLeave={(e) => {e.currentTarget.style.transform = '';e.currentTarget.style.boxShadow = `0 4px 20px ${accent}44`;}}>
-          {C.nav.ctaDownload}</Link>}
-        {isMobile &&
-        <button
-          onClick={() => setOpen((v) => !v)}
-          aria-label="Abrir menu"
-          style={{
-            width: 40, height: 40, borderRadius: '50%',
-            border: `1px solid ${accent}44`,
-            background: 'rgba(255,255,255,0.85)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: accent, cursor: 'pointer'
+      <div style={{
+        maxWidth: 1200,
+        margin: '0 auto',
+        padding: scrolled
+          ? (isMobile ? '12px 16px' : '14px 48px')
+          : (isMobile ? '16px 16px' : '20px 48px'),
+        display: 'grid',
+        gridTemplateColumns: isMobile ? '1fr auto' : 'auto 1fr auto',
+        alignItems: 'center',
+        gap: isMobile ? 12 : 32,
+        position: 'relative',
+      }}>
+        <Link href="#" style={{ justifySelf: 'start' }} onClick={(e) => e.preventDefault()}>
+          <Image
+            src="/images/logo-header.png"
+            alt="Amooora"
+            width={1024}
+            height={404}
+            priority
+            style={{ ...logoStyle, width: 'auto' }}
+          />
+        </Link>
+
+        {!isMobile && layout === 'hero' && (
+          <div style={{
+            display: 'flex',
+            gap: 28,
+            alignItems: 'center',
+            justifyContent: 'center',
+            justifySelf: 'center',
           }}>
-            <span style={{ fontSize: 20, lineHeight: 1 }}>{open ? '×' : '☰'}</span>
-          </button>
-        }
+            {links.map((link) =>
+              <Link key={link.id}
+                href={`#${link.id}`}
+                style={{
+                  fontFamily: "'DM Sans',sans-serif", fontSize: 14, fontWeight: 500,
+                  color: '#1a1a1a', textDecoration: 'none',
+                  opacity: 0.7, transition: 'opacity 0.2s', whiteSpace: 'nowrap'
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7'; }}>
+                {link.label}
+              </Link>
+            )}
+          </div>
+        )}
+
+        {!isMobile && layout === 'default' && (
+          <div style={{ display: 'flex', gap: 28, alignItems: 'center', justifySelf: 'end', gridColumn: '2 / -1' }}>
+            {links.map((link) =>
+              <Link key={link.id}
+                href={`#${link.id}`}
+                style={{
+                  fontFamily: "'DM Sans',sans-serif", fontSize: 14, fontWeight: 500,
+                  color: '#1a1a1a', textDecoration: 'none',
+                  opacity: 0.7, transition: 'opacity 0.2s'
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7'; }}>
+                {link.label}
+              </Link>
+            )}
+            {ctaButton}
+          </div>
+        )}
+
+        {(isMobile || layout === 'hero') && (
+          <div style={{ justifySelf: 'end' }}>{ctaButton}</div>
+        )}
       </div>
+
       {isMobile && open &&
       <div style={{
         position: 'absolute', top: 'calc(100% + 8px)', right: 16,
@@ -243,33 +295,52 @@ function Marquee({ accent }: MarqueeProps) {
 }
 
 /* ── HERO - Direction A: Editorial clean ── */
-function HeroA({ accent, particles, isMobile }: HeroProps) {
-  const [offset, setOffset] = useState(0);
-  useEffect(() => {
-    const onScroll = () => setOffset(window.scrollY);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+function HeroA({ accent, particles, isMobile, dir }: HeroProps & { dir: 'A' | 'B' }) {
+  const navOffset = isMobile ? 72 : 84;
 
   return (
     <section style={{
-      position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column',
-      justifyContent: 'center', alignItems: 'center', overflow: 'hidden',
+      position: 'relative',
+      minHeight: isMobile ? 'auto' : 'min(100vh, 920px)',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      overflow: 'hidden',
       backgroundColor: 'var(--white)',
-      paddingTop: 80
+      paddingTop: navOffset,
+      backgroundImage: `url(${C.hero.background})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
     }}>
+      <Nav accent={accent} dir={dir} isMobile={isMobile} layout="hero" />
 
-      {/* Editorial eyebrow */}
-      <div style={{ position: 'relative', zIndex: 5, textAlign: 'center', maxWidth: 640, padding: '0 32px' }}>
-        {/* Logo acima do eyebrow */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20, animation: 'fadeIn 0.8s ease both' }}>
+      <div style={{
+        position: 'relative', zIndex: 5, textAlign: 'center',
+        maxWidth: 560, width: '100%',
+        padding: isMobile ? '32px 20px 48px' : '40px 32px 64px',
+        margin: '0 auto',
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+        <div style={{
+          display: 'flex', justifyContent: 'center', marginBottom: 16,
+          animation: 'fadeIn 0.8s ease both'
+        }}>
           <Image
             src="/images/logo-hero.png"
             alt="Amooora"
             width={260}
             height={260}
             priority
-            style={{ objectFit: 'contain', width: '260px', height: '260px' }}
+            style={{
+              objectFit: 'contain',
+              width: isMobile ? '200px' : '240px',
+              height: isMobile ? '200px' : '240px',
+            }}
           />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 24,
@@ -326,19 +397,6 @@ function HeroA({ accent, particles, isMobile }: HeroProps) {
           </Link>
         </div>
 
-        {/* floating badge */}
-        <div style={{ marginTop: 36, display: 'flex', justifyContent: 'center', gap: 24, flexWrap: 'wrap',
-          animation: 'fadeIn 1s 0.8s ease both' }}>
-          {C.hero.badges.map((item, i) =>
-          <div key={i} style={{
-            fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: '#717182',
-            display: 'flex', alignItems: 'center', gap: 8
-          }}>
-              <div style={{ width: 6, height: 6, borderRadius: '50%', background: accent, opacity: 0.6 }} />
-              {item}
-            </div>
-          )}
-        </div>
       </div>
 
     </section>);
@@ -853,21 +911,7 @@ function AppSection({ accent, isMobile }: SectionProps) {
             })}
           </div>
 
-          {/* Download buttons */}
-          <div style={{ display: 'flex', gap: 12, marginTop: 36, flexWrap: 'wrap' }}>
-            {C.app.downloadButtons.map((s, i) =>
-            <a key={i} href="#" style={{
-              fontFamily: "'DM Sans',sans-serif", fontSize: 13, fontWeight: 600,
-              background: i === 0 ? accent : '#1a1a1a', color: 'white',
-              padding: '12px 24px', borderRadius: 100, textDecoration: 'none',
-              transition: 'all 0.2s', boxShadow: `0 4px 20px ${i === 0 ? accent : '#1a1a1a'}33`
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-            onMouseLeave={(e) => e.currentTarget.style.transform = ''}>
-                {s}
-              </a>
-            )}
-          </div>
+          <PilotSignup accent={accent} isMobile={isMobile} />
         </div>
 
         {/* Mockup alinhado ao 3º parágrafo */}
@@ -1314,12 +1358,12 @@ export default function HomePage() {
 
   return (
     <div>
-      <Nav accent={accent} dir={dir} isMobile={isMobile} />
-
       {dir === 'A' ?
-      <HeroA accent={accent} particles={particles} isMobile={isMobile} /> :
-
-      <HeroB accent={accent} particles={particles} />
+      <HeroA accent={accent} particles={particles} isMobile={isMobile} dir={dir} /> :
+      <>
+        <Nav accent={accent} dir={dir} isMobile={isMobile} />
+        <HeroB accent={accent} particles={particles} />
+      </>
       }
 
       <Marquee accent={accent} />
