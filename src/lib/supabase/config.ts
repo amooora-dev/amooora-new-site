@@ -11,9 +11,33 @@ export const SUPABASE_DB_SCHEMA =
 export const SUPABASE_STORAGE_BUCKET =
   process.env.SUPABASE_STORAGE_BUCKET ?? 'ecommerce-amooora-produtos';
 
+function envValue(key: string): string | undefined {
+  const value = process.env[key]?.trim();
+  return value || undefined;
+}
+
+export function getSupabaseUrl(): string | undefined {
+  return envValue('NEXT_PUBLIC_SUPABASE_URL');
+}
+
+export function getSupabaseAnonKey(): string | undefined {
+  return envValue('NEXT_PUBLIC_SUPABASE_ANON_KEY');
+}
+
+export function getSupabaseServiceKey(): string | undefined {
+  return envValue('SUPABASE_SERVICE_ROLE_KEY');
+}
+
+/** Chave para Server Components / admin (service role preferida) */
+export function getServerSupabaseKey(): string | undefined {
+  return getSupabaseServiceKey() ?? getSupabaseAnonKey();
+}
+
 export function isSupabaseConfigured(): boolean {
-  return Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  );
+  return Boolean(getSupabaseUrl() && getServerSupabaseKey());
+}
+
+/** Loja/cliente browser — exige anon key */
+export function isSupabaseBrowserConfigured(): boolean {
+  return Boolean(getSupabaseUrl() && getSupabaseAnonKey());
 }

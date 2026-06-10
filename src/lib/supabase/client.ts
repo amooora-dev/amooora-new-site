@@ -1,5 +1,12 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { SUPABASE_DB_SCHEMA, isSupabaseConfigured } from './config';
+import {
+  SUPABASE_DB_SCHEMA,
+  getSupabaseAnonKey,
+  getSupabaseUrl,
+  getServerSupabaseKey,
+  isSupabaseBrowserConfigured,
+  isSupabaseConfigured,
+} from './config';
 
 let browserClient: SupabaseClient<any, string, string> | null = null;
 
@@ -8,17 +15,17 @@ let browserClient: SupabaseClient<any, string, string> | null = null;
  * Retorna null se Supabase não estiver configurado (.env ausente).
  */
 export function createSupabaseBrowserClient(): SupabaseClient<any, string, string> | null {
-  if (!isSupabaseConfigured()) return null;
+  if (!isSupabaseBrowserConfigured()) return null;
+
+  const url = getSupabaseUrl();
+  const key = getSupabaseAnonKey();
+  if (!url || !key) return null;
 
   if (!browserClient) {
-    browserClient = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        db: { schema: SUPABASE_DB_SCHEMA },
-        auth: { persistSession: true },
-      }
-    );
+    browserClient = createClient(url, key, {
+      db: { schema: SUPABASE_DB_SCHEMA },
+      auth: { persistSession: true },
+    });
   }
 
   return browserClient;
@@ -30,13 +37,12 @@ export function createSupabaseBrowserClient(): SupabaseClient<any, string, strin
 export function createSupabaseServerClient(): SupabaseClient<any, string, string> | null {
   if (!isSupabaseConfigured()) return null;
 
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY ??
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      db: { schema: SUPABASE_DB_SCHEMA },
-      auth: { persistSession: false },
-    }
-  );
+  const url = getSupabaseUrl();
+  const key = getServerSupabaseKey();
+  if (!url || !key) return null;
+
+  return createClient(url, key, {
+    db: { schema: SUPABASE_DB_SCHEMA },
+    auth: { persistSession: false },
+  });
 }
