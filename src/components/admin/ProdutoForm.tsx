@@ -1,0 +1,378 @@
+'use client';
+
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
+import { useFormState, useFormStatus } from 'react-dom';
+import type { AdminProduct, AdminProductColor } from '@/lib/admin/product-repository';
+import type { ProductBadge, ProductCategory } from '@/lib/supabase/database.types';
+import { DEFAULT_WHATSAPP_MESSAGE } from '@/lib/supabase/map-product';
+import { slugify } from '@/lib/admin/slug';
+import { deleteImageAction, saveProductAction, type ActionState } from '@/app/admin/(protected)/produtos/actions';
+
+const CATEGORIES: { value: ProductCategory; label: string }[] = [
+  { value: 'camisetas', label: 'Camisetas' },
+  { value: 'moletons', label: 'Moletons' },
+  { value: 'acessorios', label: 'Acessórios' },
+];
+
+const BADGES: { value: ProductBadge | ''; label: string }[] = [
+  { value: '', label: 'Nenhum' },
+  { value: 'novo', label: 'Novo' },
+  { value: 'mais_vendido', label: 'Mais vendido' },
+  { value: 'edicao_limitada', label: 'Edição limitada' },
+];
+
+const DEFAULT_WHATSAPP_MSG = DEFAULT_WHATSAPP_MESSAGE;
+
+function SubmitButton({ label }: { label: string }) {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="rounded-full bg-primary px-8 py-3 font-sans text-sm font-semibold text-white transition hover:bg-tertiary disabled:opacity-60"
+    >
+      {pending ? 'Salvando…' : label}
+    </button>
+  );
+}
+
+const inputClass =
+  'w-full rounded-xl border border-black/10 px-4 py-2.5 font-sans text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20';
+
+const labelClass = 'mb-1 block font-sans text-sm font-medium text-ink';
+
+const INITIAL_FORM_STATE: ActionState = {};
+
+export function ProdutoForm({
+  product,
+  defaultWhatsappPhone,
+}: {
+  product?: AdminProduct;
+  defaultWhatsappPhone: string;
+}) {
+  const router = useRouter();
+  const [state, formAction] = useFormState<ActionState, FormData>(saveProductAction, INITIAL_FORM_STATE);
+  const formState = state ?? INITIAL_FORM_STATE;
+  const [name, setName] = useState(product?.name ?? '');
+  const [slug, setSlug] = useState(product?.slug ?? '');
+  const [slugTouched, setSlugTouched] = useState(Boolean(product?.slug));
+  const [colors, setColors] = useState<AdminProductColor[]>(
+    product?.colors?.length
+      ? product.colors
+      : [{ name: 'Roxo', hex_code: '#3a184f', available: true, sort_order: 0 }]
+  );
+  const [primaryImageId, setPrimaryImageId] = useState(
+    product?.images.find((i) => i.is_primary)?.id ?? product?.images[0]?.id ?? ''
+  );
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+
+  const colorsJson = useMemo(() => JSON.stringify(colors), [colors]);
+
+  const handleNameChange = (value: string) => {
+    setName(value);
+    if (!slugTouched) setSlug(slugify(value));
+  };
+
+  const addColor = () => {
+    setColors((c) => [...c, { name: '', hex_code: '#93296F', available: true, sort_order: c.length }]);
+  };
+
+  const updateColor = (index: number, patch: Partial<AdminProductColor>) => {
+    setColors((c) => c.map((item, i) => (i === index ? { ...item, ...patch } : item)));
+  };
+
+  const removeColor = (index: number) => {
+    setColors((c) => c.filter((_, i) => i !== index));
+  };
+
+  const handleFiles = (files: FileList | null) => {
+    if (!files) return;
+    setPreviewUrls(Array.from(files).map((f) => URL.createObjectURL(f)));
+  };
+
+  useEffect(() => {
+    if (formState.redirectTo) {
+      router.push(formState.redirectTo);
+    }
+  }, [formState.redirectTo, router]);
+
+  return (
+    <form action={formAction} className="mx-auto max-w-3xl space-y-8">
+      {product && <input type="hidden" name="product_id" value={product.id} />}
+      <input type="hidden" name="colors_json" value={colorsJson} readOnly />
+      <input type="hidden" name="primary_image_id" value={primaryImageId} readOnly />
+
+      {formState.error && (
+        <p className="rounded-xl bg-red-50 px-4 py-3 font-sans text-sm text-red-700" role="alert">
+          {formState.error}
+        </p>
+      )}
+
+      <section className="rounded-2xl bg-white p-6 shadow-sm">
+        <h2 className="mb-4 font-serif text-xl font-bold text-ink">Informações básicas</h2>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="md:col-span-2">
+            <label className={labelClass} htmlFor="name">Nome *</label>
+            <input
+              id="name"
+              name="name"
+              required
+              value={name}
+              onChange={(e) => handleNameChange(e.target.value)}
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label className={labelClass} htmlFor="slug">Slug (URL)</label>
+            <input
+              id="slug"
+              name="slug"
+              value={slug}
+              onChange={(e) => {
+                setSlugTouched(true);
+                setSlug(e.target.value);
+              }}
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label className={labelClass} htmlFor="sort_order">Ordem na loja</label>
+            <input
+              id="sort_order"
+              name="sort_order"
+              type="number"
+              defaultValue={product?.sort_order ?? 0}
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label className={labelClass} htmlFor="category">Categoria *</label>
+            <select
+              id="category"
+              name="category"
+              defaultValue={product?.category ?? 'camisetas'}
+              className={inputClass}
+            >
+              {CATEGORIES.map((c) => (
+                <option key={c.value} value={c.value}>{c.label}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className={labelClass} htmlFor="badge">Badge</label>
+            <select
+              id="badge"
+              name="badge"
+              defaultValue={product?.badge ?? ''}
+              className={inputClass}
+            >
+              {BADGES.map((b) => (
+                <option key={b.value || 'none'} value={b.value}>{b.label}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className={labelClass} htmlFor="price">Preço (R$) *</label>
+            <input
+              id="price"
+              name="price"
+              type="number"
+              step="0.01"
+              min="0"
+              required
+              defaultValue={product?.price ?? ''}
+              className={inputClass}
+            />
+          </div>
+          <div className="md:col-span-2">
+            <label className={labelClass} htmlFor="sizes">Tamanhos (separados por vírgula)</label>
+            <input
+              id="sizes"
+              name="sizes"
+              defaultValue={product?.sizes?.join(', ') ?? 'P, M, G, GG'}
+              className={inputClass}
+            />
+          </div>
+          <label className="flex items-center gap-2 font-sans text-sm">
+            <input type="checkbox" name="active" defaultChecked={product?.active ?? true} className="rounded" />
+            Produto ativo (visível na loja)
+          </label>
+          <label className="flex items-center gap-2 font-sans text-sm">
+            <input type="checkbox" name="featured" defaultChecked={product?.featured ?? false} className="rounded" />
+            Destaque
+          </label>
+        </div>
+      </section>
+
+      <section className="rounded-2xl bg-white p-6 shadow-sm">
+        <h2 className="mb-4 font-serif text-xl font-bold text-ink">Descrições</h2>
+        <div className="space-y-4">
+          <div>
+            <label className={labelClass} htmlFor="description_short">Descrição curta (card) *</label>
+            <textarea
+              id="description_short"
+              name="description_short"
+              required
+              rows={2}
+              defaultValue={product?.description_short ?? ''}
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label className={labelClass} htmlFor="description_full">Descrição completa (modal) *</label>
+            <textarea
+              id="description_full"
+              name="description_full"
+              required
+              rows={5}
+              defaultValue={product?.description_full ?? ''}
+              className={inputClass}
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-2xl bg-white p-6 shadow-sm">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="font-serif text-xl font-bold text-ink">Cores</h2>
+          <button type="button" onClick={addColor} className="font-sans text-sm font-medium text-primary hover:underline">
+            + Adicionar cor
+          </button>
+        </div>
+        <div className="space-y-3">
+          {colors.map((cor, i) => (
+            <div key={i} className="flex flex-wrap items-center gap-3 rounded-xl bg-muted/50 p-3">
+              <input
+                type="color"
+                value={cor.hex_code}
+                onChange={(e) => updateColor(i, { hex_code: e.target.value })}
+                className="h-10 w-10 cursor-pointer rounded-lg border-0"
+                aria-label="Cor"
+              />
+              <input
+                type="text"
+                placeholder="Nome da cor"
+                value={cor.name}
+                onChange={(e) => updateColor(i, { name: e.target.value })}
+                className={`${inputClass} max-w-[180px]`}
+              />
+              <label className="flex items-center gap-1 font-sans text-xs">
+                <input
+                  type="checkbox"
+                  checked={cor.available}
+                  onChange={(e) => updateColor(i, { available: e.target.checked })}
+                />
+                Disponível
+              </label>
+              {colors.length > 1 && (
+                <button type="button" onClick={() => removeColor(i)} className="font-sans text-xs text-red-600 hover:underline">
+                  Remover
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-2xl bg-white p-6 shadow-sm">
+        <h2 className="mb-4 font-serif text-xl font-bold text-ink">WhatsApp</h2>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div>
+            <label className={labelClass} htmlFor="whatsapp_phone">Telefone *</label>
+            <input
+              id="whatsapp_phone"
+              name="whatsapp_phone"
+              required
+              defaultValue={product?.whatsapp?.phone ?? defaultWhatsappPhone}
+              placeholder="5511970548406"
+              className={inputClass}
+            />
+          </div>
+          <div className="md:col-span-2">
+            <label className={labelClass} htmlFor="whatsapp_message">Mensagem</label>
+            <textarea
+              id="whatsapp_message"
+              name="whatsapp_message"
+              rows={3}
+              defaultValue={product?.whatsapp?.message_template ?? DEFAULT_WHATSAPP_MSG}
+              className={inputClass}
+            />
+            <p className="mt-1 font-sans text-xs text-muted-fg">
+              Variáveis: {'{produto}'}, {'{preco}'}, {'{cor}'}, {'{tamanho}'}, {'{link}'}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-2xl bg-white p-6 shadow-sm">
+        <h2 className="mb-4 font-serif text-xl font-bold text-ink">Fotos</h2>
+
+        {product?.images && product.images.length > 0 && (
+          <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {product.images.map((img) => (
+              <div
+                key={img.id}
+                className={`relative overflow-hidden rounded-xl border-2 ${
+                  primaryImageId === img.id ? 'border-primary' : 'border-transparent'
+                }`}
+              >
+                <div className="relative aspect-[3/4] bg-muted">
+                  <Image src={img.url} alt="" fill className="object-cover" sizes="120px" />
+                </div>
+                <div className="flex gap-1 p-2">
+                  <button
+                    type="button"
+                    onClick={() => setPrimaryImageId(img.id)}
+                    className="flex-1 rounded-lg bg-primary/10 py-1 font-sans text-[10px] font-medium text-primary"
+                  >
+                    {primaryImageId === img.id ? 'Principal' : 'Capa'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await deleteImageAction(img.id, product.id);
+                      router.refresh();
+                    }}
+                    className="rounded-lg bg-red-50 px-2 py-1 font-sans text-[10px] text-red-600"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <label className={labelClass} htmlFor="new_images">Adicionar fotos</label>
+        <input
+          id="new_images"
+          name="new_images"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          multiple
+          onChange={(e) => handleFiles(e.target.files)}
+          className="font-sans text-sm"
+        />
+        {previewUrls.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {previewUrls.map((url) => (
+              <div key={url} className="relative h-20 w-16 overflow-hidden rounded-lg">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={url} alt="" className="h-full w-full object-cover" />
+              </div>
+            ))}
+          </div>
+        )}
+        <p className="mt-2 font-sans text-xs text-muted-fg">
+          JPG, PNG ou WebP. Proporção recomendada 3:4 (900×1200px).
+        </p>
+      </section>
+
+      <div className="flex flex-wrap gap-3">
+        <SubmitButton label={product ? 'Salvar alterações' : 'Criar produto'} />
+      </div>
+    </form>
+  );
+}

@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import type { ProdutoLoja } from '@/lib/loja-data';
+import { buildWhatsappUrl } from '@/lib/supabase/map-product';
 
 type ProdutoModalProps = {
   produto: ProdutoLoja;
@@ -10,11 +11,10 @@ type ProdutoModalProps = {
 };
 
 export function ProdutoModal({ produto, onClose }: ProdutoModalProps) {
+  const imagens = produto.imagens.length ? produto.imagens : [produto.imagem];
   const [slideAtivo, setSlideAtivo] = useState(0);
   const [corSelecionada, setCorSelecionada] = useState(0);
-  const [tamanhoSelecionado, setTamanhoSelecionado] = useState(1);
-
-  const slides = 4;
+  const [tamanhoSelecionado, setTamanhoSelecionado] = useState(0);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -28,8 +28,14 @@ export function ProdutoModal({ produto, onClose }: ProdutoModalProps) {
     };
   }, [onClose]);
 
-  const prevSlide = () => setSlideAtivo((i) => (i - 1 + slides) % slides);
-  const nextSlide = () => setSlideAtivo((i) => (i + 1) % slides);
+  const whatsappUrl = useMemo(() => {
+    const cor = produto.cores[corSelecionada]?.nome;
+    const tamanho = produto.tamanhos[tamanhoSelecionado];
+    return buildWhatsappUrl(produto, { cor, tamanho });
+  }, [produto, corSelecionada, tamanhoSelecionado]);
+
+  const prevSlide = () => setSlideAtivo((i) => (i - 1 + imagens.length) % imagens.length);
+  const nextSlide = () => setSlideAtivo((i) => (i + 1) % imagens.length);
 
   return (
     <div
@@ -55,43 +61,46 @@ export function ProdutoModal({ produto, onClose }: ProdutoModalProps) {
         <div className="grid md:grid-cols-2">
           <div className="relative aspect-[3/4] overflow-hidden bg-muted md:aspect-auto md:min-h-[480px]">
             <Image
-              src={produto.imagem}
-              alt={produto.nome}
+              src={imagens[slideAtivo]}
+              alt={`${produto.nome} — foto ${slideAtivo + 1}`}
               fill
               className="object-cover object-center"
               sizes="(max-width: 768px) 100vw, 50vw"
             />
 
-            <button
-              type="button"
-              onClick={prevSlide}
-              aria-label="Imagem anterior"
-              className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-primary shadow-md transition hover:bg-white"
-            >
-              ‹
-            </button>
-            <button
-              type="button"
-              onClick={nextSlide}
-              aria-label="Próxima imagem"
-              className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-primary shadow-md transition hover:bg-white"
-            >
-              ›
-            </button>
-
-            <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-              {Array.from({ length: slides }).map((_, i) => (
+            {imagens.length > 1 && (
+              <>
                 <button
-                  key={i}
                   type="button"
-                  aria-label={`Imagem ${i + 1}`}
-                  onClick={() => setSlideAtivo(i)}
-                  className={`h-2 rounded-full transition-all ${
-                    i === slideAtivo ? 'w-6 bg-primary' : 'w-2 bg-white/70'
-                  }`}
-                />
-              ))}
-            </div>
+                  onClick={prevSlide}
+                  aria-label="Imagem anterior"
+                  className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-primary shadow-md transition hover:bg-white"
+                >
+                  ‹
+                </button>
+                <button
+                  type="button"
+                  onClick={nextSlide}
+                  aria-label="Próxima imagem"
+                  className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-primary shadow-md transition hover:bg-white"
+                >
+                  ›
+                </button>
+                <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+                  {imagens.map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      aria-label={`Imagem ${i + 1}`}
+                      onClick={() => setSlideAtivo(i)}
+                      className={`h-2 rounded-full transition-all ${
+                        i === slideAtivo ? 'w-6 bg-primary' : 'w-2 bg-white/70'
+                      }`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
           </div>
 
           <div className="flex flex-col gap-5 p-6 md:p-8">
@@ -112,27 +121,29 @@ export function ProdutoModal({ produto, onClose }: ProdutoModalProps) {
 
             <p className="font-serif text-2xl font-bold text-primary">{produto.preco}</p>
 
-            <div>
-              <p className="mb-2 font-sans text-sm font-medium text-ink">Cor</p>
-              <div className="flex gap-2">
-                {produto.cores.map((cor, i) => (
-                  <button
-                    key={cor.nome}
-                    type="button"
-                    aria-label={cor.nome}
-                    title={cor.nome}
-                    onClick={() => setCorSelecionada(i)}
-                    className={`h-8 w-8 rounded-full border-2 transition ${
-                      i === corSelecionada ? 'border-primary scale-110' : 'border-transparent'
-                    }`}
-                    style={{
-                      background: cor.hex,
-                      boxShadow: cor.hex === '#ffffff' ? 'inset 0 0 0 1px #e8eaf2' : undefined,
-                    }}
-                  />
-                ))}
+            {produto.cores.length > 0 && (
+              <div>
+                <p className="mb-2 font-sans text-sm font-medium text-ink">Cor</p>
+                <div className="flex gap-2">
+                  {produto.cores.map((cor, i) => (
+                    <button
+                      key={cor.nome}
+                      type="button"
+                      aria-label={cor.nome}
+                      title={cor.nome}
+                      onClick={() => setCorSelecionada(i)}
+                      className={`h-8 w-8 rounded-full border-2 transition ${
+                        i === corSelecionada ? 'border-primary scale-110' : 'border-transparent'
+                      }`}
+                      style={{
+                        background: cor.hex,
+                        boxShadow: cor.hex === '#ffffff' ? 'inset 0 0 0 1px #e8eaf2' : undefined,
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             <div>
               <p className="mb-2 font-sans text-sm font-medium text-ink">Tamanho</p>
@@ -158,20 +169,13 @@ export function ProdutoModal({ produto, onClose }: ProdutoModalProps) {
               {produto.descricaoCompleta}
             </p>
 
-            <button
-              type="button"
-              className="w-full rounded-full bg-primary px-6 py-3 font-sans text-sm font-semibold text-white transition hover:bg-tertiary"
-            >
-              Adicionar ao Carrinho
-            </button>
-
             <a
-              href={produto.shopUrl}
+              href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-center font-sans text-sm font-medium text-primary underline-offset-2 transition hover:text-tertiary hover:underline"
+              className="w-full rounded-full bg-primary px-6 py-3 text-center font-sans text-sm font-semibold text-white transition hover:bg-tertiary"
             >
-              Ir para o site da loja →
+              Comprar via WhatsApp
             </a>
           </div>
         </div>

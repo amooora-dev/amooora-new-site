@@ -19,6 +19,8 @@
  *   Referenciar em: PRODUTOS_LOJA[].imagem (ex.: '/images/loja/produtos/meu-produto.jpg')
  *   No CMS, cada produto terá o campo imagem próprio.
  */
+import { buildWhatsappUrl, DEFAULT_WHATSAPP_MESSAGE } from '@/lib/supabase/map-product';
+
 const IMG = {
   regataVagitariana: '/images/loja/produtos/regata-vagitariana.png',
   capaceteSapatao: '/images/loja/produtos/capacete-sapatao-vermelho.png',
@@ -46,16 +48,23 @@ export const CONTEUDO_LOJA = {
 } as const;
 
 export type ProdutoLoja = {
+  uuid: string;
+  slug: string;
   id: number;
   nome: string;
   categoria: 'Camisetas' | 'Moletons' | 'Acessórios';
   preco: string;
+  precoNumerico: number;
   badge: 'NOVO' | 'EDIÇÃO LIMITADA' | 'MAIS VENDIDO' | null;
   desc: string;
   descricaoCompleta: string;
   imagem: string;
+  imagens: string[];
   cores: { nome: string; hex: string }[];
   tamanhos: string[];
+  whatsappPhone: string;
+  whatsappMessageTemplate: string;
+  /** Link wa.me (atualizado conforme cor/tamanho no modal) */
   shopUrl: string;
 };
 
@@ -69,9 +78,15 @@ export const CATEGORIAS_LOJA = [
 
 export type CategoriaFiltro = (typeof CATEGORIAS_LOJA)[number];
 
-export const PRODUTOS_LOJA: ProdutoLoja[] = [
+type ProdutoLojaBase = Omit<
+  ProdutoLoja,
+  'uuid' | 'imagens' | 'precoNumerico' | 'whatsappPhone' | 'whatsappMessageTemplate' | 'shopUrl'
+>;
+
+const PRODUTOS_BASE: ProdutoLojaBase[] = [
   {
     id: 1,
+    slug: 'camiseta-sapatao-arco-iris',
     nome: 'Camiseta Sapatão Arco-íris',
     categoria: 'Camisetas',
     preco: 'R$ 84,90',
@@ -84,11 +99,11 @@ export const PRODUTOS_LOJA: ProdutoLoja[] = [
       { nome: 'Vinho', hex: '#93296F' },
     ],
     tamanhos: ['P', 'M', 'G', 'GG'],
-    shopUrl: 'https://amooora.myshopify.com',
     imagem: IMG.camisetaSapataoArcoIris,
   },
   {
     id: 2,
+    slug: 'camiseta-sapatao-preta',
     nome: 'Camiseta Sapatão Preta',
     categoria: 'Camisetas',
     preco: 'R$ 79,90',
@@ -101,11 +116,11 @@ export const PRODUTOS_LOJA: ProdutoLoja[] = [
       { nome: 'Vinho', hex: '#93296F' },
     ],
     tamanhos: ['P', 'M', 'G', 'GG'],
-    shopUrl: 'https://amooora.myshopify.com',
     imagem: IMG.camisetaSapataoPreta,
   },
   {
     id: 3,
+    slug: 'camiseta-sapatao-ringer-amarela',
     nome: 'Camiseta Sapatão Ringer Amarela',
     categoria: 'Camisetas',
     preco: 'R$ 74,90',
@@ -118,11 +133,11 @@ export const PRODUTOS_LOJA: ProdutoLoja[] = [
       { nome: 'Verde', hex: '#2d5016' },
     ],
     tamanhos: ['P', 'M', 'G', 'GG'],
-    shopUrl: 'https://amooora.myshopify.com',
     imagem: IMG.camisetaSapataoAmarela,
   },
   {
     id: 4,
+    slug: 'camiseta-quenga-ringer',
     nome: 'Camiseta Quenga Ringer',
     categoria: 'Camisetas',
     preco: 'R$ 74,90',
@@ -135,11 +150,11 @@ export const PRODUTOS_LOJA: ProdutoLoja[] = [
       { nome: 'Verde', hex: '#2d5016' },
     ],
     tamanhos: ['P', 'M', 'G', 'GG'],
-    shopUrl: 'https://amooora.myshopify.com',
     imagem: IMG.camisetaQuenga,
   },
   {
     id: 5,
+    slug: 'regata-vagitariana',
     nome: 'Regata Vagitariana',
     categoria: 'Camisetas',
     preco: 'R$ 69,90',
@@ -152,11 +167,11 @@ export const PRODUTOS_LOJA: ProdutoLoja[] = [
       { nome: 'Vinho', hex: '#93296F' },
     ],
     tamanhos: ['P', 'M', 'G', 'GG'],
-    shopUrl: 'https://amooora.myshopify.com',
     imagem: IMG.regataVagitariana,
   },
   {
     id: 6,
+    slug: 'moletom-sapatao-roxo',
     nome: 'Moletom Sapatão Roxo',
     categoria: 'Moletons',
     preco: 'R$ 189,90',
@@ -169,11 +184,11 @@ export const PRODUTOS_LOJA: ProdutoLoja[] = [
       { nome: 'Vinho', hex: '#93296F' },
     ],
     tamanhos: ['P', 'M', 'G', 'GG'],
-    shopUrl: 'https://amooora.myshopify.com',
     imagem: IMG.moletomSapataoRoxo,
   },
   {
     id: 7,
+    slug: 'bone-trucker-sapatao',
     nome: 'Boné Trucker Sapatão',
     categoria: 'Acessórios',
     preco: 'R$ 59,90',
@@ -186,11 +201,11 @@ export const PRODUTOS_LOJA: ProdutoLoja[] = [
       { nome: 'Branco', hex: '#ffffff' },
     ],
     tamanhos: ['Único'],
-    shopUrl: 'https://amooora.myshopify.com',
     imagem: IMG.boneSapatao,
   },
   {
     id: 8,
+    slug: 'capacete-sapatao-uvex',
     nome: 'Capacete Sapatão Uvex',
     categoria: 'Acessórios',
     preco: 'R$ 249,90',
@@ -202,15 +217,36 @@ export const PRODUTOS_LOJA: ProdutoLoja[] = [
       { nome: 'Vermelho', hex: '#c41e3a' },
     ],
     tamanhos: ['P', 'M', 'G'],
-    shopUrl: 'https://amooora.myshopify.com',
     imagem: IMG.capaceteSapatao,
   },
 ];
 
-export function filtrarProdutos(filtro: CategoriaFiltro) {
-  if (filtro === 'Todos') return PRODUTOS_LOJA;
+function parsePrecoBRL(preco: string): number {
+  return Number.parseFloat(preco.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+}
+
+function enrichProduto(p: ProdutoLojaBase): ProdutoLoja {
+  const precoNumerico = parsePrecoBRL(p.preco);
+  const whatsappPhone = process.env.WHATSAPP_DEFAULT_PHONE ?? '';
+  const produto: ProdutoLoja = {
+    ...p,
+    uuid: `static-${p.id}`,
+    imagens: [p.imagem],
+    precoNumerico,
+    whatsappPhone,
+    whatsappMessageTemplate: DEFAULT_WHATSAPP_MESSAGE,
+    shopUrl: '#',
+  };
+  produto.shopUrl = buildWhatsappUrl(produto);
+  return produto;
+}
+
+export const PRODUTOS_LOJA: ProdutoLoja[] = PRODUTOS_BASE.map(enrichProduto);
+
+export function filtrarProdutos(produtos: ProdutoLoja[], filtro: CategoriaFiltro) {
+  if (filtro === 'Todos') return produtos;
   if (filtro === 'Edição Limitada') {
-    return PRODUTOS_LOJA.filter((p) => p.badge === 'EDIÇÃO LIMITADA');
+    return produtos.filter((p) => p.badge === 'EDIÇÃO LIMITADA');
   }
-  return PRODUTOS_LOJA.filter((p) => p.categoria === filtro);
+  return produtos.filter((p) => p.categoria === filtro);
 }
