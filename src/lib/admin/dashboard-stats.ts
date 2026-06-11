@@ -1,6 +1,6 @@
 import { PRODUTOS_LOJA } from '@/lib/loja-data';
-import { createSupabaseServerClient } from '@/lib/supabase/client';
-import { isSupabaseConfigured, SUPABASE_DB_SCHEMA } from '@/lib/supabase/config';
+import { createSupabaseAdminClient } from '@/lib/supabase/client';
+import { isSupabaseAdminConfigured, SUPABASE_DB_SCHEMA } from '@/lib/supabase/config';
 
 export type DashboardStats = {
   source: 'supabase' | 'static';
@@ -32,9 +32,9 @@ function staticStats(): DashboardStats {
 }
 
 export async function getDashboardStats(): Promise<DashboardStats> {
-  if (!isSupabaseConfigured()) return staticStats();
+  if (!isSupabaseAdminConfigured()) return staticStats();
 
-  const supabase = createSupabaseServerClient();
+  const supabase = createSupabaseAdminClient();
   if (!supabase) return staticStats();
 
   const { data, error } = await supabase

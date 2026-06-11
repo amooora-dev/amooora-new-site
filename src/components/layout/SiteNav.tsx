@@ -11,6 +11,8 @@ type SiteNavProps = {
   dir?: 'A' | 'B';
   layout?: 'default' | 'hero';
   page?: 'home' | 'loja';
+  /** Nav transparente sobre hero escuro (modelo 1 da loja) */
+  navOverDark?: boolean;
 };
 
 function navHref(id: string, page: 'home' | 'loja') {
@@ -24,6 +26,7 @@ export function SiteNav({
   dir = 'A',
   layout = 'default',
   page = 'home',
+  navOverDark,
 }: SiteNavProps) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -34,7 +37,7 @@ export function SiteNav({
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const overDarkHero = page === 'loja' && !scrolled;
+  const overDarkHero = (navOverDark ?? page === 'loja') && page === 'loja' && !scrolled;
 
   const navStyle: CSSProperties = {
     position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,

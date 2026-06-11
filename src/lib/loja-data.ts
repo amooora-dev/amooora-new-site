@@ -8,8 +8,9 @@
  *   Deixe o foco visual no centro/direita — o texto fica à esquerda.
  *
  * Para trocar o banner:
- * 1. Substitua public/images/loja/banner-hero.png (mesmo nome), ou
- * 2. Altere hero.imagem abaixo.
+ * 1. Modelo 1: substitua public/images/loja/banner-hero-modelo-1.png
+ * 2. Modelo 2: substitua produtos em produtosDestaque ou banner-hero-modelo-2-visual.png
+ * 3. Altere hero.modelo (1 ou 2) abaixo.
  *
  * Thumbs dos produtos — tamanho recomendado:
  *   900 × 1200 px  (proporção 3:4, igual ao card)
@@ -32,10 +33,28 @@ const IMG = {
   camisetaSapataoArcoIris: '/images/loja/produtos/camiseta-sapatao-arco-iris.png',
 } as const;
 
+export type LojaHeroModelo = 1 | 2;
+
 export const CONTEUDO_LOJA = {
   hero: {
-    imagem: '/images/loja/banner-hero.png',
-    /** Referência de altura máxima do hero em px (usado no layout) */
+    /** 1 = banner full-bleed | 2 = produtos à esquerda + texto à direita */
+    modelo: 2 as LojaHeroModelo,
+    /** Modelo 1 — banner de fundo (cópia do hero original) */
+    imagemModelo1: '/images/loja/banner-hero-modelo-1.png',
+    /**
+     * Modelo 2 — imagem única à esquerda (opcional).
+     * Deixe vazio ('') para usar o mosaico em produtosDestaque.
+     * Troque o arquivo em public/images/loja/banner-hero-modelo-2-visual.png
+     */
+    imagemVisual: '/images/loja/banner-hero-modelo-2-visual.png',
+    /** Modelo 2 — mosaico de produtos (ordem: sup-esq, sup-dir, inf-esq, inf-dir) */
+    produtosDestaque: [
+      '/images/loja/produtos/regata-vagitariana.png',
+      '/images/loja/produtos/camiseta-sapatao-amarela-ringer.png',
+      '/images/loja/produtos/camiseta-sapatao-preta.png',
+      '/images/loja/produtos/camiseta-sapatao-arco-iris.png',
+    ],
+    /** Referência de altura máxima do hero em px (modelo 1) */
     alturaMaxPx: 580,
     label: 'LOJA AMOOORA',
     titulo: 'Vista sua identidade sáfica',
@@ -44,6 +63,10 @@ export const CONTEUDO_LOJA = {
       'Cada peça é feita com amor, representatividade e orgulho sáfico. Produtos feitos por nós, para nós.',
     ctaPrimario: 'Ver Coleção',
     ctaSecundario: 'Nossa História',
+  },
+  filtros: {
+    titulo: 'Filtrar por categoria',
+    descricao: 'Selecione uma categoria para ver camisetas, moletons, acessórios e edições limitadas.',
   },
 } as const;
 

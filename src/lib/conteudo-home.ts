@@ -34,12 +34,6 @@ export const CONTEUDO_HOME = {
     badges: ['10k+ usuárias', 'Comunidade ativa', '100% seguro']
   },
 
-  video: {
-    eyebrow: 'Nossa comunidade',
-    titleLine1: 'Existir com coragem,',
-    titleHighlight: 'afeto e liberdade.'
-  },
-
   manifesto: {
     label: 'Manifesto',
     image: '/images/manifesto.png',

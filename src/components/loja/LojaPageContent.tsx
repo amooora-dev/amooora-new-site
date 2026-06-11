@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { SiteNav } from '@/components/layout/SiteNav';
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import { ProdutoModal } from '@/components/loja/ProdutoModal';
+import { LojaHero, lojaNavOverDark } from '@/components/loja/LojaHero';
 import {
   CATEGORIAS_LOJA,
   CONTEUDO_LOJA,
@@ -15,9 +16,8 @@ import {
   type ProdutoLoja,
 } from '@/lib/loja-data';
 
-const { hero } = CONTEUDO_LOJA;
-
 const ACCENT = '#93296F';
+const { hero, filtros } = CONTEUDO_LOJA;
 
 function SectionLabel({ children, light = false }: { children: React.ReactNode; light?: boolean }) {
   return (
@@ -134,80 +134,69 @@ export function LojaPageContent({
 
   return (
     <main className="min-h-screen bg-white">
-      <SiteNav accent={ACCENT} isMobile={isMobile} layout="default" page="loja" />
+      <SiteNav
+        accent={ACCENT}
+        isMobile={isMobile}
+        dir="A"
+        layout="hero"
+        page="loja"
+        navOverDark={lojaNavOverDark(hero.modelo)}
+      />
 
-      {/* Hero — imagem de fundo full-bleed (caminho em CONTEUDO_LOJA.hero.imagem) */}
+      <LojaHero modelo={hero.modelo} navOffset={navOffset} isMobile={isMobile} />
+
+      {/* Filtros — fora do hero, seção dedicada */}
       <section
-        className="relative w-full overflow-hidden"
-        style={{ minHeight: `min(62vh, ${hero.alturaMaxPx}px)` }}
+        id="produtos"
+        aria-labelledby="loja-filtros-titulo"
+        className="border-b border-black/5 bg-off-white"
       >
-        <Image
-          src={hero.imagem}
-          alt=""
-          fill
-          priority
-          className="object-cover object-center"
-          sizes="100vw"
-          aria-hidden="true"
-        />
-        <div
-          className="absolute inset-0 bg-gradient-to-r from-[#1a1a1a]/85 via-[#3a184f]/70 to-[#3a184f]/40"
-          aria-hidden="true"
-        />
+        <div className="mx-auto max-w-[1200px] px-6 py-8 md:px-12 lg:px-20">
+          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p
+                id="loja-filtros-titulo"
+                className="mb-1 font-sans text-xs font-semibold uppercase tracking-[0.2em] text-primary"
+              >
+                {filtros.titulo}
+              </p>
+              <p className="max-w-xl font-sans text-sm text-muted-fg">{filtros.descricao}</p>
+            </div>
+            <p className="font-sans text-sm text-muted-fg" aria-live="polite">
+              <span className="font-semibold text-ink">{produtosFiltrados.length}</span>{' '}
+              {produtosFiltrados.length === 1 ? 'produto' : 'produtos'}
+              {filtro !== 'Todos' && (
+                <span className="text-primary"> · {filtro}</span>
+              )}
+            </p>
+          </div>
 
-        <div
-          className="relative z-10 mx-auto flex max-w-[1200px] flex-col justify-center px-6 pb-10 md:px-12 lg:px-20"
-          style={{ minHeight: `min(62vh, ${hero.alturaMaxPx}px)`, paddingTop: navOffset }}
-        >
-          <SectionLabel light>{hero.label}</SectionLabel>
-          <h1 className="mb-4 max-w-3xl font-serif text-4xl font-bold leading-tight text-white md:text-5xl lg:text-[64px]">
-            {hero.titulo}
-          </h1>
-          <p className="mb-6 font-serif text-xl italic text-white md:text-2xl">
-            {hero.subtitulo}
-          </p>
-          <p className="mb-8 max-w-xl font-sans text-lg leading-relaxed text-white">
-            {hero.descricao}
-          </p>
-          <div className="mb-5 flex flex-wrap gap-4">
-            <a
-              href="#produtos"
-              className="rounded-full bg-primary px-6 py-3 font-sans text-sm font-semibold text-white transition hover:bg-tertiary"
-            >
-              {hero.ctaPrimario}
-            </a>
-            <Link
-              href="/#manifesto"
-              className="rounded-full border border-white/70 px-6 py-3 font-sans text-sm font-semibold text-white transition hover:bg-white/10"
-            >
-              {hero.ctaSecundario}
-            </Link>
+          <div
+            role="group"
+            aria-label="Categorias de produtos"
+            className="flex flex-wrap gap-2"
+          >
+            {CATEGORIAS_LOJA.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setFiltro(cat)}
+                aria-pressed={filtro === cat}
+                className={`shrink-0 rounded-full px-5 py-2 font-sans text-sm font-medium transition ${
+                  filtro === cat
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'border border-primary bg-white text-primary hover:bg-primary/5'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Filtros */}
-      <div className="sticky top-[72px] z-50 border-b border-black/5 bg-white shadow-sm md:top-[84px]">
-        <div className="mx-auto flex max-w-[1200px] gap-2 overflow-x-auto px-6 py-4 md:px-12 lg:px-20">
-          {CATEGORIAS_LOJA.map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              onClick={() => setFiltro(cat)}
-              className={`shrink-0 rounded-full px-5 py-2 font-sans text-sm font-medium transition ${
-                filtro === cat
-                  ? 'bg-primary text-white'
-                  : 'border border-primary text-primary hover:bg-primary/5'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Galeria */}
-      <section id="produtos" className="bg-off-white py-16 md:py-20">
+      <section className="bg-off-white py-16 md:py-20">
         {dataSource === 'static' && dataError && process.env.NODE_ENV === 'development' && (
           <p className="mx-auto mb-6 max-w-2xl px-6 text-center font-sans text-xs text-amber-800">
             Fallback estático: {dataError}

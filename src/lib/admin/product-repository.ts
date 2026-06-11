@@ -1,4 +1,4 @@
-import { createSupabaseServerClient } from '@/lib/supabase/client';
+import { createSupabaseAdminClient } from '@/lib/supabase/client';
 import { SUPABASE_STORAGE_BUCKET } from '@/lib/supabase/config';
 import type { ProductBadge, ProductCategory } from '@/lib/supabase/database.types';
 import { slugify } from './slug';
@@ -61,8 +61,12 @@ export type ProductFormInput = {
 };
 
 function db() {
-  const client = createSupabaseServerClient();
-  if (!client) throw new Error('Supabase não configurado. Verifique o .env');
+  const client = createSupabaseAdminClient();
+  if (!client) {
+    throw new Error(
+      'SUPABASE_SERVICE_ROLE_KEY não configurada. Adicione a service role na Vercel (Settings → Environment Variables).'
+    );
+  }
   return client;
 }
 

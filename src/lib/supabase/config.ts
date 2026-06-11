@@ -41,3 +41,8 @@ export function isSupabaseConfigured(): boolean {
 export function isSupabaseBrowserConfigured(): boolean {
   return Boolean(getSupabaseUrl() && getSupabaseAnonKey());
 }
+
+/** Admin/CMS — exige service role (bypass RLS + INSERT/UPDATE/DELETE) */
+export function isSupabaseAdminConfigured(): boolean {
+  return Boolean(getSupabaseUrl() && getSupabaseServiceKey());
+}

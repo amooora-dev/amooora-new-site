@@ -443,19 +443,6 @@ function VideoSection({ isMobile }: MobileProps) {
         pointerEvents: 'none'
       }} />
 
-      {/* Text */}
-      <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', padding: '0 32px', pointerEvents: 'none' }}>
-        <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, letterSpacing: '0.22em',
-          textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)', marginBottom: 16 }}>
-          {C.video.eyebrow}
-        </p>
-        <h2 style={{ fontFamily: "'Playfair Display',serif",
-          fontSize: 'clamp(32px,5vw,72px)', fontWeight: 900,
-          color: 'white', lineHeight: 1.1, textShadow: '0 4px 32px rgba(0,0,0,0.4)' }}>
-          {C.video.titleLine1}<br /><em>{C.video.titleHighlight}</em>
-        </h2>
-      </div>
-
       {/* Video controls */}
       <div style={{
         position: 'absolute', bottom: 28, right: 28, zIndex: 10,
