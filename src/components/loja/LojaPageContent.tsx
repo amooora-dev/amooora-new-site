@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { SiteNav } from '@/components/layout/SiteNav';
 import { SiteFooter } from '@/components/layout/SiteFooter';
-import { ProdutoModal } from '@/components/loja/ProdutoModal';
+import { ColorSwatches } from '@/components/loja/product/ColorSwatches';
+import { ProductImageGallery } from '@/components/loja/product/ProductImageGallery';
 import { LojaHero, lojaNavOverDark } from '@/components/loja/LojaHero';
 import {
   CATEGORIAS_LOJA,
@@ -42,62 +43,76 @@ function WhatsAppIcon() {
 function ProdutoCard({
   produto,
   index,
-  onSelect,
 }: {
   produto: ProdutoLoja;
   index: number;
-  onSelect: (p: ProdutoLoja) => void;
 }) {
+  const router = useRouter();
+  const imagens = produto.imagens.length ? produto.imagens : [produto.imagem];
+  const [imgAtiva, setImgAtiva] = useState(0);
+  const [corAtiva, setCorAtiva] = useState(0);
+
+  const whatsappUrl = buildWhatsappUrl(produto, {
+    cor: produto.cores[corAtiva]?.nome,
+  });
+
   return (
     <article
       className="group animate-fadeUp overflow-hidden rounded-3xl bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
       style={{ animationDelay: `${index * 0.08}s` }}
     >
-      <div className="relative aspect-[3/4] overflow-hidden bg-muted">
-        <Image
-          src={produto.imagem}
+      <div className="relative">
+        <ProductImageGallery
+          variant="card"
+          imagens={imagens}
           alt={produto.nome}
-          fill
-          className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          activeIndex={imgAtiva}
+          onIndexChange={setImgAtiva}
+          onMainImageClick={() => router.push(`/loja/${produto.slug}`)}
         />
 
         {produto.badge && (
-          <span className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 font-sans text-xs font-semibold uppercase tracking-wide text-white">
+          <span className="pointer-events-none absolute left-3 top-3 z-10 rounded-full bg-primary px-3 py-1 font-sans text-xs font-semibold uppercase tracking-wide text-white">
             {produto.badge}
           </span>
         )}
 
-        <div className="absolute inset-0 flex items-center justify-center bg-primary/0 opacity-0 transition-all duration-300 group-hover:bg-primary/20 group-hover:opacity-100">
-          <button
-            type="button"
-            onClick={() => onSelect(produto)}
-            className="translate-y-2 rounded-full bg-white px-5 py-2.5 font-sans text-sm font-semibold text-primary shadow-md transition group-hover:translate-y-0"
-          >
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-primary/0 opacity-0 transition-all duration-300 group-hover:bg-primary/20 group-hover:opacity-100">
+          <span className="translate-y-2 rounded-full bg-white px-5 py-2.5 font-sans text-sm font-semibold text-primary shadow-md transition group-hover:translate-y-0">
             Ver Detalhes
-          </button>
+          </span>
         </div>
       </div>
 
-      <div className="p-4">
+      <Link href={`/loja/${produto.slug}`} className="block p-4">
         <p className="mb-1 font-sans text-xs font-semibold uppercase tracking-widest text-muted-fg">
           {produto.categoria}
         </p>
         <h3 className="mb-1 font-sans text-base font-medium text-ink">{produto.nome}</h3>
-        <p className="mb-4 line-clamp-2 font-sans text-sm text-muted-fg">{produto.desc}</p>
+        <p className="mb-3 line-clamp-2 font-sans text-sm text-muted-fg">{produto.desc}</p>
+
+        <ColorSwatches
+          cores={produto.cores}
+          selectedIndex={corAtiva}
+          onSelect={(i) => { setCorAtiva(i); }}
+          size="sm"
+          className="mb-4"
+        />
+
         <div className="flex items-center justify-between">
           <span className="font-serif text-xl font-bold text-primary">{produto.preco}</span>
           <a
-            href={buildWhatsappUrl(produto)}
+            href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`Comprar ${produto.nome} via WhatsApp`}
+            onClick={(e) => e.stopPropagation()}
             className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-white transition hover:brightness-95"
           >
             <WhatsAppIcon />
           </a>
         </div>
-      </div>
+      </Link>
     </article>
   );
 }
@@ -113,15 +128,15 @@ export function LojaPageContent({
 }) {
   const [isMobile, setIsMobile] = useState(false);
   const [filtro, setFiltro] = useState<CategoriaFiltro>('Todos');
-  const [produtoSelecionado, setProdutoSelecionado] = useState<ProdutoLoja | null>(null);
   const searchParams = useSearchParams();
 
   useEffect(() => {
     const slug = searchParams.get('produto');
-    if (!slug) return;
-    const produto = produtos.find((p) => p.slug === slug);
-    if (produto) setProdutoSelecionado(produto);
-  }, [searchParams, produtos]);
+    if (slug) {
+      // redireciona para a página de detalhe se acessado via ?produto=slug (compatibilidade)
+      window.location.replace(`/loja/${slug}`);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const sync = () => setIsMobile(window.innerWidth <= 900);
@@ -209,7 +224,6 @@ export function LojaPageContent({
               key={produto.uuid}
               produto={produto}
               index={i}
-              onSelect={setProdutoSelecionado}
             />
           ))}
         </div>
@@ -263,13 +277,6 @@ export function LojaPageContent({
       </section>
 
       <SiteFooter accent={ACCENT} isMobile={isMobile} page="loja" />
-
-      {produtoSelecionado && (
-        <ProdutoModal
-          produto={produtoSelecionado}
-          onClose={() => setProdutoSelecionado(null)}
-        />
-      )}
     </main>
   );
 }

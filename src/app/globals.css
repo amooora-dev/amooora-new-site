@@ -60,3 +60,25 @@ body {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
 }
+
+/* Descrição rica do produto (modal) */
+.product-description p { margin-bottom: 0.75rem; }
+.product-description p:last-child { margin-bottom: 0; }
+.product-description strong,
+.product-description b { font-weight: 600; color: var(--ink); }
+.product-description ul,
+.product-description ol { margin: 0.5rem 0 0.75rem 1.25rem; }
+.product-description li { margin-bottom: 0.35rem; }
+.product-description h3,
+.product-description h4 {
+  font-family: var(--serif);
+  font-weight: 700;
+  color: var(--ink);
+  margin: 1rem 0 0.5rem;
+}
+.product-description blockquote {
+  border-left: 3px solid var(--primary);
+  padding-left: 1rem;
+  margin: 0.75rem 0;
+  color: var(--ink-mid);
+}

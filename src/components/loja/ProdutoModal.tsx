@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import Image from 'next/image';
 import type { ProdutoLoja } from '@/lib/loja-data';
 import { buildWhatsappUrl } from '@/lib/supabase/map-product';
+import { ColorSwatches } from '@/components/loja/product/ColorSwatches';
+import { ProductDescription } from '@/components/loja/product/ProductDescription';
+import { ProductImageGallery } from '@/components/loja/product/ProductImageGallery';
 
 type ProdutoModalProps = {
   produto: ProdutoLoja;
@@ -17,8 +19,20 @@ export function ProdutoModal({ produto, onClose }: ProdutoModalProps) {
   const [tamanhoSelecionado, setTamanhoSelecionado] = useState(0);
 
   useEffect(() => {
+    setSlideAtivo(0);
+    setCorSelecionada(0);
+    setTamanhoSelecionado(0);
+  }, [produto.uuid]);
+
+  useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
+      if (imagens.length > 1 && e.key === 'ArrowLeft') {
+        setSlideAtivo((i) => (i - 1 + imagens.length) % imagens.length);
+      }
+      if (imagens.length > 1 && e.key === 'ArrowRight') {
+        setSlideAtivo((i) => (i + 1) % imagens.length);
+      }
     };
     document.body.style.overflow = 'hidden';
     window.addEventListener('keydown', onKey);
@@ -26,16 +40,13 @@ export function ProdutoModal({ produto, onClose }: ProdutoModalProps) {
       document.body.style.overflow = '';
       window.removeEventListener('keydown', onKey);
     };
-  }, [onClose]);
+  }, [onClose, imagens.length]);
 
   const whatsappUrl = useMemo(() => {
     const cor = produto.cores[corSelecionada]?.nome;
     const tamanho = produto.tamanhos[tamanhoSelecionado];
     return buildWhatsappUrl(produto, { cor, tamanho });
   }, [produto, corSelecionada, tamanhoSelecionado]);
-
-  const prevSlide = () => setSlideAtivo((i) => (i - 1 + imagens.length) % imagens.length);
-  const nextSlide = () => setSlideAtivo((i) => (i + 1) % imagens.length);
 
   return (
     <div
@@ -53,55 +64,19 @@ export function ProdutoModal({ produto, onClose }: ProdutoModalProps) {
           type="button"
           onClick={onClose}
           aria-label="Fechar"
-          className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-ink shadow-md transition hover:bg-muted"
+          className="absolute right-4 top-4 z-30 flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white text-xl text-ink shadow-md transition hover:bg-muted"
         >
           ×
         </button>
 
         <div className="grid md:grid-cols-2">
-          <div className="relative aspect-[3/4] overflow-hidden bg-muted md:aspect-auto md:min-h-[480px]">
-            <Image
-              src={imagens[slideAtivo]}
-              alt={`${produto.nome} — foto ${slideAtivo + 1}`}
-              fill
-              className="object-cover object-center"
-              sizes="(max-width: 768px) 100vw, 50vw"
-            />
-
-            {imagens.length > 1 && (
-              <>
-                <button
-                  type="button"
-                  onClick={prevSlide}
-                  aria-label="Imagem anterior"
-                  className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-primary shadow-md transition hover:bg-white"
-                >
-                  ‹
-                </button>
-                <button
-                  type="button"
-                  onClick={nextSlide}
-                  aria-label="Próxima imagem"
-                  className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-primary shadow-md transition hover:bg-white"
-                >
-                  ›
-                </button>
-                <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-                  {imagens.map((_, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      aria-label={`Imagem ${i + 1}`}
-                      onClick={() => setSlideAtivo(i)}
-                      className={`h-2 rounded-full transition-all ${
-                        i === slideAtivo ? 'w-6 bg-primary' : 'w-2 bg-white/70'
-                      }`}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
+          <ProductImageGallery
+            variant="modal"
+            imagens={imagens}
+            alt={produto.nome}
+            activeIndex={slideAtivo}
+            onIndexChange={setSlideAtivo}
+          />
 
           <div className="flex flex-col gap-5 p-6 md:p-8">
             <div className="flex flex-wrap items-center gap-2">
@@ -121,29 +96,12 @@ export function ProdutoModal({ produto, onClose }: ProdutoModalProps) {
 
             <p className="font-serif text-2xl font-bold text-primary">{produto.preco}</p>
 
-            {produto.cores.length > 0 && (
-              <div>
-                <p className="mb-2 font-sans text-sm font-medium text-ink">Cor</p>
-                <div className="flex gap-2">
-                  {produto.cores.map((cor, i) => (
-                    <button
-                      key={cor.nome}
-                      type="button"
-                      aria-label={cor.nome}
-                      title={cor.nome}
-                      onClick={() => setCorSelecionada(i)}
-                      className={`h-8 w-8 rounded-full border-2 transition ${
-                        i === corSelecionada ? 'border-primary scale-110' : 'border-transparent'
-                      }`}
-                      style={{
-                        background: cor.hex,
-                        boxShadow: cor.hex === '#ffffff' ? 'inset 0 0 0 1px #e8eaf2' : undefined,
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-            )}
+            <ColorSwatches
+              cores={produto.cores}
+              selectedIndex={corSelecionada}
+              onSelect={setCorSelecionada}
+              size="md"
+            />
 
             <div>
               <p className="mb-2 font-sans text-sm font-medium text-ink">Tamanho</p>
@@ -165,15 +123,13 @@ export function ProdutoModal({ produto, onClose }: ProdutoModalProps) {
               </div>
             </div>
 
-            <p className="font-sans text-sm leading-relaxed text-muted-fg">
-              {produto.descricaoCompleta}
-            </p>
+            <ProductDescription html={produto.descricaoCompleta} />
 
             <a
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full rounded-full bg-accent px-6 py-3 text-center font-sans text-sm font-semibold text-white transition hover:brightness-95"
+              className="mt-auto w-full rounded-full bg-accent px-6 py-3 text-center font-sans text-sm font-semibold text-white transition hover:brightness-95"
             >
               Comprar via WhatsApp
             </a>

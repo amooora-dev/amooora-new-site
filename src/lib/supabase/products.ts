@@ -10,6 +10,11 @@ export type StoreProductsResult = {
   error: string | null;
 };
 
+export type SingleProductResult = {
+  produto: ProdutoLoja | null;
+  source: 'supabase' | 'static';
+};
+
 function staticFallback(error: string | null): StoreProductsResult {
   return {
     produtos: PRODUTOS_LOJA,
@@ -41,5 +46,38 @@ export async function fetchStoreProducts(): Promise<StoreProductsResult> {
     ),
     source: 'supabase',
     error: null,
+  };
+}
+
+export async function fetchSingleProduct(slug: string): Promise<SingleProductResult> {
+  if (!isSupabaseConfigured()) {
+    return {
+      produto: PRODUTOS_LOJA.find((p) => p.slug === slug) ?? null,
+      source: 'static',
+    };
+  }
+
+  const supabase = createSupabaseServerClient();
+  if (!supabase) {
+    return {
+      produto: PRODUTOS_LOJA.find((p) => p.slug === slug) ?? null,
+      source: 'static',
+    };
+  }
+
+  const { data, error } = await supabase
+    .from('store_products')
+    .select('*')
+    .eq('slug', slug)
+    .single();
+
+  if (error || !data) {
+    const staticProduto = PRODUTOS_LOJA.find((p) => p.slug === slug) ?? null;
+    return { produto: staticProduto, source: 'static' };
+  }
+
+  return {
+    produto: mapStoreProductToProdutoLoja(data as StoreProduct, 0),
+    source: 'supabase',
   };
 }

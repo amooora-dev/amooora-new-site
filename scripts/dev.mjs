@@ -82,7 +82,7 @@ if (forceClean) {
 }
 
 setTimeout(() => {
-  const child = spawn('next', ['dev', '-p', port], {
+  const child = spawn('./node_modules/.bin/next', ['dev', '-p', port], {
     cwd: root,
     stdio: 'inherit',
     shell: false,

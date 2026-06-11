@@ -214,6 +214,9 @@ export function ProdutoForm({
           </div>
           <div>
             <label className={adminLabelClass} htmlFor="description_full">Descrição completa (modal) *</label>
+            <p className="mb-2 font-sans text-xs text-muted-fg">
+              Suporta parágrafos (linha em branco), <strong>**negrito**</strong>, HTML básico (p, br, strong, ul, li) e emojis.
+            </p>
             <textarea
               id="description_full"
               name="description_full"
