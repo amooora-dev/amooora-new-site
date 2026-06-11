@@ -5,10 +5,11 @@ import { CONTEUDO_HOME as C } from '@/lib/conteudo-home';
 
 type PilotSignupProps = {
   accent: string;
+  cta: string;
   isMobile: boolean;
 };
 
-export function PilotSignup({ accent, isMobile }: PilotSignupProps) {
+export function PilotSignup({ accent, cta, isMobile }: PilotSignupProps) {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -28,7 +29,7 @@ export function PilotSignup({ accent, isMobile }: PilotSignupProps) {
   return (
     <div style={{ marginTop: 36 }}>
       <p style={{
-        fontFamily: "'DM Sans',sans-serif",
+        fontFamily: "var(--sans)",
         fontSize: 'clamp(15px,1.4vw,17px)',
         fontWeight: 400,
         lineHeight: 1.7,
@@ -46,25 +47,25 @@ export function PilotSignup({ accent, isMobile }: PilotSignupProps) {
           return !v;
         })}
         style={{
-          fontFamily: "'DM Sans',sans-serif",
+          fontFamily: "var(--sans)",
           fontSize: 15,
           fontWeight: 600,
-          background: accent,
+          background: cta,
           color: 'white',
           padding: '12px 28px',
           borderRadius: 100,
           border: 'none',
           cursor: 'pointer',
-          boxShadow: `0 8px 32px ${accent}44`,
+          boxShadow: `0 8px 32px ${cta}44`,
           transition: 'all 0.25s',
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = 'translateY(-2px)';
-          e.currentTarget.style.boxShadow = `0 12px 40px ${accent}55`;
+          e.currentTarget.style.boxShadow = `0 12px 40px ${cta}55`;
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.transform = '';
-          e.currentTarget.style.boxShadow = `0 8px 32px ${accent}44`;
+          e.currentTarget.style.boxShadow = `0 8px 32px ${cta}44`;
         }}
       >
         {pilot.cta}
@@ -81,7 +82,7 @@ export function PilotSignup({ accent, isMobile }: PilotSignupProps) {
         }}>
           {submitted ? (
             <p style={{
-              fontFamily: "'DM Sans',sans-serif",
+              fontFamily: "var(--sans)",
               fontSize: 15,
               fontWeight: 500,
               color: accent,
@@ -107,7 +108,7 @@ export function PilotSignup({ accent, isMobile }: PilotSignupProps) {
                   borderRadius: 8,
                   border: '1px solid #e8eaf2',
                   padding: '0 16px',
-                  fontFamily: "'DM Sans',sans-serif",
+                  fontFamily: "var(--sans)",
                   fontSize: 16,
                   color: '#0f1b3d',
                   outline: 'none',
@@ -123,9 +124,9 @@ export function PilotSignup({ accent, isMobile }: PilotSignupProps) {
                   padding: '0 24px',
                   borderRadius: 100,
                   border: 'none',
-                  background: accent,
+                  background: cta,
                   color: 'white',
-                  fontFamily: "'DM Sans',sans-serif",
+                  fontFamily: "var(--sans)",
                   fontSize: 14,
                   fontWeight: 600,
                   cursor: 'pointer',

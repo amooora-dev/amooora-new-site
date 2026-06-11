@@ -45,7 +45,7 @@ export function AdminButton({
     'inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 font-sans text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 disabled:pointer-events-none disabled:opacity-50';
 
   const variants = {
-    primary: 'bg-primary text-white shadow-sm hover:bg-tertiary hover:shadow-md active:scale-[0.98]',
+    primary: 'bg-accent text-white shadow-sm hover:brightness-95 hover:shadow-md active:scale-[0.98]',
     secondary:
       'border border-primary/25 bg-white text-primary hover:border-primary/40 hover:bg-primary/[0.04]',
     ghost: 'text-muted-fg hover:bg-black/[0.04] hover:text-ink',
@@ -100,7 +100,7 @@ export function AdminPageHeader({
       )}
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-serif text-2xl font-bold tracking-tight text-ink md:text-3xl">{title}</h1>
+          <h1 className="font-serif text-2xl font-bold text-ink md:text-3xl">{title}</h1>
           {description && <p className="mt-1 font-sans text-sm text-muted-fg md:text-base">{description}</p>}
         </div>
         {action}

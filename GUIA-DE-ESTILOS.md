@@ -21,7 +21,7 @@ Este guia consolida os padroes visuais atuais do site para manter consistencia e
 ## 2) Tipografia
 
 - Fonte serifada de marca/titulos: `Playfair Display`
-- Fonte sans para interface e corpo: `DM Sans`
+- Fonte sans para interface e corpo: `Rubik` (regular)
 
 ### Hierarquia recomendada
 
@@ -68,7 +68,7 @@ Checklist para voce revisar antes de publicar alteracoes no site (nao e avaliaca
 Antes de publicar:
 
 - Cor primaria aplicada em CTAs e rodape?
-- Tipografia segue Playfair (titulos) e DM Sans (interface/corpo)?
+- Tipografia segue Playfair Display (titulos) e Rubik (interface/corpo)?
 - Espacamentos de secao em 120/80?
 - Mobile sem sobreposicao de elementos decorativos?
 - Contraste e legibilidade aprovados nos textos longos?

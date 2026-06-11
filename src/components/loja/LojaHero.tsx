@@ -17,7 +17,7 @@ function SectionLabel({ children, light = false }: { children: React.ReactNode; 
 
 function HeroCTAs({ variant }: { variant: 'dark' | 'light' }) {
   const primaryClass =
-    'rounded-full bg-primary px-6 py-3 font-sans text-sm font-semibold text-white transition hover:bg-tertiary';
+    'rounded-full bg-accent px-6 py-3 font-sans text-sm font-semibold text-white transition hover:brightness-95';
   const secondaryClass =
     variant === 'dark'
       ? 'rounded-full border border-white/70 px-6 py-3 font-sans text-sm font-semibold text-white transition hover:bg-white/10'
@@ -60,7 +60,7 @@ function HeroModelo1({ navOffset }: { navOffset: number }) {
         style={{ minHeight: `min(62vh, ${hero.alturaMaxPx}px)`, paddingTop: navOffset }}
       >
         <SectionLabel light>{hero.label}</SectionLabel>
-        <h1 className="mb-4 max-w-3xl font-serif text-4xl font-bold leading-tight text-white md:text-5xl lg:text-[64px]">
+        <h1 className="mb-4 max-w-3xl font-serif text-4xl font-bold leading-[1.05] text-white md:text-5xl lg:text-[64px]">
           {hero.titulo}
         </h1>
         <p className="mb-6 font-serif text-xl italic text-white md:text-2xl">{hero.subtitulo}</p>
@@ -150,7 +150,7 @@ function HeroModelo2({ navOffset, isMobile }: { navOffset: number; isMobile: boo
 
         <div className="flex flex-col justify-center text-center lg:text-left">
           <SectionLabel>{hero.label}</SectionLabel>
-          <h1 className="mb-4 font-serif text-4xl font-bold leading-tight text-[#3a184f] md:text-5xl lg:text-[56px]">
+          <h1 className="mb-4 font-serif text-4xl font-bold leading-[1.05] text-[#3a184f] md:text-5xl lg:text-[56px]">
             {hero.titulo}
           </h1>
           <p className="mb-6 font-serif text-xl italic text-primary md:text-2xl">{hero.subtitulo}</p>

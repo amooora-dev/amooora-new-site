@@ -1,21 +1,6 @@
 import type { Metadata, Viewport } from 'next';
-import { Playfair_Display, DM_Sans } from 'next/font/google';
+import { playfair, rubik } from '@/lib/fonts';
 import './globals.css';
-
-const playfair = Playfair_Display({
-  subsets: ['latin'],
-  weight: ['400', '500', '700', '900'],
-  style: ['normal', 'italic'],
-  variable: '--font-playfair',
-  display: 'swap',
-});
-
-const dmSans = DM_Sans({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600'],
-  variable: '--font-dm-sans',
-  display: 'swap',
-});
 
 export const metadata: Metadata = {
   title: 'Amooora — Um mundo inteiro de acolhimento e liberdade',
@@ -29,8 +14,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${playfair.variable} ${dmSans.variable}`}>
-      <body className="min-h-screen">{children}</body>
+    <html lang="pt-BR" className={`${playfair.variable} ${rubik.variable}`}>
+      <body className={`${rubik.className} font-sans min-h-screen antialiased`}>{children}</body>
     </html>
   );
 }

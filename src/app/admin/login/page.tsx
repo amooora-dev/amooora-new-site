@@ -12,7 +12,7 @@ function SubmitButton() {
     <button
       type="submit"
       disabled={pending}
-      className="mt-2 w-full rounded-xl bg-primary px-6 py-3 font-sans text-sm font-semibold text-white shadow-sm transition hover:bg-tertiary hover:shadow-md active:scale-[0.99] disabled:opacity-60"
+      className="mt-2 w-full rounded-xl bg-accent px-6 py-3 font-sans text-sm font-semibold text-white shadow-sm transition hover:brightness-95 hover:shadow-md active:scale-[0.99] disabled:opacity-60"
     >
       {pending ? 'Entrando…' : 'Entrar no painel'}
     </button>

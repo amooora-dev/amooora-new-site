@@ -18,7 +18,7 @@ export const CONTEUDO_HOME = {
       { label: 'Loja Amooora', id: 'loja' },
       { label: 'FAQ', id: 'faq' }
     ],
-    ctaDownload: 'Baixar App'
+    ctaDownload: 'Conhecer App'
   },
 
   hero: {
@@ -266,7 +266,7 @@ export const CONTEUDO_HOME = {
   newsletter: {
     title: 'Cadastre o seu email para saber as novidades em primeira mão!',
     placeholder: 'Seu melhor email',
-    button: 'INSCREVER-SE'
+    button: 'Inscrever-se'
   },
 
   footer: {

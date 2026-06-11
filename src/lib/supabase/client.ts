@@ -65,3 +65,17 @@ export function createSupabaseAdminClient(): SupabaseClient<any, string, string>
     auth: { persistSession: false },
   });
 }
+
+/**
+ * Leitura no admin — service role se disponível; senão anon (só produtos ativos).
+ */
+export function createAdminReadClient(): SupabaseClient<any, string, string> | null {
+  return createSupabaseAdminClient() ?? createSupabaseServerClient();
+}
+
+/**
+ * Escrita no admin — exige service role (bypass RLS).
+ */
+export function createAdminWriteClient(): SupabaseClient<any, string, string> | null {
+  return createSupabaseAdminClient();
+}

@@ -92,7 +92,7 @@ function ProdutoCard({
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`Comprar ${produto.nome} via WhatsApp`}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white transition hover:bg-tertiary"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-white transition hover:brightness-95"
           >
             <WhatsAppIcon />
           </a>
@@ -248,7 +248,7 @@ export function LojaPageContent({
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/#aplicativo"
-              className="rounded-full bg-primary px-6 py-3 font-sans text-sm font-semibold text-white transition hover:bg-tertiary"
+              className="rounded-full bg-accent px-6 py-3 font-sans text-sm font-semibold text-white transition hover:brightness-95"
             >
               Baixar o App
             </Link>

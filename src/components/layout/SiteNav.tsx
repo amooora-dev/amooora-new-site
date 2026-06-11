@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback, type CSSProperties } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
+import { AmoooraLogoHeader } from '@/components/brand/AmoooraLogoHeader';
 import { CONTEUDO_HOME as C } from '@/lib/conteudo-home';
 
 type SiteNavProps = {
@@ -131,24 +131,33 @@ export function SiteNav({
     transition: 'all 0.4s ease'
   };
 
-  const logoStyle: CSSProperties = {
-    height: isMobile ? 34 : 44,
-    objectFit: 'contain',
-    cursor: 'pointer',
-    display: 'block'
-  };
+  const logoHeight = isMobile ? 34 : 44;
 
   const links = C.nav.links;
+  const [ctaColor, setCtaColor] = useState('#c4532f');
+
+  useEffect(() => {
+    const sync = () => {
+      setCtaColor(
+        getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#c4532f'
+      );
+    };
+    sync();
+    window.addEventListener('resize', sync);
+    return () => window.removeEventListener('resize', sync);
+  }, []);
 
   const ctaButton = !isMobile ? (
     <Link href={ctaHref} style={{
-      fontFamily: "'DM Sans',sans-serif", fontSize: 13, fontWeight: 600,
-      background: accent, color: 'white', padding: '10px 22px', borderRadius: 100,
+      fontFamily: 'var(--font-rubik, Rubik), Rubik, system-ui, sans-serif',
+      fontSize: 13,
+      fontWeight: 600,
+      background: ctaColor, color: 'white', padding: '10px 22px', borderRadius: 100,
       textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s',
-      boxShadow: `0 4px 20px ${accent}44`, whiteSpace: 'nowrap'
+      boxShadow: `0 4px 20px ${ctaColor}44`, whiteSpace: 'nowrap'
     }}
-    onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = `0 8px 28px ${accent}66`; }}
-    onMouseLeave={(e) => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = `0 4px 20px ${accent}44`; }}>
+    onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = `0 8px 28px ${ctaColor}66`; }}
+    onMouseLeave={(e) => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = `0 4px 20px ${ctaColor}44`; }}>
       {C.nav.ctaDownload}
     </Link>
   ) : (
@@ -170,14 +179,16 @@ export function SiteNav({
   );
 
   const linkStyle: CSSProperties = {
-    fontFamily: "'DM Sans',sans-serif", fontSize: 14, fontWeight: 500,
+    fontFamily: 'var(--font-rubik, Rubik), Rubik, system-ui, sans-serif',
+    fontSize: 14,
+    fontWeight: 500,
     color: overDarkHero ? '#ffffff' : '#1a1a1a', textDecoration: 'none',
     opacity: overDarkHero ? 0.9 : 0.7, transition: 'opacity 0.2s', whiteSpace: 'nowrap'
   };
 
   return (
     <>
-      <nav style={navStyle} aria-label="Principal">
+      <nav className="font-sans" style={navStyle} aria-label="Principal">
         <div style={{
           maxWidth: 1200,
           margin: '0 auto',
@@ -190,15 +201,8 @@ export function SiteNav({
           gap: isMobile ? 12 : 32,
           position: 'relative',
         }}>
-          <Link href="/" style={{ justifySelf: 'start' }} onClick={closeMenu}>
-            <Image
-              src="/images/logo-header.png"
-              alt="Amooora"
-              width={1024}
-              height={404}
-              priority
-              style={{ ...logoStyle, width: 'auto' }}
-            />
+          <Link href="/" style={{ justifySelf: 'start', background: 'transparent', boxShadow: 'none' }} onClick={closeMenu}>
+            <AmoooraLogoHeader height={logoHeight} priority />
           </Link>
 
           {!isMobile && layout === 'hero' && (
@@ -304,7 +308,7 @@ export function SiteNav({
               <Link
                 href={ctaHref}
                 onClick={closeMenu}
-                className="flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-primary font-sans text-sm font-semibold text-white shadow-md transition hover:bg-tertiary"
+                className="flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-accent font-sans text-sm font-semibold text-white shadow-md transition hover:brightness-95"
               >
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75} aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />

@@ -1,6 +1,6 @@
 import { PRODUTOS_LOJA } from '@/lib/loja-data';
-import { createSupabaseAdminClient } from '@/lib/supabase/client';
-import { isSupabaseAdminConfigured, SUPABASE_DB_SCHEMA } from '@/lib/supabase/config';
+import { createAdminReadClient } from '@/lib/supabase/client';
+import { getSupabaseConfigStatus, isSupabaseConfigured, SUPABASE_DB_SCHEMA } from '@/lib/supabase/config';
 
 export type RecentProduct = {
   name: string;
@@ -12,13 +12,14 @@ export type RecentProduct = {
 export type DashboardStats = {
   source: 'supabase' | 'static';
   dbConnected: boolean;
+  readOnly: boolean;
   dbError: string | null;
   totalProducts: number;
   byCategory: { camisetas: number; moletons: number; acessorios: number };
   recentProducts: RecentProduct[];
 };
 
-function staticStats(): DashboardStats {
+function staticStats(dbError: string | null = 'Tabelas ainda não criadas — rode os SQL no Supabase.'): DashboardStats {
   const byCategory = { camisetas: 0, moletons: 0, acessorios: 0 };
   for (const p of PRODUTOS_LOJA) {
     const key = p.categoria === 'Camisetas' ? 'camisetas' : p.categoria === 'Moletons' ? 'moletons' : 'acessorios';
@@ -27,7 +28,8 @@ function staticStats(): DashboardStats {
   return {
     source: 'static',
     dbConnected: false,
-    dbError: 'Tabelas ainda não criadas — rode os SQL no Supabase.',
+    readOnly: false,
+    dbError,
     totalProducts: PRODUTOS_LOJA.length,
     byCategory,
     recentProducts: PRODUTOS_LOJA.slice(0, 5).map((p) => ({
@@ -40,10 +42,20 @@ function staticStats(): DashboardStats {
 }
 
 export async function getDashboardStats(): Promise<DashboardStats> {
-  if (!isSupabaseAdminConfigured()) return staticStats();
+  const config = getSupabaseConfigStatus();
 
-  const supabase = createSupabaseAdminClient();
+  if (!isSupabaseConfigured()) {
+    return staticStats(
+      !config.url
+        ? 'NEXT_PUBLIC_SUPABASE_URL não configurada na Vercel.'
+        : 'NEXT_PUBLIC_SUPABASE_ANON_KEY não configurada na Vercel.'
+    );
+  }
+
+  const supabase = createAdminReadClient();
   if (!supabase) return staticStats();
+
+  const readOnly = !config.canWriteAdmin;
 
   const { data, error } = await supabase
     .from('products')
@@ -52,10 +64,12 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 
   if (error) {
     return {
-      ...staticStats(),
-      dbError: error.message.includes('does not exist')
-        ? `Schema "${SUPABASE_DB_SCHEMA}" sem tabelas — rode supabase/migrations/001_loja_cms.sql`
-        : error.message,
+      ...staticStats(
+        error.message.includes('does not exist')
+          ? `Schema "${SUPABASE_DB_SCHEMA}" sem tabelas — rode supabase/migrations/001_loja_cms.sql`
+          : error.message
+      ),
+      readOnly,
     };
   }
 
@@ -74,7 +88,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   const recent = (data ?? []).slice(0, 5);
   const recentIds = recent.map((row) => row.id);
 
-  let thumbByProductId = new Map<string, string>();
+  const thumbByProductId = new Map<string, string>();
   if (recentIds.length) {
     const { data: images } = await supabase
       .from('product_images')
@@ -91,7 +105,10 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   return {
     source: 'supabase',
     dbConnected: true,
-    dbError: null,
+    readOnly,
+    dbError: readOnly
+      ? 'SUPABASE_SERVICE_ROLE_KEY ausente na Vercel — você vê os produtos ativos, mas criar/editar exige a service role + redeploy.'
+      : null,
     totalProducts: data?.length ?? 0,
     byCategory,
     recentProducts: recent.map((row) => ({

@@ -173,7 +173,7 @@ export function ProdutoModal({ produto, onClose }: ProdutoModalProps) {
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full rounded-full bg-primary px-6 py-3 text-center font-sans text-sm font-semibold text-white transition hover:bg-tertiary"
+              className="w-full rounded-full bg-accent px-6 py-3 text-center font-sans text-sm font-semibold text-white transition hover:brightness-95"
             >
               Comprar via WhatsApp
             </a>

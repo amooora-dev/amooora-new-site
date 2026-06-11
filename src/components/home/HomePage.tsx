@@ -16,6 +16,7 @@ import { PilotSignup } from '@/components/home/PilotSignup';
 import { SiteNav } from '@/components/layout/SiteNav';
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import type {
+  CtaProps,
   HeroBProps,
   HeroProps,
   ManifestoParagraph,
@@ -119,7 +120,7 @@ function ParticleCanvas({ color, active }: ParticleCanvasProps) {
 }
 
 /* ── HERO - Direction A: Editorial clean ── */
-function HeroA({ accent, particles, isMobile, dir }: HeroProps & { dir: 'A' | 'B' }) {
+function HeroA({ accent, cta, particles, isMobile, dir }: HeroProps & CtaProps & { dir: 'A' | 'B' }) {
   const navOffset = isMobile ? 72 : 84;
 
   return (
@@ -170,7 +171,7 @@ function HeroA({ accent, particles, isMobile, dir }: HeroProps & { dir: 'A' | 'B
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 24,
           animation: 'fadeUp 0.6s ease both' }}>
           <div style={{ width: 32, height: 1, background: accent, opacity: 0.5 }} />
-          <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 600,
+          <span style={{ fontFamily: "var(--sans)", fontSize: 11, fontWeight: 600,
             letterSpacing: '0.2em', textTransform: 'uppercase', color: accent, opacity: 0.8 }}>
             {C.hero.eyebrow}
           </span>
@@ -178,7 +179,7 @@ function HeroA({ accent, particles, isMobile, dir }: HeroProps & { dir: 'A' | 'B
         </div>
 
         <h1 style={{
-          fontFamily: "'Playfair Display',serif",
+          fontFamily: "var(--serif)",
           fontWeight: 900, lineHeight: 1.0, letterSpacing: '-0.03em',
           color: 'var(--ink)', marginBottom: 12,
           animation: 'fadeUp 0.8s 0.1s ease both', fontSize: isMobile ? '44px' : "70px"
@@ -189,7 +190,7 @@ function HeroA({ accent, particles, isMobile, dir }: HeroProps & { dir: 'A' | 'B
         </h1>
 
         <p style={{
-          fontFamily: "'DM Sans',sans-serif", fontSize: 'clamp(14px,1.2vw,16px)',
+          fontFamily: "var(--sans)", fontSize: 'clamp(14px,1.2vw,16px)',
           color: '#717182', fontWeight: 300, lineHeight: 1.7,
           maxWidth: 460, margin: '20px auto 0',
           animation: 'fadeUp 0.8s 0.25s ease both'
@@ -200,17 +201,17 @@ function HeroA({ accent, particles, isMobile, dir }: HeroProps & { dir: 'A' | 'B
         <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 28,
           animation: 'fadeUp 0.8s 0.4s ease both', flexWrap: 'wrap' }}>
           <Link href="#aplicativo" style={{
-            fontFamily: "'DM Sans',sans-serif", fontSize: 15, fontWeight: 600,
-            background: accent, color: 'white', padding: '12px 28px', borderRadius: 100,
-            textDecoration: 'none', boxShadow: `0 8px 32px ${accent}44`,
+            fontFamily: "var(--sans)", fontSize: 15, fontWeight: 600,
+            background: cta, color: 'white', padding: '12px 28px', borderRadius: 100,
+            textDecoration: 'none', boxShadow: `0 8px 32px ${cta}44`,
             transition: 'all 0.25s'
           }}
-          onMouseEnter={(e) => {e.currentTarget.style.transform = 'translateY(-3px)';e.currentTarget.style.boxShadow = `0 16px 48px ${accent}55`;}}
-          onMouseLeave={(e) => {e.currentTarget.style.transform = '';e.currentTarget.style.boxShadow = `0 8px 32px ${accent}44`;}}>
+          onMouseEnter={(e) => {e.currentTarget.style.transform = 'translateY(-3px)';e.currentTarget.style.boxShadow = `0 16px 48px ${cta}55`;}}
+          onMouseLeave={(e) => {e.currentTarget.style.transform = '';e.currentTarget.style.boxShadow = `0 8px 32px ${cta}44`;}}>
             {C.hero.ctaPrimary}
           </Link>
           <Link href="#manifesto" style={{
-            fontFamily: "'DM Sans',sans-serif", fontSize: 15, fontWeight: 500,
+            fontFamily: "var(--sans)", fontSize: 15, fontWeight: 500,
             color: accent, padding: '12px 28px', borderRadius: 100,
             textDecoration: 'none', border: `1.5px solid ${accent}44`,
             transition: 'all 0.25s'
@@ -253,18 +254,18 @@ function HeroB({ accent, particles }: HeroBProps) {
           borderRadius: '50%', border: '1px solid rgba(255,255,255,0.1)', pointerEvents: 'none',
           transform: `translateY(${offset * 0.08}px)` }} />
         <div style={{ position: 'relative', zIndex: 2 }}>
-          <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, letterSpacing: '0.2em',
+          <p style={{ fontFamily: "var(--sans)", fontSize: 11, letterSpacing: '0.2em',
             textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', marginBottom: 20 }}>
             Para sáficas, com amor
           </p>
           <h1 style={{
-            fontFamily: "'Playfair Display',serif", fontSize: 'clamp(42px,4.5vw,76px)',
+            fontFamily: "var(--serif)", fontSize: 'clamp(42px,4.5vw,76px)',
             fontWeight: 900, lineHeight: 1.05, color: 'white', marginBottom: 24
           }}>
             Um mundo<br /><em>inteiro</em><br />de liberdade
           </h1>
           <Link href="#aplicativo" style={{
-            display: 'inline-block', fontFamily: "'DM Sans',sans-serif", fontSize: 14, fontWeight: 600,
+            display: 'inline-block', fontFamily: "var(--sans)", fontSize: 14, fontWeight: 600,
             background: 'white', color: accent, padding: '14px 32px', borderRadius: 100,
             textDecoration: 'none', marginTop: 8,
             transition: 'all 0.25s'
@@ -282,17 +283,17 @@ function HeroB({ accent, particles }: HeroBProps) {
         justifyContent: 'center', padding: '120px 56px 80px',
         transform: `translateY(${offset * 0.05}px)`
       }}>
-        <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 'clamp(100px,12vw,180px)',
+        <div style={{ fontFamily: "var(--serif)", fontSize: 'clamp(100px,12vw,180px)',
           fontWeight: 900, lineHeight: 0.9, color: `${accent}0d`, letterSpacing: '-0.04em',
           position: 'absolute', top: '20%', right: '-5%', userSelect: 'none', pointerEvents: 'none' }}>
           ✦
         </div>
         <div style={{ marginBottom: 40 }}>
-          <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, letterSpacing: '0.15em',
+          <p style={{ fontFamily: "var(--sans)", fontSize: 12, letterSpacing: '0.15em',
             textTransform: 'uppercase', color: accent, opacity: 0.7, marginBottom: 16 }}>
             Acolhimento
           </p>
-          <p style={{ fontFamily: "'Playfair Display',serif", fontSize: 'clamp(20px,2vw,28px)',
+          <p style={{ fontFamily: "var(--serif)", fontSize: 'clamp(20px,2vw,28px)',
             fontWeight: 400, fontStyle: 'italic', color: 'var(--ink)', lineHeight: 1.5 }}>
             "Um espaço feito por sáficas,<br />para sáficas."
           </p>
@@ -305,7 +306,7 @@ function HeroB({ accent, particles }: HeroBProps) {
               background: `${accent}12`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 <div style={{ width: 8, height: 8, borderRadius: '50%', background: accent }} />
               </div>
-              <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 15, color: '#3a184f', fontWeight: 400 }}>
+              <span style={{ fontFamily: "var(--sans)", fontSize: 15, color: '#3a184f', fontWeight: 400 }}>
                 {item}
               </span>
             </div>
@@ -316,10 +317,10 @@ function HeroB({ accent, particles }: HeroBProps) {
           display: 'flex', gap: 40 }}>
           {[['10k+', 'usuárias'], ['98%', 'satisfação'], ['∞', 'histórias']].map(([num, label], i) =>
           <div key={i}>
-              <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 32, fontWeight: 700, color: accent }}>
+              <div style={{ fontFamily: "var(--serif)", fontSize: 32, fontWeight: 700, color: accent }}>
                 {num}
               </div>
-              <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12, color: '#717182', marginTop: 2 }}>
+              <div style={{ fontFamily: "var(--sans)", fontSize: 12, color: '#717182', marginTop: 2 }}>
                 {label}
               </div>
             </div>
@@ -529,12 +530,12 @@ function Manifesto({ accent, dir, isMobile }: ManifestoProps) {
       transition: `all 0.8s ${0.1 + delayOffset + i * 0.12}s ease`
     }}>
       {p.big ?
-      <p style={{ fontFamily: "'Playfair Display',serif",
+      <p style={{ fontFamily: "var(--serif)",
         fontSize: 'clamp(28px,4vw,54px)', fontWeight: 700,
         lineHeight: 1.15, color: 'var(--ink)', letterSpacing: '-0.02em' }}>
           <TextWithBreaks text={p.text} />
         </p> :
-      <p style={{ fontFamily: "'DM Sans',sans-serif",
+      <p style={{ fontFamily: "var(--sans)",
         fontSize: 'clamp(16px,1.5vw,20px)', fontWeight: 300,
         lineHeight: 1.8, color: '#717182' }}>
           <TextWithBreaks text={p.text} />
@@ -547,7 +548,7 @@ function Manifesto({ accent, dir, isMobile }: ManifestoProps) {
       opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(20px)',
       transition: 'all 0.7s ease' }}>
       <div style={{ width: 48, height: 1.5, background: accent }} />
-      <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 600,
+      <span style={{ fontFamily: "var(--sans)", fontSize: 11, fontWeight: 600,
         letterSpacing: '0.2em', textTransform: 'uppercase', color: accent }}>
         {C.manifesto.label}
       </span>
@@ -613,7 +614,7 @@ function Manifesto({ accent, dir, isMobile }: ManifestoProps) {
 }
 
 /* ── APP SECTION ── */
-function AppSection({ accent, isMobile }: SectionProps) {
+function AppSection({ accent, cta, isMobile }: SectionProps & CtaProps) {
   const ref = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
   const [open, setOpen] = useState<number | null>(null);
@@ -628,7 +629,7 @@ function AppSection({ accent, isMobile }: SectionProps) {
   const introFull = C.app.intro.slice(0, 2);
   const introSplit = C.app.intro.slice(2);
   const introParagraphStyle = (marginBottom: number): CSSProperties => ({
-    fontFamily: "'DM Sans',sans-serif",
+    fontFamily: "var(--sans)",
     fontSize: 'clamp(16px,1.5vw,20px)', fontWeight: 300,
     lineHeight: 1.8, color: '#717182', marginBottom
   });
@@ -644,15 +645,15 @@ function AppSection({ accent, isMobile }: SectionProps) {
         <div style={{ opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(24px)', transition: 'all 0.7s ease' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
             <div style={{ width: 36, height: 1.5, background: accent }} />
-            <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 600,
+            <span style={{ fontFamily: "var(--sans)", fontSize: 11, fontWeight: 600,
               letterSpacing: '0.2em', textTransform: 'uppercase', color: accent }}>{C.app.label}</span>
           </div>
-          <h2 style={{ fontFamily: "'Playfair Display',serif",
+          <h2 style={{ fontFamily: "var(--serif)",
             fontSize: 'clamp(28px,3.5vw,50px)', fontWeight: 900, color: 'var(--ink)',
             lineHeight: 1.1, marginBottom: 12 }}>
             {C.app.title}
           </h2>
-          <p style={{ fontFamily: "'Playfair Display',serif",
+          <p style={{ fontFamily: "var(--serif)",
             fontSize: 'clamp(18px,2vw,28px)', fontStyle: 'italic', color: accent,
             marginBottom: 28, fontWeight: 400 }}>
             {C.app.subtitle}
@@ -693,7 +694,7 @@ function AppSection({ accent, isMobile }: SectionProps) {
                     width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                     padding: '18px 0', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', gap: 12
                   }}>
-                    <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 16, fontWeight: 600,
+                    <span style={{ fontFamily: "var(--sans)", fontSize: 16, fontWeight: 600,
                       color: isOpen ? accent : 'var(--ink)', transition: 'color 0.2s' }}>
                       {item.label}
                     </span>
@@ -716,9 +717,9 @@ function AppSection({ accent, isMobile }: SectionProps) {
                       borderLeft: `2px solid ${accent}`,
                       marginBottom: bi < item.blocks.length - 1 ? 12 : 0
                     }}>
-                          <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, fontWeight: 600,
+                          <p style={{ fontFamily: "var(--sans)", fontSize: 13, fontWeight: 600,
                         color: 'var(--ink)', marginBottom: 6 }}>{b.q}</p>
-                          <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 13, color: '#717182',
+                          <p style={{ fontFamily: "var(--sans)", fontSize: 13, color: '#717182',
                         lineHeight: 1.7, fontWeight: 300 }}>{b.a}</p>
                         </div>
                     )}
@@ -729,7 +730,7 @@ function AppSection({ accent, isMobile }: SectionProps) {
             })}
           </div>
 
-          <PilotSignup accent={accent} isMobile={isMobile} />
+              <PilotSignup accent={accent} cta={cta} isMobile={isMobile} />
         </div>
 
         {/* Mockup alinhado ao 3º parágrafo */}
@@ -803,10 +804,10 @@ function Values({ accent, isMobile }: SectionProps) {
         <div style={{ marginBottom: 72, opacity: visible ? 1 : 0, transition: 'all 0.7s ease' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
             <div style={{ width: 36, height: 1.5, background: accent }} />
-            <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 600,
+            <span style={{ fontFamily: "var(--sans)", fontSize: 11, fontWeight: 600,
               letterSpacing: '0.2em', textTransform: 'uppercase', color: accent }}>{C.values.label}</span>
           </div>
-          <h2 style={{ fontFamily: "'Playfair Display',serif",
+          <h2 style={{ fontFamily: "var(--serif)",
             fontSize: 'clamp(32px,4vw,56px)', fontWeight: 900, color: 'var(--ink)', lineHeight: 1.1 }}>
             {C.values.titleLine1}<br /><em style={{ color: accent }}>{C.values.titleHighlight}</em>
           </h2>
@@ -839,7 +840,7 @@ function Values({ accent, isMobile }: SectionProps) {
               }}>
                 {/* Number */}
                 <div style={{
-                  fontFamily: "'Playfair Display',serif",
+                  fontFamily: "var(--serif)",
                   fontSize: 48, fontWeight: 900, lineHeight: 1,
                   color: isHov ? accent : `${accent}22`,
                   transition: 'color 0.25s',
@@ -850,12 +851,12 @@ function Values({ accent, isMobile }: SectionProps) {
                 </div>
                 {/* Content */}
                 <div>
-                  <h3 style={{ fontFamily: "'Playfair Display',serif", fontSize: 20, fontWeight: 700,
+                  <h3 style={{ fontFamily: "var(--serif)", fontSize: 20, fontWeight: 700,
                     color: 'var(--ink)', marginBottom: 10, lineHeight: 1.2,
                     transition: 'color 0.25s', ...(isHov ? { color: accent } : {}) }}>
                     {v.title}
                   </h3>
-                  <p style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 14, color: '#717182',
+                  <p style={{ fontFamily: "var(--sans)", fontSize: 14, color: '#717182',
                     lineHeight: 1.75, fontWeight: 300 }}>{v.desc}</p>
                 </div>
               </div>);
@@ -888,10 +889,10 @@ function FAQ({ accent, isMobile }: SectionProps) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24,
           opacity: visible ? 1 : 0, transition: 'all 0.7s ease' }}>
           <div style={{ width: 36, height: 1.5, background: accent }} />
-          <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, fontWeight: 600,
+          <span style={{ fontFamily: "var(--sans)", fontSize: 11, fontWeight: 600,
             letterSpacing: '0.2em', textTransform: 'uppercase', color: accent }}>{C.faq.label}</span>
         </div>
-        <h2 style={{ fontFamily: "'Playfair Display',serif",
+        <h2 style={{ fontFamily: "var(--serif)",
           fontSize: 'clamp(28px,3.5vw,48px)', fontWeight: 900, color: 'var(--ink)',
           marginBottom: 56, opacity: visible ? 1 : 0, transition: 'all 0.7s 0.1s ease' }}>
           {C.faq.title}
@@ -911,7 +912,7 @@ function FAQ({ accent, isMobile }: SectionProps) {
                   padding: '20px 0', background: 'none', border: 'none', cursor: 'pointer',
                   textAlign: 'left', gap: 16
                 }}>
-                  <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 16, fontWeight: 500,
+                  <span style={{ fontFamily: "var(--sans)", fontSize: 16, fontWeight: 500,
                     color: isOpen ? accent : 'var(--ink)', transition: 'color 0.2s' }}>
                     {item.q}
                   </span>
@@ -926,7 +927,7 @@ function FAQ({ accent, isMobile }: SectionProps) {
                 </button>
                 {isOpen &&
                 <div style={{
-                  fontFamily: "'DM Sans',sans-serif", fontSize: 15, color: '#717182',
+                  fontFamily: "var(--sans)", fontSize: 15, color: '#717182',
                   lineHeight: 1.8, paddingBottom: 24, fontWeight: 300,
                   animation: 'fadeUp 0.3s ease both'
                 }}>
@@ -943,7 +944,7 @@ function FAQ({ accent, isMobile }: SectionProps) {
 }
 
 /* ── LOJA (ex-Galeria) ── */
-function Gallery({ accent, isMobile }: SectionProps) {
+function Gallery({ accent, cta, isMobile }: SectionProps & CtaProps) {
   const ref = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -959,12 +960,12 @@ function Gallery({ accent, isMobile }: SectionProps) {
     <section id="loja" ref={ref} style={{ padding: isMobile ? '80px 0' : '120px 0', background: '#faf7fb' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '0 20px' : '0 48px' }}>
         <div style={{ marginBottom: 48, opacity: visible ? 1 : 0, transition: 'all 0.7s ease' }}>
-          <h2 style={{ fontFamily: "'Playfair Display',serif",
+          <h2 style={{ fontFamily: "var(--serif)",
             fontSize: 'clamp(28px,3.5vw,50px)', fontWeight: 900, color: 'var(--ink)',
             lineHeight: 1.1, marginBottom: 12 }}>
             {C.gallery.title}
           </h2>
-          <p style={{ fontFamily: "'Playfair Display',serif",
+          <p style={{ fontFamily: "var(--serif)",
             fontSize: 'clamp(18px,2vw,28px)', fontStyle: 'italic', color: accent,
             fontWeight: 400, maxWidth: 720 }}>
             {C.gallery.subtitle}
@@ -999,13 +1000,13 @@ function Gallery({ accent, isMobile }: SectionProps) {
           opacity: visible ? 1 : 0, transition: 'all 0.7s 0.5s ease' }}>
           <Link href={C.gallery.ctaUrl} style={{
             display: 'inline-block',
-            fontFamily: "'DM Sans',sans-serif", fontSize: 15, fontWeight: 600,
-            background: accent, color: 'white', padding: '14px 32px', borderRadius: 100,
-            textDecoration: 'none', boxShadow: `0 8px 32px ${accent}44`,
+            fontFamily: "var(--sans)", fontSize: 15, fontWeight: 600,
+            background: cta, color: 'white', padding: '14px 32px', borderRadius: 100,
+            textDecoration: 'none', boxShadow: `0 8px 32px ${cta}44`,
             transition: 'all 0.25s'
           }}
-          onMouseEnter={(e) => {e.currentTarget.style.transform = 'translateY(-2px)';e.currentTarget.style.boxShadow = `0 12px 40px ${accent}55`;}}
-          onMouseLeave={(e) => {e.currentTarget.style.transform = '';e.currentTarget.style.boxShadow = `0 8px 32px ${accent}44`;}}>
+          onMouseEnter={(e) => {e.currentTarget.style.transform = 'translateY(-2px)';e.currentTarget.style.boxShadow = `0 12px 40px ${cta}55`;}}
+          onMouseLeave={(e) => {e.currentTarget.style.transform = '';e.currentTarget.style.boxShadow = `0 8px 32px ${cta}44`;}}>
             {C.gallery.cta}
           </Link>
         </div>
@@ -1015,7 +1016,7 @@ function Gallery({ accent, isMobile }: SectionProps) {
 }
 
 /* ── FOOTER ── */
-function Newsletter({ accent, isMobile }: SectionProps) {
+function Newsletter({ cta, isMobile }: CtaProps & MobileProps) {
   return (
     <section style={{ background: 'var(--white)', padding: '48px 48px 36px' }}>
       <div style={{
@@ -1023,7 +1024,7 @@ function Newsletter({ accent, isMobile }: SectionProps) {
         display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.1fr 1.9fr', gap: 24, alignItems: 'center'
       }}>
         <h3 style={{
-          fontFamily: "'DM Sans',sans-serif", fontSize: isMobile ? '22px' : 'clamp(14px,1.6vw,21px)',
+          fontFamily: "var(--sans)", fontSize: isMobile ? '22px' : 'clamp(14px,1.6vw,21px)',
           lineHeight: 1.2, fontWeight: 700, color: '#0f1b3d'
         }}>
           {C.newsletter.title}
@@ -1040,7 +1041,7 @@ function Newsletter({ accent, isMobile }: SectionProps) {
               borderRadius: 8,
               border: '1px solid #e8eaf2',
               padding: '0 16px',
-              fontFamily: "'DM Sans',sans-serif",
+              fontFamily: "var(--sans)",
               fontSize: 18,
               color: '#0f1b3d',
               outline: 'none',
@@ -1052,9 +1053,9 @@ function Newsletter({ accent, isMobile }: SectionProps) {
             padding: '0 20px',
             borderRadius: 8,
             border: 'none',
-            background: accent,
+            background: cta,
             color: 'white',
-            fontFamily: "'DM Sans',sans-serif",
+            fontFamily: "var(--sans)",
             fontSize: 15,
             fontWeight: 700,
             letterSpacing: '0.02em',
@@ -1075,6 +1076,7 @@ export default function HomePage() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
   const [isMobile, setIsMobile] = useState(false);
   const [accent, setAccent] = useState('#93296F');
+  const [cta, setCta] = useState('#c4532f');
   const dir = t.direction;
   const particles = t.showParticles;
 
@@ -1082,9 +1084,9 @@ export default function HomePage() {
     document.title = C.site.title;
     const sync = () => {
       setIsMobile(window.innerWidth <= 900);
-      setAccent(
-        getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#93296F'
-      );
+      const root = getComputedStyle(document.documentElement);
+      setAccent(root.getPropertyValue('--primary').trim() || '#93296F');
+      setCta(root.getPropertyValue('--accent').trim() || '#c4532f');
     };
     sync();
     window.addEventListener('resize', sync);
@@ -1094,7 +1096,7 @@ export default function HomePage() {
   return (
     <div>
       {dir === 'A' ?
-      <HeroA accent={accent} particles={particles} isMobile={isMobile} dir={dir} /> :
+      <HeroA accent={accent} cta={cta} particles={particles} isMobile={isMobile} dir={dir} /> :
       <>
         <SiteNav accent={accent} dir={dir} isMobile={isMobile} />
         <HeroB accent={accent} particles={particles} />
@@ -1103,11 +1105,11 @@ export default function HomePage() {
 
       <VideoSection isMobile={isMobile} />
       <Manifesto accent={accent} dir={dir} isMobile={isMobile} />
-      <AppSection accent={accent} isMobile={isMobile} />
+      <AppSection accent={accent} cta={cta} isMobile={isMobile} />
       <Values accent={accent} isMobile={isMobile} />
-      <Gallery accent={accent} isMobile={isMobile} />
+      <Gallery accent={accent} cta={cta} isMobile={isMobile} />
       <FAQ accent={accent} isMobile={isMobile} />
-      <Newsletter accent={accent} isMobile={isMobile} />
+      <Newsletter cta={cta} isMobile={isMobile} />
       <SiteFooter accent={accent} isMobile={isMobile} />
 
       <TweaksPanel>

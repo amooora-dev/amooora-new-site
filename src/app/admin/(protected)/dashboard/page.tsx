@@ -25,30 +25,52 @@ export default async function AdminDashboardPage() {
         description="Visão geral do catálogo e status da loja"
         breadcrumb={[{ label: 'Admin', href: '/admin/dashboard' }, { label: 'Dashboard' }]}
         action={
-          <AdminBadge variant={stats.dbConnected ? 'success' : 'default'}>
-            {stats.dbConnected ? 'Supabase conectado' : 'Modo estático'}
+          <AdminBadge variant={stats.dbConnected ? (stats.readOnly ? 'default' : 'success') : 'default'}>
+            {stats.dbConnected
+              ? stats.readOnly
+                ? 'Conectado (somente leitura)'
+                : 'Supabase conectado'
+              : 'Modo estático'}
           </AdminBadge>
         }
       />
 
+      {stats.dbConnected && stats.readOnly && stats.dbError && (
+        <div className="mb-6">
+          <AdminAlert variant="warning">
+            <p className="font-medium">Service role ausente</p>
+            <p className="mt-1 opacity-90">{stats.dbError}</p>
+            <p className="mt-2 opacity-90">
+              Na Vercel, confira o nome exato:{' '}
+              <code className="rounded bg-amber-100/80 px-1">SUPABASE_SERVICE_ROLE_KEY</code> (não é a anon key).
+              Marque para <strong>Production</strong> e faça <strong>Redeploy</strong>.
+            </p>
+          </AdminAlert>
+        </div>
+      )}
+
       {!stats.dbConnected && stats.dbError && (
-        <AdminAlert variant="warning" >
-          <p className="font-medium">Próximo passo</p>
-          <p className="mt-1 opacity-90">{stats.dbError}</p>
-          <ol className="mt-3 list-inside list-decimal space-y-1 opacity-90">
-            <li>
-              Supabase → Settings → API → Exposed schemas → adicionar{' '}
-              <code className="rounded bg-amber-100/80 px-1">{SUPABASE_DB_SCHEMA}</code>
-            </li>
-            <li>
-              SQL Editor → rodar{' '}
-              <code className="rounded bg-amber-100/80 px-1">supabase/migrations/001_loja_cms.sql</code>
-            </li>
-            <li>
-              Depois rodar <code className="rounded bg-amber-100/80 px-1">supabase/seed.sql</code>
-            </li>
-          </ol>
-        </AdminAlert>
+        <div className="mb-6">
+          <AdminAlert variant="warning">
+            <p className="font-medium">Próximo passo</p>
+            <p className="mt-1 opacity-90">{stats.dbError}</p>
+            {stats.dbError.includes('tabelas') || stats.dbError.includes('Schema') ? (
+              <ol className="mt-3 list-inside list-decimal space-y-1 opacity-90">
+                <li>
+                  Supabase → Settings → API → Exposed schemas → adicionar{' '}
+                  <code className="rounded bg-amber-100/80 px-1">{SUPABASE_DB_SCHEMA}</code>
+                </li>
+                <li>
+                  SQL Editor → rodar{' '}
+                  <code className="rounded bg-amber-100/80 px-1">supabase/migrations/001_loja_cms.sql</code>
+                </li>
+                <li>
+                  Depois rodar <code className="rounded bg-amber-100/80 px-1">supabase/seed.sql</code>
+                </li>
+              </ol>
+            ) : null}
+          </AdminAlert>
+        </div>
       )}
 
       <div className="mb-8 mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

@@ -25,7 +25,23 @@ export function getSupabaseAnonKey(): string | undefined {
 }
 
 export function getSupabaseServiceKey(): string | undefined {
-  return envValue('SUPABASE_SERVICE_ROLE_KEY');
+  return (
+    envValue('SUPABASE_SERVICE_ROLE_KEY') ??
+    envValue('SUPABASE_SERVICE_KEY') ??
+    envValue('SUPABASE_SERVICE_ROLE')
+  );
+}
+
+/** Diagnóstico (sem expor valores) — útil no painel admin */
+export function getSupabaseConfigStatus() {
+  return {
+    url: Boolean(getSupabaseUrl()),
+    anonKey: Boolean(getSupabaseAnonKey()),
+    serviceRoleKey: Boolean(getSupabaseServiceKey()),
+    schema: SUPABASE_DB_SCHEMA,
+    canReadStore: isSupabaseConfigured(),
+    canWriteAdmin: isSupabaseAdminConfigured(),
+  };
 }
 
 /** Chave para Server Components / admin (service role preferida) */

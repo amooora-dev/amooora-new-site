@@ -4,6 +4,10 @@ export type AccentProps = {
   accent: string;
 };
 
+export type CtaProps = {
+  cta: string;
+};
+
 export type MobileProps = {
   isMobile: boolean;
 };

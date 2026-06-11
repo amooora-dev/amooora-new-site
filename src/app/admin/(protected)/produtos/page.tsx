@@ -1,7 +1,7 @@
 import { ProdutosTable } from '@/components/admin/ProdutosTable';
 import { IconPlus, IconSearch } from '@/components/admin/admin-icons';
 import { AdminAlert, AdminButton, AdminCard, AdminPageHeader, adminInputClass } from '@/components/admin/admin-ui';
-import { listAdminProducts } from '@/lib/admin/product-repository';
+import { isAdminReadOnly, listAdminProducts } from '@/lib/admin/product-repository';
 import type { ProductCategory } from '@/lib/supabase/database.types';
 
 export const metadata = { title: 'Produtos — CMS Amooora' };
@@ -21,6 +21,7 @@ export default async function AdminProdutosPage({
   const search = searchParams.q?.trim() ?? '';
   const category = (searchParams.categoria ?? '') as ProductCategory | '';
 
+  const readOnly = isAdminReadOnly();
   let products: Awaited<ReturnType<typeof listAdminProducts>> = [];
   let error: string | null = null;
 
@@ -50,6 +51,16 @@ export default async function AdminProdutosPage({
       {searchParams.deleted === '1' && (
         <div className="mb-4">
           <AdminAlert variant="success">Produto excluído com sucesso.</AdminAlert>
+        </div>
+      )}
+
+      {readOnly && !error && (
+        <div className="mb-4">
+          <AdminAlert variant="warning">
+            <strong>Somente leitura.</strong> A loja pública funciona com a anon key; o admin precisa de{' '}
+            <code className="rounded bg-amber-100/80 px-1">SUPABASE_SERVICE_ROLE_KEY</code> na Vercel
+            (Production) para criar, editar e excluir. Depois de adicionar, faça redeploy.
+          </AdminAlert>
         </div>
       )}
 

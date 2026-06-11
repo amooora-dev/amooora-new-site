@@ -22,8 +22,8 @@ const config: Config = {
         'ink-soft': 'var(--ink-soft)',
       },
       fontFamily: {
-        serif: ['var(--serif)'],
-        sans: ['var(--sans)'],
+        serif: ['var(--font-playfair)', 'Playfair Display', 'Georgia', 'serif'],
+        sans: ['var(--font-rubik)', 'Rubik', 'system-ui', 'sans-serif'],
       },
       keyframes: {
         fadeUp: {

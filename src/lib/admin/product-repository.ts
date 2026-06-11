@@ -1,4 +1,5 @@
-import { createSupabaseAdminClient } from '@/lib/supabase/client';
+import { createAdminReadClient, createAdminWriteClient } from '@/lib/supabase/client';
+import { isSupabaseAdminConfigured } from '@/lib/supabase/config';
 import { SUPABASE_STORAGE_BUCKET } from '@/lib/supabase/config';
 import type { ProductBadge, ProductCategory } from '@/lib/supabase/database.types';
 import { slugify } from './slug';
@@ -60,14 +61,29 @@ export type ProductFormInput = {
   primary_image_id?: string | null;
 };
 
-function db() {
-  const client = createSupabaseAdminClient();
+function dbRead() {
+  const client = createAdminReadClient();
   if (!client) {
     throw new Error(
-      'SUPABASE_SERVICE_ROLE_KEY não configurada. Adicione a service role na Vercel (Settings → Environment Variables).'
+      'Supabase não configurado. Verifique NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY na Vercel.'
     );
   }
   return client;
+}
+
+function dbWrite() {
+  const client = createAdminWriteClient();
+  if (!client) {
+    throw new Error(
+      'SUPABASE_SERVICE_ROLE_KEY não configurada — leitura funciona, mas criar/editar/excluir exige a service role na Vercel (Settings → Environment Variables). Depois de adicionar, faça redeploy.'
+    );
+  }
+  return client;
+}
+
+/** true quando o admin só consegue listar (anon), sem gravar */
+export function isAdminReadOnly(): boolean {
+  return !isSupabaseAdminConfigured();
 }
 
 function storagePublicUrl(path: string) {
@@ -79,7 +95,7 @@ export async function listAdminProducts(opts?: {
   search?: string;
   category?: ProductCategory | '';
 }) {
-  let query = db()
+  let query = dbRead()
     .from('products')
     .select('id, slug, name, price, category, badge, active, featured, sort_order, created_at')
     .order('sort_order', { ascending: true });
@@ -94,7 +110,7 @@ export async function listAdminProducts(opts?: {
   const ids = products.map((p) => p.id);
   if (!ids.length) return [];
 
-  const { data: images } = await db()
+  const { data: images } = await dbRead()
     .from('product_images')
     .select('id, product_id, url, is_primary')
     .in('product_id', ids);
@@ -107,7 +123,7 @@ export async function listAdminProducts(opts?: {
 }
 
 export async function getAdminProduct(id: string): Promise<AdminProduct | null> {
-  const { data: product, error } = await db()
+  const { data: product, error } = await dbRead()
     .from('products')
     .select('*')
     .eq('id', id)
@@ -117,9 +133,9 @@ export async function getAdminProduct(id: string): Promise<AdminProduct | null> 
   if (!product) return null;
 
   const [{ data: images }, { data: colors }, { data: whatsapp }] = await Promise.all([
-    db().from('product_images').select('*').eq('product_id', id).order('sort_order'),
-    db().from('product_colors').select('*').eq('product_id', id).order('sort_order'),
-    db().from('whatsapp_ctas').select('*').eq('product_id', id).maybeSingle(),
+    dbRead().from('product_images').select('*').eq('product_id', id).order('sort_order'),
+    dbRead().from('product_colors').select('*').eq('product_id', id).order('sort_order'),
+    dbRead().from('whatsapp_ctas').select('*').eq('product_id', id).maybeSingle(),
   ]);
 
   return {
@@ -138,7 +154,7 @@ async function ensureUniqueSlug(baseSlug: string, excludeId?: string) {
   let n = 0;
   while (true) {
     const candidate = n === 0 ? slug : `${slug}-${n}`;
-    let query = db().from('products').select('id').eq('slug', candidate);
+    let query = dbRead().from('products').select('id').eq('slug', candidate);
     if (excludeId) query = query.neq('id', excludeId);
     const { data } = await query.maybeSingle();
     if (!data) return candidate;
@@ -147,9 +163,9 @@ async function ensureUniqueSlug(baseSlug: string, excludeId?: string) {
 }
 
 async function saveColors(productId: string, colors: AdminProductColor[]) {
-  await db().from('product_colors').delete().eq('product_id', productId);
+  await dbWrite().from('product_colors').delete().eq('product_id', productId);
   if (!colors.length) return;
-  const { error } = await db().from('product_colors').insert(
+  const { error } = await dbWrite().from('product_colors').insert(
     colors.map((c, i) => ({
       product_id: productId,
       name: c.name,
@@ -162,8 +178,8 @@ async function saveColors(productId: string, colors: AdminProductColor[]) {
 }
 
 async function saveWhatsapp(productId: string, whatsapp: AdminProductWhatsapp) {
-  await db().from('whatsapp_ctas').delete().eq('product_id', productId);
-  const { error } = await db().from('whatsapp_ctas').insert({
+  await dbWrite().from('whatsapp_ctas').delete().eq('product_id', productId);
+  const { error } = await dbWrite().from('whatsapp_ctas').insert({
     product_id: productId,
     phone: whatsapp.phone,
     message_template: whatsapp.message_template,
@@ -172,7 +188,7 @@ async function saveWhatsapp(productId: string, whatsapp: AdminProductWhatsapp) {
 }
 
 async function uploadImages(productId: string, files: File[], startOrder: number) {
-  const supabase = db();
+  const supabase = dbWrite();
   const inserted: AdminProductImage[] = [];
 
   for (let i = 0; i < files.length; i++) {
@@ -208,7 +224,7 @@ async function uploadImages(productId: string, files: File[], startOrder: number
 }
 
 async function ensurePrimaryImage(productId: string, primaryId?: string | null) {
-  const { data: images } = await db()
+  const { data: images } = await dbWrite()
     .from('product_images')
     .select('id')
     .eq('product_id', productId);
@@ -219,14 +235,14 @@ async function ensurePrimaryImage(productId: string, primaryId?: string | null) 
     ? primaryId
     : images[0].id;
 
-  await db().from('product_images').update({ is_primary: false }).eq('product_id', productId);
-  await db().from('product_images').update({ is_primary: true }).eq('id', target);
+  await dbWrite().from('product_images').update({ is_primary: false }).eq('product_id', productId);
+  await dbWrite().from('product_images').update({ is_primary: true }).eq('id', target);
 }
 
 export async function createProduct(input: ProductFormInput, files: File[]) {
   const slug = await ensureUniqueSlug(input.slug || slugify(input.name));
 
-  const { data, error } = await db()
+  const { data, error } = await dbWrite()
     .from('products')
     .insert({
       slug,
@@ -261,7 +277,7 @@ export async function createProduct(input: ProductFormInput, files: File[]) {
 export async function updateProduct(id: string, input: ProductFormInput, files: File[]) {
   const slug = await ensureUniqueSlug(input.slug || slugify(input.name), id);
 
-  const { error } = await db()
+  const { error } = await dbWrite()
     .from('products')
     .update({
       slug,
@@ -283,7 +299,7 @@ export async function updateProduct(id: string, input: ProductFormInput, files: 
   await saveColors(id, input.colors);
   await saveWhatsapp(id, input.whatsapp);
 
-  const { count } = await db()
+  const { count } = await dbWrite()
     .from('product_images')
     .select('*', { count: 'exact', head: true })
     .eq('product_id', id);
@@ -296,23 +312,23 @@ export async function updateProduct(id: string, input: ProductFormInput, files: 
 }
 
 export async function deleteProduct(id: string) {
-  const { error } = await db().from('products').delete().eq('id', id);
+  const { error } = await dbWrite().from('products').delete().eq('id', id);
   if (error) throw new Error(error.message);
 }
 
 export async function deleteProductImage(imageId: string, productId: string) {
-  const { data: image } = await db()
+  const { data: image } = await dbWrite()
     .from('product_images')
     .select('url, is_primary')
     .eq('id', imageId)
     .maybeSingle();
 
-  const { error } = await db().from('product_images').delete().eq('id', imageId);
+  const { error } = await dbWrite().from('product_images').delete().eq('id', imageId);
   if (error) throw new Error(error.message);
 
   if (image?.url.includes(SUPABASE_STORAGE_BUCKET)) {
     const path = image.url.split(`${SUPABASE_STORAGE_BUCKET}/`)[1];
-    if (path) await db().storage.from(SUPABASE_STORAGE_BUCKET).remove([path]);
+    if (path) await dbWrite().storage.from(SUPABASE_STORAGE_BUCKET).remove([path]);
   }
 
   if (image?.is_primary) {
@@ -321,7 +337,7 @@ export async function deleteProductImage(imageId: string, productId: string) {
 }
 
 export async function toggleProductActive(id: string, active: boolean) {
-  const { error } = await db().from('products').update({ active }).eq('id', id);
+  const { error } = await dbWrite().from('products').update({ active }).eq('id', id);
   if (error) throw new Error(error.message);
 }
 
