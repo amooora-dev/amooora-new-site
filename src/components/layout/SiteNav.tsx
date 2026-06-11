@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, type CSSProperties } from 'react';
+import { useState, useEffect, useCallback, type CSSProperties } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { CONTEUDO_HOME as C } from '@/lib/conteudo-home';
@@ -15,9 +15,66 @@ type SiteNavProps = {
   navOverDark?: boolean;
 };
 
+type NavLinkId = (typeof C.nav.links)[number]['id'];
+
 function navHref(id: string, page: 'home' | 'loja') {
   if (id === 'loja') return '/loja';
   return page === 'home' ? `#${id}` : `/#${id}`;
+}
+
+function NavIcon({ id, className = 'h-5 w-5' }: { id: NavLinkId; className?: string }) {
+  const props = { className, fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', strokeWidth: 1.75, 'aria-hidden': true as const };
+
+  switch (id) {
+    case 'manifesto':
+      return (
+        <svg {...props}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+      );
+    case 'aplicativo':
+      return (
+        <svg {...props}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+        </svg>
+      );
+    case 'valores':
+      return (
+        <svg {...props}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      );
+    case 'loja':
+      return (
+        <svg {...props}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+        </svg>
+      );
+    case 'faq':
+      return (
+        <svg {...props}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      );
+    default:
+      return null;
+  }
+}
+
+function MenuToggleIcon({ open }: { open: boolean }) {
+  return (
+    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+      {open ? (
+        <path strokeLinecap="round" d="M6 6l12 12M18 6L6 18" />
+      ) : (
+        <>
+          <path strokeLinecap="round" d="M4 7h16" />
+          <path strokeLinecap="round" d="M4 12h16" />
+          <path strokeLinecap="round" d="M4 17h16" />
+        </>
+      )}
+    </svg>
+  );
 }
 
 export function SiteNav({
@@ -31,13 +88,38 @@ export function SiteNav({
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
+  const closeMenu = useCallback(() => setOpen(false), []);
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  useEffect(() => {
+    if (!isMobile || !open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [isMobile, open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeMenu();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, closeMenu]);
+
+  useEffect(() => {
+    closeMenu();
+  }, [page, closeMenu]);
+
   const overDarkHero = (navOverDark ?? page === 'loja') && page === 'loja' && !scrolled;
+  const ctaHref = page === 'home' ? '#aplicativo' : '/#aplicativo';
 
   const navStyle: CSSProperties = {
     position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
@@ -59,7 +141,7 @@ export function SiteNav({
   const links = C.nav.links;
 
   const ctaButton = !isMobile ? (
-    <Link href={page === 'home' ? '#aplicativo' : '/#aplicativo'} style={{
+    <Link href={ctaHref} style={{
       fontFamily: "'DM Sans',sans-serif", fontSize: 13, fontWeight: 600,
       background: accent, color: 'white', padding: '10px 22px', borderRadius: 100,
       textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s',
@@ -73,15 +155,17 @@ export function SiteNav({
     <button
       type="button"
       onClick={() => setOpen((v) => !v)}
-      aria-label="Abrir menu"
+      aria-label={open ? 'Fechar menu' : 'Abrir menu'}
+      aria-expanded={open}
+      aria-controls="mobile-nav-drawer"
       style={{
-        width: 40, height: 40, borderRadius: '50%',
+        width: 44, height: 44, borderRadius: '50%',
         border: overDarkHero ? '1px solid rgba(255,255,255,0.6)' : `1px solid ${accent}44`,
         background: overDarkHero ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.85)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         color: overDarkHero ? '#ffffff' : accent, cursor: 'pointer'
       }}>
-      <span style={{ fontSize: 20, lineHeight: 1 }}>{open ? '×' : '☰'}</span>
+      <MenuToggleIcon open={open} />
     </button>
   );
 
@@ -92,95 +176,145 @@ export function SiteNav({
   };
 
   return (
-    <nav style={navStyle}>
-      <div style={{
-        maxWidth: 1200,
-        margin: '0 auto',
-        padding: scrolled
-          ? (isMobile ? '12px 16px' : '14px 48px')
-          : (isMobile ? '16px 16px' : '20px 48px'),
-        display: 'grid',
-        gridTemplateColumns: isMobile ? '1fr auto' : 'auto 1fr auto',
-        alignItems: 'center',
-        gap: isMobile ? 12 : 32,
-        position: 'relative',
-      }}>
-        <Link href="/" style={{ justifySelf: 'start' }}>
-          <Image
-            src="/images/logo-header.png"
-            alt="Amooora"
-            width={1024}
-            height={404}
-            priority
-            style={{ ...logoStyle, width: 'auto' }}
-          />
-        </Link>
-
-        {!isMobile && layout === 'hero' && (
-          <div style={{
-            display: 'flex',
-            gap: 28,
-            alignItems: 'center',
-            justifyContent: 'center',
-            justifySelf: 'center',
-          }}>
-            {links.map((link) =>
-              <Link key={link.id}
-                href={navHref(link.id, page)}
-                style={linkStyle}
-                onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7'; }}>
-                {link.label}
-              </Link>
-            )}
-          </div>
-        )}
-
-        {!isMobile && layout === 'default' && (
-          <div style={{ display: 'flex', gap: 28, alignItems: 'center', justifySelf: 'end', gridColumn: '2 / -1' }}>
-            {links.map((link) =>
-              <Link key={link.id}
-                href={navHref(link.id, page)}
-                style={{ ...linkStyle, whiteSpace: 'normal' }}
-                onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7'; }}>
-                {link.label}
-              </Link>
-            )}
-            {ctaButton}
-          </div>
-        )}
-
-        {(isMobile || layout === 'hero') && (
-          <div style={{ justifySelf: 'end' }}>{ctaButton}</div>
-        )}
-      </div>
-
-      {isMobile && open &&
-      <div style={{
-        position: 'absolute', top: 'calc(100% + 8px)', right: 16,
-        background: 'rgba(255,255,255,0.98)',
-        border: `1px solid ${accent}22`,
-        borderRadius: 14,
-        padding: '12px 14px',
-        display: 'flex', flexDirection: 'column', gap: 10,
-        boxShadow: '0 10px 30px rgba(0,0,0,0.12)'
-      }}>
-          {links.map((link) =>
-        <Link key={link.id}
-        href={navHref(link.id, page)}
-        onClick={() => setOpen(false)}
-        style={{
-          fontFamily: "'DM Sans',sans-serif",
-          fontSize: 14,
-          fontWeight: 600,
-          color: '#1a1a1a',
-          textDecoration: 'none'
+    <>
+      <nav style={navStyle} aria-label="Principal">
+        <div style={{
+          maxWidth: 1200,
+          margin: '0 auto',
+          padding: scrolled
+            ? (isMobile ? '12px 16px' : '14px 48px')
+            : (isMobile ? '16px 16px' : '20px 48px'),
+          display: 'grid',
+          gridTemplateColumns: isMobile ? '1fr auto' : 'auto 1fr auto',
+          alignItems: 'center',
+          gap: isMobile ? 12 : 32,
+          position: 'relative',
         }}>
-              {link.label}
-            </Link>
-        )}
+          <Link href="/" style={{ justifySelf: 'start' }} onClick={closeMenu}>
+            <Image
+              src="/images/logo-header.png"
+              alt="Amooora"
+              width={1024}
+              height={404}
+              priority
+              style={{ ...logoStyle, width: 'auto' }}
+            />
+          </Link>
+
+          {!isMobile && layout === 'hero' && (
+            <div style={{
+              display: 'flex',
+              gap: 28,
+              alignItems: 'center',
+              justifyContent: 'center',
+              justifySelf: 'center',
+            }}>
+              {links.map((link) =>
+                <Link key={link.id}
+                  href={navHref(link.id, page)}
+                  style={linkStyle}
+                  onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7'; }}>
+                  {link.label}
+                </Link>
+              )}
+            </div>
+          )}
+
+          {!isMobile && layout === 'default' && (
+            <div style={{ display: 'flex', gap: 28, alignItems: 'center', justifySelf: 'end', gridColumn: '2 / -1' }}>
+              {links.map((link) =>
+                <Link key={link.id}
+                  href={navHref(link.id, page)}
+                  style={{ ...linkStyle, whiteSpace: 'normal' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7'; }}>
+                  {link.label}
+                </Link>
+              )}
+              {ctaButton}
+            </div>
+          )}
+
+          {(isMobile || layout === 'hero') && (
+            <div style={{ justifySelf: 'end' }}>{ctaButton}</div>
+          )}
         </div>
-      }
-    </nav>);
+      </nav>
+
+      {/* Mobile — drawer + overlay (padrão slide-in) */}
+      {isMobile && (
+        <div
+          className={`fixed inset-0 z-[110] transition-opacity duration-300 ${
+            open ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
+          }`}
+          aria-hidden={!open}
+        >
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/45"
+            aria-label="Fechar menu"
+            tabIndex={open ? 0 : -1}
+            onClick={closeMenu}
+          />
+
+          <div
+            id="mobile-nav-drawer"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu de navegação"
+            className={`absolute right-0 top-0 flex h-full w-[min(100%,320px)] flex-col bg-white shadow-2xl transition-transform duration-300 ease-out ${
+              open ? 'translate-x-0' : 'translate-x-full'
+            }`}
+          >
+            <div className="flex items-center justify-between border-b border-black/5 px-5 py-4">
+              <span className="font-sans text-sm font-semibold uppercase tracking-[0.15em] text-primary">
+                Menu
+              </span>
+              <button
+                type="button"
+                onClick={closeMenu}
+                aria-label="Fechar menu"
+                className="flex h-10 w-10 items-center justify-center rounded-full text-primary transition hover:bg-primary/5"
+              >
+                <MenuToggleIcon open />
+              </button>
+            </div>
+
+            <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Seções do site">
+              <ul className="space-y-1">
+                {links.map((link) => (
+                  <li key={link.id}>
+                    <Link
+                      href={navHref(link.id, page)}
+                      onClick={closeMenu}
+                      className="flex min-h-[52px] items-center gap-3 rounded-xl px-3 font-sans text-[15px] font-medium text-ink transition hover:bg-primary/5 active:bg-primary/10"
+                    >
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                        <NavIcon id={link.id} />
+                      </span>
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            <div className="border-t border-black/5 p-5">
+              <Link
+                href={ctaHref}
+                onClick={closeMenu}
+                className="flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-primary font-sans text-sm font-semibold text-white shadow-md transition hover:bg-tertiary"
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75} aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                {C.nav.ctaDownload}
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }

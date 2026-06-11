@@ -9,6 +9,7 @@ import type { ProductBadge, ProductCategory } from '@/lib/supabase/database.type
 import { DEFAULT_WHATSAPP_MESSAGE } from '@/lib/supabase/map-product';
 import { slugify } from '@/lib/admin/slug';
 import { deleteImageAction, saveProductAction, type ActionState } from '@/app/admin/(protected)/produtos/actions';
+import { AdminButton, AdminCard, adminInputClass, adminLabelClass } from '@/components/admin/admin-ui';
 
 const CATEGORIES: { value: ProductCategory; label: string }[] = [
   { value: 'camisetas', label: 'Camisetas' },
@@ -28,20 +29,11 @@ const DEFAULT_WHATSAPP_MSG = DEFAULT_WHATSAPP_MESSAGE;
 function SubmitButton({ label }: { label: string }) {
   const { pending } = useFormStatus();
   return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="rounded-full bg-primary px-8 py-3 font-sans text-sm font-semibold text-white transition hover:bg-tertiary disabled:opacity-60"
-    >
+    <AdminButton type="submit" variant="primary" disabled={pending} className="px-8">
       {pending ? 'Salvando…' : label}
-    </button>
+    </AdminButton>
   );
 }
-
-const inputClass =
-  'w-full rounded-xl border border-black/10 px-4 py-2.5 font-sans text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20';
-
-const labelClass = 'mb-1 block font-sans text-sm font-medium text-ink';
 
 const INITIAL_FORM_STATE: ActionState = {};
 
@@ -99,7 +91,7 @@ export function ProdutoForm({
   }, [formState.redirectTo, router]);
 
   return (
-    <form action={formAction} className="mx-auto max-w-3xl space-y-8">
+    <form action={formAction} className="space-y-6">
       {product && <input type="hidden" name="product_id" value={product.id} />}
       <input type="hidden" name="colors_json" value={colorsJson} readOnly />
       <input type="hidden" name="primary_image_id" value={primaryImageId} readOnly />
@@ -110,22 +102,22 @@ export function ProdutoForm({
         </p>
       )}
 
-      <section className="rounded-2xl bg-white p-6 shadow-sm">
+      <AdminCard>
         <h2 className="mb-4 font-serif text-xl font-bold text-ink">Informações básicas</h2>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="md:col-span-2">
-            <label className={labelClass} htmlFor="name">Nome *</label>
+            <label className={adminLabelClass} htmlFor="name">Nome *</label>
             <input
               id="name"
               name="name"
               required
               value={name}
               onChange={(e) => handleNameChange(e.target.value)}
-              className={inputClass}
+              className={adminInputClass}
             />
           </div>
           <div>
-            <label className={labelClass} htmlFor="slug">Slug (URL)</label>
+            <label className={adminLabelClass} htmlFor="slug">Slug (URL)</label>
             <input
               id="slug"
               name="slug"
@@ -134,26 +126,26 @@ export function ProdutoForm({
                 setSlugTouched(true);
                 setSlug(e.target.value);
               }}
-              className={inputClass}
+              className={adminInputClass}
             />
           </div>
           <div>
-            <label className={labelClass} htmlFor="sort_order">Ordem na loja</label>
+            <label className={adminLabelClass} htmlFor="sort_order">Ordem na loja</label>
             <input
               id="sort_order"
               name="sort_order"
               type="number"
               defaultValue={product?.sort_order ?? 0}
-              className={inputClass}
+              className={adminInputClass}
             />
           </div>
           <div>
-            <label className={labelClass} htmlFor="category">Categoria *</label>
+            <label className={adminLabelClass} htmlFor="category">Categoria *</label>
             <select
               id="category"
               name="category"
               defaultValue={product?.category ?? 'camisetas'}
-              className={inputClass}
+              className={adminInputClass}
             >
               {CATEGORIES.map((c) => (
                 <option key={c.value} value={c.value}>{c.label}</option>
@@ -161,12 +153,12 @@ export function ProdutoForm({
             </select>
           </div>
           <div>
-            <label className={labelClass} htmlFor="badge">Badge</label>
+            <label className={adminLabelClass} htmlFor="badge">Badge</label>
             <select
               id="badge"
               name="badge"
               defaultValue={product?.badge ?? ''}
-              className={inputClass}
+              className={adminInputClass}
             >
               {BADGES.map((b) => (
                 <option key={b.value || 'none'} value={b.value}>{b.label}</option>
@@ -174,7 +166,7 @@ export function ProdutoForm({
             </select>
           </div>
           <div>
-            <label className={labelClass} htmlFor="price">Preço (R$) *</label>
+            <label className={adminLabelClass} htmlFor="price">Preço (R$) *</label>
             <input
               id="price"
               name="price"
@@ -183,16 +175,16 @@ export function ProdutoForm({
               min="0"
               required
               defaultValue={product?.price ?? ''}
-              className={inputClass}
+              className={adminInputClass}
             />
           </div>
           <div className="md:col-span-2">
-            <label className={labelClass} htmlFor="sizes">Tamanhos (separados por vírgula)</label>
+            <label className={adminLabelClass} htmlFor="sizes">Tamanhos (separados por vírgula)</label>
             <input
               id="sizes"
               name="sizes"
               defaultValue={product?.sizes?.join(', ') ?? 'P, M, G, GG'}
-              className={inputClass}
+              className={adminInputClass}
             />
           </div>
           <label className="flex items-center gap-2 font-sans text-sm">
@@ -204,37 +196,37 @@ export function ProdutoForm({
             Destaque
           </label>
         </div>
-      </section>
+      </AdminCard>
 
-      <section className="rounded-2xl bg-white p-6 shadow-sm">
+      <AdminCard>
         <h2 className="mb-4 font-serif text-xl font-bold text-ink">Descrições</h2>
         <div className="space-y-4">
           <div>
-            <label className={labelClass} htmlFor="description_short">Descrição curta (card) *</label>
+            <label className={adminLabelClass} htmlFor="description_short">Descrição curta (card) *</label>
             <textarea
               id="description_short"
               name="description_short"
               required
               rows={2}
               defaultValue={product?.description_short ?? ''}
-              className={inputClass}
+              className={adminInputClass}
             />
           </div>
           <div>
-            <label className={labelClass} htmlFor="description_full">Descrição completa (modal) *</label>
+            <label className={adminLabelClass} htmlFor="description_full">Descrição completa (modal) *</label>
             <textarea
               id="description_full"
               name="description_full"
               required
               rows={5}
               defaultValue={product?.description_full ?? ''}
-              className={inputClass}
+              className={adminInputClass}
             />
           </div>
         </div>
-      </section>
+      </AdminCard>
 
-      <section className="rounded-2xl bg-white p-6 shadow-sm">
+      <AdminCard>
         <div className="mb-4 flex items-center justify-between">
           <h2 className="font-serif text-xl font-bold text-ink">Cores</h2>
           <button type="button" onClick={addColor} className="font-sans text-sm font-medium text-primary hover:underline">
@@ -256,7 +248,7 @@ export function ProdutoForm({
                 placeholder="Nome da cor"
                 value={cor.name}
                 onChange={(e) => updateColor(i, { name: e.target.value })}
-                className={`${inputClass} max-w-[180px]`}
+                className={`${adminInputClass} max-w-[180px]`}
               />
               <label className="flex items-center gap-1 font-sans text-xs">
                 <input
@@ -274,39 +266,39 @@ export function ProdutoForm({
             </div>
           ))}
         </div>
-      </section>
+      </AdminCard>
 
-      <section className="rounded-2xl bg-white p-6 shadow-sm">
+      <AdminCard>
         <h2 className="mb-4 font-serif text-xl font-bold text-ink">WhatsApp</h2>
         <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <label className={labelClass} htmlFor="whatsapp_phone">Telefone *</label>
+            <label className={adminLabelClass} htmlFor="whatsapp_phone">Telefone *</label>
             <input
               id="whatsapp_phone"
               name="whatsapp_phone"
               required
               defaultValue={product?.whatsapp?.phone ?? defaultWhatsappPhone}
               placeholder="5511970548406"
-              className={inputClass}
+              className={adminInputClass}
             />
           </div>
           <div className="md:col-span-2">
-            <label className={labelClass} htmlFor="whatsapp_message">Mensagem</label>
+            <label className={adminLabelClass} htmlFor="whatsapp_message">Mensagem</label>
             <textarea
               id="whatsapp_message"
               name="whatsapp_message"
               rows={3}
               defaultValue={product?.whatsapp?.message_template ?? DEFAULT_WHATSAPP_MSG}
-              className={inputClass}
+              className={adminInputClass}
             />
             <p className="mt-1 font-sans text-xs text-muted-fg">
               Variáveis: {'{produto}'}, {'{preco}'}, {'{cor}'}, {'{tamanho}'}, {'{link}'}
             </p>
           </div>
         </div>
-      </section>
+      </AdminCard>
 
-      <section className="rounded-2xl bg-white p-6 shadow-sm">
+      <AdminCard>
         <h2 className="mb-4 font-serif text-xl font-bold text-ink">Fotos</h2>
 
         {product?.images && product.images.length > 0 && (
@@ -345,7 +337,7 @@ export function ProdutoForm({
           </div>
         )}
 
-        <label className={labelClass} htmlFor="new_images">Adicionar fotos</label>
+        <label className={adminLabelClass} htmlFor="new_images">Adicionar fotos</label>
         <input
           id="new_images"
           name="new_images"
@@ -368,9 +360,9 @@ export function ProdutoForm({
         <p className="mt-2 font-sans text-xs text-muted-fg">
           JPG, PNG ou WebP. Proporção recomendada 3:4 (900×1200px).
         </p>
-      </section>
+      </AdminCard>
 
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-3 pt-2">
         <SubmitButton label={product ? 'Salvar alterações' : 'Criar produto'} />
       </div>
     </form>

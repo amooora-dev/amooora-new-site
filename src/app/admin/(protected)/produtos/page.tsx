@@ -1,12 +1,13 @@
-import Link from 'next/link';
 import { ProdutosTable } from '@/components/admin/ProdutosTable';
+import { IconPlus, IconSearch } from '@/components/admin/admin-icons';
+import { AdminAlert, AdminButton, AdminCard, AdminPageHeader, adminInputClass } from '@/components/admin/admin-ui';
 import { listAdminProducts } from '@/lib/admin/product-repository';
 import type { ProductCategory } from '@/lib/supabase/database.types';
 
 export const metadata = { title: 'Produtos — CMS Amooora' };
 
 const CATEGORIES = [
-  { value: '', label: 'Todas' },
+  { value: '', label: 'Todas as categorias' },
   { value: 'camisetas', label: 'Camisetas' },
   { value: 'moletons', label: 'Moletons' },
   { value: 'acessorios', label: 'Acessórios' },
@@ -31,53 +32,61 @@ export default async function AdminProdutosPage({
 
   return (
     <div className="mx-auto max-w-6xl">
-      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="font-serif text-3xl font-bold text-ink">Produtos</h1>
-          <p className="mt-1 font-sans text-muted-fg">Gerencie o catálogo da loja</p>
-        </div>
-        <Link
-          href="/admin/produtos/novo"
-          className="rounded-full bg-primary px-6 py-3 font-sans text-sm font-semibold text-white transition hover:bg-tertiary"
-        >
-          + Novo produto
-        </Link>
-      </div>
+      <AdminPageHeader
+        title="Produtos"
+        description="Gerencie o catálogo da loja"
+        breadcrumb={[
+          { label: 'Admin', href: '/admin/dashboard' },
+          { label: 'Produtos' },
+        ]}
+        action={
+          <AdminButton href="/admin/produtos/novo" variant="primary">
+            <IconPlus className="h-4 w-4" />
+            Novo produto
+          </AdminButton>
+        }
+      />
 
       {searchParams.deleted === '1' && (
-        <p className="mb-4 rounded-xl bg-green-50 px-4 py-3 font-sans text-sm text-green-800">
-          Produto excluído com sucesso.
-        </p>
+        <div className="mb-4">
+          <AdminAlert variant="success">Produto excluído com sucesso.</AdminAlert>
+        </div>
       )}
 
       {error && (
-        <p className="mb-4 rounded-xl bg-red-50 px-4 py-3 font-sans text-sm text-red-700">{error}</p>
+        <div className="mb-4">
+          <AdminAlert variant="error">{error}</AdminAlert>
+        </div>
       )}
 
-      <form className="mb-6 flex flex-wrap gap-3" method="get">
-        <input
-          type="search"
-          name="q"
-          defaultValue={search}
-          placeholder="Buscar por nome…"
-          className="min-w-[200px] flex-1 rounded-xl border border-black/10 px-4 py-2.5 font-sans text-sm outline-none focus:border-primary"
-        />
-        <select
-          name="categoria"
-          defaultValue={category}
-          className="rounded-xl border border-black/10 px-4 py-2.5 font-sans text-sm outline-none focus:border-primary"
-        >
-          {CATEGORIES.map((c) => (
-            <option key={c.value} value={c.value}>{c.label}</option>
-          ))}
-        </select>
-        <button
-          type="submit"
-          className="rounded-full border border-primary px-5 py-2.5 font-sans text-sm font-medium text-primary hover:bg-primary/5"
-        >
-          Filtrar
-        </button>
-      </form>
+      <AdminCard className="mb-6" padding="p-4 md:p-5">
+        <form className="flex flex-col gap-3 md:flex-row md:items-center" method="get">
+          <div className="relative min-w-0 flex-1">
+            <IconSearch className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-fg" />
+            <input
+              type="search"
+              name="q"
+              defaultValue={search}
+              placeholder="Buscar por nome…"
+              className={`${adminInputClass} pl-10`}
+            />
+          </div>
+          <select
+            name="categoria"
+            defaultValue={category}
+            className={`${adminInputClass} md:w-52`}
+          >
+            {CATEGORIES.map((c) => (
+              <option key={c.value} value={c.value}>
+                {c.label}
+              </option>
+            ))}
+          </select>
+          <AdminButton type="submit" variant="secondary" className="md:w-auto">
+            Filtrar
+          </AdminButton>
+        </form>
+      </AdminCard>
 
       <ProdutosTable products={products} />
     </div>

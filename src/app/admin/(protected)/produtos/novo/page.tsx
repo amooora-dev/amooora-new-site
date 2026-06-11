@@ -1,5 +1,5 @@
-import Link from 'next/link';
 import { ProdutoForm } from '@/components/admin/ProdutoForm';
+import { AdminPageHeader } from '@/components/admin/admin-ui';
 
 export const metadata = { title: 'Novo produto — CMS Amooora' };
 
@@ -7,13 +7,16 @@ export default function NovoProdutoPage() {
   const defaultWhatsappPhone = process.env.WHATSAPP_DEFAULT_PHONE ?? '';
 
   return (
-    <div>
-      <div className="mb-8">
-        <Link href="/admin/produtos" className="font-sans text-sm text-primary hover:underline">
-          ← Voltar para produtos
-        </Link>
-        <h1 className="mt-2 font-serif text-3xl font-bold text-ink">Novo produto</h1>
-      </div>
+    <div className="mx-auto max-w-4xl">
+      <AdminPageHeader
+        title="Novo produto"
+        description="Preencha os dados para publicar na loja"
+        breadcrumb={[
+          { label: 'Admin', href: '/admin/dashboard' },
+          { label: 'Produtos', href: '/admin/produtos' },
+          { label: 'Novo' },
+        ]}
+      />
       <ProdutoForm defaultWhatsappPhone={defaultWhatsappPhone} />
     </div>
   );

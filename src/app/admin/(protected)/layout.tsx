@@ -1,5 +1,5 @@
 import { requireAdminSession } from '@/lib/admin/auth';
-import { AdminSidebar } from '@/components/admin/AdminSidebar';
+import { AdminShell } from '@/components/admin/AdminShell';
 
 export default async function AdminProtectedLayout({
   children,
@@ -8,10 +8,5 @@ export default async function AdminProtectedLayout({
 }) {
   const session = await requireAdminSession();
 
-  return (
-    <div className="flex min-h-screen bg-[#F9F9F9]">
-      <AdminSidebar email={session.email} />
-      <main className="flex-1 overflow-auto p-6 md:p-10">{children}</main>
-    </div>
-  );
+  return <AdminShell email={session.email}>{children}</AdminShell>;
 }

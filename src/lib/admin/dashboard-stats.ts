@@ -2,13 +2,20 @@ import { PRODUTOS_LOJA } from '@/lib/loja-data';
 import { createSupabaseAdminClient } from '@/lib/supabase/client';
 import { isSupabaseAdminConfigured, SUPABASE_DB_SCHEMA } from '@/lib/supabase/config';
 
+export type RecentProduct = {
+  name: string;
+  category: string;
+  createdAt: string | null;
+  thumb: string | null;
+};
+
 export type DashboardStats = {
   source: 'supabase' | 'static';
   dbConnected: boolean;
   dbError: string | null;
   totalProducts: number;
   byCategory: { camisetas: number; moletons: number; acessorios: number };
-  recentProducts: { name: string; category: string; createdAt: string | null }[];
+  recentProducts: RecentProduct[];
 };
 
 function staticStats(): DashboardStats {
@@ -27,6 +34,7 @@ function staticStats(): DashboardStats {
       name: p.nome,
       category: p.categoria,
       createdAt: null,
+      thumb: p.imagem ?? null,
     })),
   };
 }
@@ -39,7 +47,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 
   const { data, error } = await supabase
     .from('products')
-    .select('name, category, created_at')
+    .select('id, name, category, created_at')
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -63,16 +71,34 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     acessorios: 'Acessórios',
   };
 
+  const recent = (data ?? []).slice(0, 5);
+  const recentIds = recent.map((row) => row.id);
+
+  let thumbByProductId = new Map<string, string>();
+  if (recentIds.length) {
+    const { data: images } = await supabase
+      .from('product_images')
+      .select('product_id, url, is_primary')
+      .in('product_id', recentIds);
+
+    for (const id of recentIds) {
+      const imgs = (images ?? []).filter((i) => i.product_id === id);
+      const primary = imgs.find((i) => i.is_primary) ?? imgs[0];
+      if (primary?.url) thumbByProductId.set(id, primary.url);
+    }
+  }
+
   return {
     source: 'supabase',
     dbConnected: true,
     dbError: null,
     totalProducts: data?.length ?? 0,
     byCategory,
-    recentProducts: (data ?? []).slice(0, 5).map((row) => ({
+    recentProducts: recent.map((row) => ({
       name: row.name,
       category: categoryLabel[row.category] ?? row.category,
       createdAt: row.created_at,
+      thumb: thumbByProductId.get(row.id) ?? null,
     })),
   };
 }
