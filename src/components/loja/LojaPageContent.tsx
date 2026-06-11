@@ -15,6 +15,7 @@ import {
   type CategoriaFiltro,
   type ProdutoLoja,
 } from '@/lib/loja-data';
+import { buildWhatsappUrl } from '@/lib/supabase/map-product';
 
 const ACCENT = '#93296F';
 const { hero, filtros } = CONTEUDO_LOJA;
@@ -87,7 +88,7 @@ function ProdutoCard({
         <div className="flex items-center justify-between">
           <span className="font-serif text-xl font-bold text-primary">{produto.preco}</span>
           <a
-            href={produto.shopUrl}
+            href={buildWhatsappUrl(produto)}
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`Comprar ${produto.nome} via WhatsApp`}

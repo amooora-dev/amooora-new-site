@@ -1,4 +1,5 @@
 import type { ProdutoLoja } from '@/lib/loja-data';
+import { buildAbsoluteSiteUrl } from '@/lib/site-url';
 import type { ProductBadge, ProductCategory, StoreProduct } from './database.types';
 
 const CATEGORY_LABEL: Record<ProductCategory, ProdutoLoja['categoria']> = {
@@ -21,11 +22,7 @@ export const DEFAULT_WHATSAPP_MESSAGE =
   'Olá! Tenho interesse no {produto} ({preco}). Cor: {cor}. Tamanho: {tamanho}.\n\nLink: {link}';
 
 export function buildProductPageUrl(slug: string): string {
-  const path = `/loja?produto=${encodeURIComponent(slug)}`;
-  const base = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '');
-  if (base) return `${base}${path}`;
-  if (typeof window !== 'undefined') return `${window.location.origin}${path}`;
-  return path;
+  return buildAbsoluteSiteUrl(`/loja?produto=${encodeURIComponent(slug)}`);
 }
 
 export function buildWhatsappUrl(
