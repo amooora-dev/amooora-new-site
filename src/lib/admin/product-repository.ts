@@ -306,6 +306,7 @@ async function ensurePrimaryImage(productId: string, primaryId?: string | null) 
 
 export async function createProduct(input: ProductFormInput, files: File[]) {
   const slug = await ensureUniqueSlug(input.slug || slugify(input.name));
+  const sortOrder = await getNextProductSortOrder();
 
   const { data, error } = await dbWrite()
     .from('products')
@@ -320,7 +321,7 @@ export async function createProduct(input: ProductFormInput, files: File[]) {
       active: input.active,
       featured: input.featured,
       sizes: input.sizes,
-      sort_order: input.sort_order,
+      sort_order: sortOrder,
     })
     .select('id')
     .single();
@@ -352,7 +353,6 @@ export async function updateProduct(id: string, input: ProductFormInput, files: 
       active: input.active,
       featured: input.featured,
       sizes: input.sizes,
-      sort_order: input.sort_order,
     })
     .eq('id', id);
 
@@ -387,6 +387,49 @@ export async function deleteProductImage(imageId: string, productId: string) {
   if (image?.is_primary) {
     await ensurePrimaryImage(productId, null);
   }
+}
+
+export async function getNextProductSortOrder(): Promise<number> {
+  const { data, error } = await dbRead()
+    .from('products')
+    .select('sort_order')
+    .order('sort_order', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  return (data?.sort_order ?? -1) + 1;
+}
+
+export async function reorderProducts(orderedIds: string[]) {
+  if (!orderedIds.length) return;
+
+  const { data: existing, error: readError } = await dbRead()
+    .from('products')
+    .select('id');
+
+  if (readError) throw new Error(readError.message);
+
+  const allIds = (existing ?? []).map((p) => p.id);
+  const seen = new Set<string>();
+  const fullOrder: string[] = [];
+
+  for (const id of orderedIds) {
+    if (allIds.includes(id) && !seen.has(id)) {
+      fullOrder.push(id);
+      seen.add(id);
+    }
+  }
+  for (const id of allIds) {
+    if (!seen.has(id)) fullOrder.push(id);
+  }
+
+  const supabase = dbWrite();
+  await Promise.all(
+    fullOrder.map((id, index) =>
+      supabase.from('products').update({ sort_order: index }).eq('id', id)
+    )
+  );
 }
 
 export async function reorderProductImages(productId: string, orderedIds: string[]) {

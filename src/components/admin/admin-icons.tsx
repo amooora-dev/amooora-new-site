@@ -97,6 +97,17 @@ export function IconPackage({ className = 'h-5 w-5' }: IconProps) {
   );
 }
 
+export function IconSort({ className = 'h-5 w-5' }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+      <line x1="4" y1="9" x2="20" y2="9" />
+      <line x1="4" y1="15" x2="20" y2="15" />
+      <circle cx="9" cy="9" r="2" fill="currentColor" stroke="none" />
+      <circle cx="15" cy="15" r="2" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
 export function IconTrending({ className = 'h-5 w-5' }: IconProps) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>

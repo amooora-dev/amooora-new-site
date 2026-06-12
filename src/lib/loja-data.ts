@@ -110,7 +110,7 @@ const PRODUTOS_BASE: ProdutoLojaBase[] = [
   {
     id: 1,
     slug: 'camiseta-sapatao-arco-iris',
-    nome: 'Camiseta Sapatão Arco-íris',
+    nome: 'Sapatão — Camiseta Arco-íris',
     categoria: 'Camisetas',
     preco: 'R$ 84,90',
     badge: 'MAIS VENDIDO',
@@ -127,7 +127,7 @@ const PRODUTOS_BASE: ProdutoLojaBase[] = [
   {
     id: 2,
     slug: 'camiseta-sapatao-preta',
-    nome: 'Camiseta Sapatão Preta',
+    nome: 'Sapatão — Camiseta Preta',
     categoria: 'Camisetas',
     preco: 'R$ 79,90',
     badge: null,
@@ -144,7 +144,7 @@ const PRODUTOS_BASE: ProdutoLojaBase[] = [
   {
     id: 3,
     slug: 'camiseta-sapatao-ringer-amarela',
-    nome: 'Camiseta Sapatão Ringer Amarela',
+    nome: 'Sapatão — Camiseta Ringer Amarela',
     categoria: 'Camisetas',
     preco: 'R$ 74,90',
     badge: 'NOVO',
@@ -161,7 +161,7 @@ const PRODUTOS_BASE: ProdutoLojaBase[] = [
   {
     id: 4,
     slug: 'camiseta-quenga-ringer',
-    nome: 'Camiseta Quenga Ringer',
+    nome: 'Quenga — Camiseta Oversized Brasil',
     categoria: 'Camisetas',
     preco: 'R$ 74,90',
     badge: null,
@@ -178,7 +178,7 @@ const PRODUTOS_BASE: ProdutoLojaBase[] = [
   {
     id: 5,
     slug: 'regata-vagitariana',
-    nome: 'Regata Vagitariana',
+    nome: 'Vagitariana — Regata Roxa',
     categoria: 'Camisetas',
     preco: 'R$ 69,90',
     badge: 'NOVO',
@@ -195,7 +195,7 @@ const PRODUTOS_BASE: ProdutoLojaBase[] = [
   {
     id: 6,
     slug: 'moletom-sapatao-roxo',
-    nome: 'Moletom Sapatão Roxo',
+    nome: 'Sapatão — Moletom Roxo',
     categoria: 'Moletons',
     preco: 'R$ 189,90',
     badge: 'NOVO',
@@ -212,7 +212,7 @@ const PRODUTOS_BASE: ProdutoLojaBase[] = [
   {
     id: 7,
     slug: 'bone-trucker-sapatao',
-    nome: 'Boné Trucker Sapatão',
+    nome: 'Sapatão — Boné Trucker Roxo',
     categoria: 'Acessórios',
     preco: 'R$ 59,90',
     badge: null,

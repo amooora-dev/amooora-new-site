@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { SiteNav } from '@/components/layout/SiteNav';
 import { SiteFooter } from '@/components/layout/SiteFooter';
@@ -46,9 +46,11 @@ function ProdutoCard({
   produto: ProdutoLoja;
   index: number;
 }) {
+  const router = useRouter();
   const imagens = produto.imagens.length ? produto.imagens : [produto.imagem];
   const [imgAtiva, setImgAtiva] = useState(0);
   const [corAtiva, setCorAtiva] = useState(0);
+  const produtoHref = `/loja/${produto.slug}`;
 
   const whatsappUrl = buildWhatsappUrl(produto, {
     cor: produto.cores[corAtiva]?.nome,
@@ -62,12 +64,12 @@ function ProdutoCard({
     >
       {/* Link atrás do conteúdo — cliques passam via pointer-events-none nos filhos */}
       <Link
-        href={`/loja/${produto.slug}`}
+        href={produtoHref}
         className="absolute inset-0 z-0"
         aria-label={`Ver detalhes de ${produto.nome}`}
       />
 
-      {/* Imagem — pointer-events-none deixa cliques irem ao Link, exceto controles com pointer-events-auto */}
+      {/* Imagem — swipe no mobile; setas no desktop; toque na imagem abre o produto */}
       <div className="relative z-10 pointer-events-none">
         <ProductImageGallery
           variant="card"
@@ -75,6 +77,7 @@ function ProdutoCard({
           alt={produto.nome}
           activeIndex={imgAtiva}
           onIndexChange={setImgAtiva}
+          onCardNavigate={() => router.push(produtoHref)}
         />
 
         {produto.badge && (
@@ -82,12 +85,6 @@ function ProdutoCard({
             {produto.badge}
           </span>
         )}
-
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-primary/0 opacity-0 transition-all duration-300 group-hover:bg-primary/20 group-hover:opacity-100">
-          <span className="translate-y-2 rounded-full bg-white px-5 py-2.5 font-sans text-sm font-semibold text-primary shadow-md transition group-hover:translate-y-0">
-            Ver Detalhes
-          </span>
-        </div>
       </div>
 
       <div className="relative z-10 pointer-events-none p-4">

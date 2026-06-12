@@ -11,16 +11,19 @@ import {
   IconLogout,
   IconMenu,
   IconProducts,
+  IconSort,
   IconStore,
 } from '@/components/admin/admin-icons';
 
 const NAV = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: IconDashboard },
   { href: '/admin/produtos', label: 'Produtos', icon: IconProducts },
+  { href: '/admin/produtos/ordenar', label: 'Ordenar Produtos', icon: IconSort },
 ] as const;
 
 function getPageTitle(pathname: string): string {
   if (pathname.startsWith('/admin/produtos/novo')) return 'Novo produto';
+  if (pathname.startsWith('/admin/produtos/ordenar')) return 'Ordenar produtos';
   if (pathname.match(/^\/admin\/produtos\/[^/]+$/)) return 'Editar produto';
   if (pathname.startsWith('/admin/produtos')) return 'Produtos';
   return 'Dashboard';
@@ -59,7 +62,12 @@ function SidebarContent({
           Menu
         </p>
         {NAV.map((item) => {
-          const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+          const active =
+            item.href === '/admin/produtos'
+              ? pathname === '/admin/produtos' ||
+                (pathname.startsWith('/admin/produtos/') &&
+                  !pathname.startsWith('/admin/produtos/ordenar'))
+              : pathname === item.href || pathname.startsWith(`${item.href}/`);
           const Icon = item.icon;
           return (
             <Link

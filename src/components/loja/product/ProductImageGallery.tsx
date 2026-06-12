@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
 function ChevronLeft({ className = 'h-5 w-5' }: { className?: string }) {
@@ -25,8 +26,12 @@ type ProductImageGalleryProps = {
   onIndexChange: (index: number) => void;
   variant?: 'card' | 'modal';
   onMainImageClick?: () => void;
+  /** Card no mobile: toque na imagem abre o produto (se não foi swipe) */
+  onCardNavigate?: () => void;
   className?: string;
 };
+
+const SWIPE_THRESHOLD_PX = 48;
 
 export function ProductImageGallery({
   imagens,
@@ -35,11 +40,24 @@ export function ProductImageGallery({
   onIndexChange,
   variant = 'card',
   onMainImageClick,
+  onCardNavigate,
   className = '',
 }: ProductImageGalleryProps) {
   const total = imagens.length;
   const hasMultiple = total > 1;
   const isModal = variant === 'modal';
+  const isCard = variant === 'card';
+  const [isMobile, setIsMobile] = useState(false);
+  const touchStart = useRef({ x: 0, y: 0 });
+  const didSwipe = useRef(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    const sync = () => setIsMobile(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
 
   const prev = () => onIndexChange((activeIndex - 1 + total) % total);
   const next = () => onIndexChange((activeIndex + 1) % total);
@@ -47,7 +65,41 @@ export function ProductImageGallery({
   const thumbSize = isModal ? 'h-[72px] w-[56px]' : 'h-14 w-11';
   const arrowBtn = isModal
     ? 'h-12 w-12 border border-black/10 bg-white text-ink shadow-lg hover:bg-off-white'
-    : 'h-10 w-10 bg-secondary text-white shadow-md hover:brightness-110';
+    : 'h-10 w-10 bg-muted text-secondary shadow-md hover:bg-off-white';
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!isCard || !isMobile || !hasMultiple) return;
+    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    didSwipe.current = false;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!isCard || !isMobile || !hasMultiple) return;
+    const dx = e.changedTouches[0].clientX - touchStart.current.x;
+    const dy = e.changedTouches[0].clientY - touchStart.current.y;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) >= SWIPE_THRESHOLD_PX) {
+      didSwipe.current = true;
+      e.stopPropagation();
+      if (dx > 0) prev();
+      else next();
+    }
+  };
+
+  const handleCardImageClick = (e: React.MouseEvent) => {
+    if (!isCard || !isMobile || !onCardNavigate) return;
+    if (didSwipe.current) {
+      didSwipe.current = false;
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    onCardNavigate();
+  };
+
+  const imageWrapperClass =
+    isCard && isMobile
+      ? 'relative h-full w-full touch-pan-y pointer-events-auto cursor-pointer'
+      : 'relative h-full w-full';
 
   return (
     <div className={`flex flex-col ${className}`}>
@@ -77,7 +129,24 @@ export function ProductImageGallery({
             />
           </button>
         ) : (
-          <div className="relative h-full w-full">
+          <div
+            className={imageWrapperClass}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            onClick={handleCardImageClick}
+            role={isCard && isMobile && onCardNavigate ? 'link' : undefined}
+            tabIndex={isCard && isMobile && onCardNavigate ? 0 : undefined}
+            onKeyDown={
+              isCard && isMobile && onCardNavigate
+                ? (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      onCardNavigate();
+                    }
+                  }
+                : undefined
+            }
+          >
             <Image
               src={imagens[activeIndex]}
               alt={`${alt} — foto ${activeIndex + 1} de ${total}`}
@@ -89,6 +158,7 @@ export function ProductImageGallery({
                   : '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw'
               }
               priority={isModal && activeIndex === 0}
+              draggable={false}
             />
           </div>
         )}
@@ -102,9 +172,9 @@ export function ProductImageGallery({
                 prev();
               }}
               aria-label="Foto anterior"
-              className={`pointer-events-auto absolute left-2 top-1/2 z-20 flex -translate-y-1/2 items-center justify-center rounded-full transition hover:scale-105 active:scale-95 ${arrowBtn} ${
-                isModal ? 'md:left-4' : ''
-              }`}
+              className={`pointer-events-auto absolute left-2 top-1/2 z-20 -translate-y-1/2 items-center justify-center rounded-full transition hover:scale-105 active:scale-95 ${arrowBtn} ${
+                isCard ? 'hidden md:flex' : 'flex'
+              } ${isModal ? 'md:left-4' : ''}`}
             >
               <ChevronLeft className={isModal ? 'h-6 w-6' : 'h-5 w-5'} />
             </button>
@@ -115,9 +185,9 @@ export function ProductImageGallery({
                 next();
               }}
               aria-label="Próxima foto"
-              className={`pointer-events-auto absolute right-2 top-1/2 z-20 flex -translate-y-1/2 items-center justify-center rounded-full transition hover:scale-105 active:scale-95 ${arrowBtn} ${
-                isModal ? 'md:right-4' : ''
-              }`}
+              className={`pointer-events-auto absolute right-2 top-1/2 z-20 -translate-y-1/2 items-center justify-center rounded-full transition hover:scale-105 active:scale-95 ${arrowBtn} ${
+                isCard ? 'hidden md:flex' : 'flex'
+              } ${isModal ? 'md:right-4' : ''}`}
             >
               <ChevronRight className={isModal ? 'h-6 w-6' : 'h-5 w-5'} />
             </button>

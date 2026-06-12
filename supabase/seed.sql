@@ -12,49 +12,49 @@ insert into "ecommerce-amooora".products (
 ) values
 (
   'camiseta-sapatao-arco-iris',
-  'Camiseta Sapatão Arco-íris',
+  'Sapatão — Camiseta Arco-íris',
   'Estampa tipográfica em sete cores, roxo vibrante',
   'Camiseta roxa com a palavra "sapatão" repetida em sete cores do arco-íris. Modelagem unissex, 100% algodão, ideal para o dia a dia com muito orgulho.',
   84.90, 'camisetas', 'mais_vendido', array['P','M','G','GG'], 1
 ),
 (
   'camiseta-sapatao-preta',
-  'Camiseta Sapatão Preta',
+  'Sapatão — Camiseta Preta',
   'Estampa branca com detalhe rosa, algodão premium',
   'Camiseta preta com estampa "sapatão" em branco e círculo rosa no peito. Corte confortável, tecido de alta qualidade.',
   79.90, 'camisetas', null, array['P','M','G','GG'], 2
 ),
 (
   'camiseta-sapatao-ringer-amarela',
-  'Camiseta Sapatão Ringer Amarela',
+  'Sapatão — Camiseta Ringer Amarela',
   'Modelo ringer amarelo, estampa verde e detalhe laranja',
   'Camiseta ringer amarela com gola e mangas verdes. Estampa "sapatão" em verde escuro com círculo laranja. Unissex e confortável.',
   74.90, 'camisetas', 'novo', array['P','M','G','GG'], 3
 ),
 (
   'camiseta-quenga-ringer',
-  'Camiseta Quenga Ringer',
+  'Quenga — Camiseta Oversized Brasil',
   'Ringer amarela com estampa tipográfica quenga',
   'Camiseta ringer amarela com detalhes verdes na gola. Estampa "quenga" em tipografia serifada preta. Peça ousada e cheia de personalidade.',
   74.90, 'camisetas', null, array['P','M','G','GG'], 4
 ),
 (
   'regata-vagitariana',
-  'Regata Vagitariana',
+  'Vagitariana — Regata Roxa',
   'Tipografia serifada em branco, roxo vibrante',
   'Regata em tom roxo profundo com estampa "vagitariana" em letras brancas e detalhes em rosa. Tecido leve e confortável para o calor.',
   69.90, 'camisetas', 'novo', array['P','M','G','GG'], 5
 ),
 (
   'moletom-sapatao-roxo',
-  'Moletom Sapatão Roxo',
+  'Sapatão — Moletom Roxo',
   'Capuz, bolso canguru, estampa branca e detalhe rosa',
   'Moletom roxo com estampa "sapatão" em branco e círculo rosa no peito. Soft fleece, capuz com cordão e bolso frontal.',
   189.90, 'moletons', 'novo', array['P','M','G','GG'], 6
 ),
 (
   'bone-trucker-sapatao',
-  'Boné Trucker Sapatão',
+  'Sapatão — Boné Trucker Roxo',
   'Boné trucker roxo e branco, estampa Amooora',
   'Boné trucker com aba roxa, tela branca e estampa "sapatão" com detalhe Amooora. Ajuste traseiro, ideal para o dia a dia.',
   59.90, 'acessorios', null, array['Único'], 7

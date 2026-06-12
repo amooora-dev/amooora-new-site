@@ -28,6 +28,7 @@ function revalidateLoja(slug?: string) {
   revalidatePath('/loja');
   if (slug) revalidatePath(`/loja/${slug}`);
   revalidatePath('/admin/produtos');
+  revalidatePath('/admin/produtos/ordenar');
   revalidatePath('/admin/dashboard');
 }
 
@@ -78,6 +79,18 @@ export async function toggleActiveAction(productId: string, active: boolean) {
   await toggleProductActive(productId, active);
   revalidateLoja();
   revalidatePath('/admin/produtos');
+}
+
+export async function saveProductOrderAction(orderedIds: string[]): Promise<ActionState> {
+  await requireAdminSession();
+  try {
+    const { reorderProducts } = await import('@/lib/admin/product-repository');
+    await reorderProducts(orderedIds);
+    revalidateLoja();
+    return { success: 'Ordem salva! A loja já exibe os produtos na nova sequência.' };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Erro ao salvar ordem.' };
+  }
 }
 
 export async function reorderImagesAction(

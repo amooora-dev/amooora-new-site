@@ -187,14 +187,31 @@ export function ProdutoForm({
             />
           </div>
           <div>
-            <label className={adminLabelClass} htmlFor="sort_order">Ordem na loja</label>
-            <input
-              id="sort_order"
-              name="sort_order"
-              type="number"
-              defaultValue={product?.sort_order ?? 0}
-              className={adminInputClass}
-            />
+            <label className={adminLabelClass} htmlFor="sort_order_display">Ordem na loja</label>
+            {product ? (
+              <>
+                <p
+                  id="sort_order_display"
+                  className="rounded-xl border border-black/[0.08] bg-muted/40 px-4 py-3 font-sans text-sm text-ink"
+                >
+                  Posição <strong>{product.sort_order + 1}</strong> na vitrine
+                </p>
+                <p className="mt-1.5 font-sans text-xs text-muted-fg">
+                  Para alterar, use{' '}
+                  <a href="/admin/produtos/ordenar" className="font-medium text-primary hover:underline">
+                    Ordenar Produtos
+                  </a>
+                  .
+                </p>
+              </>
+            ) : (
+              <p
+                id="sort_order_display"
+                className="rounded-xl border border-black/[0.08] bg-muted/40 px-4 py-3 font-sans text-sm text-muted-fg"
+              >
+                Será adicionado ao <strong>final da lista</strong> ao salvar.
+              </p>
+            )}
           </div>
           <div>
             <label className={adminLabelClass} htmlFor="category">Categoria *</label>
