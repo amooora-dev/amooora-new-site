@@ -45,10 +45,10 @@ export function GalleryPageLayout({ imagens, alt, activeIndex, onIndexChange }: 
   return (
     <>
       {/* Desktop: thumbnails verticais à esquerda + imagem principal */}
-      <div className="flex flex-col gap-3 md:flex-row md:gap-4">
+      <div className="flex w-full min-w-0 items-start gap-4">
         {hasMultiple && (
           <div
-            className="order-2 flex flex-row gap-2 overflow-x-auto pb-1 md:order-1 md:w-[80px] md:flex-col md:overflow-x-visible md:overflow-y-auto md:pb-0"
+            className="hidden w-[70px] shrink-0 flex-col gap-2 overflow-y-auto md:flex"
             role="tablist"
             aria-label="Miniaturas"
           >
@@ -75,16 +75,18 @@ export function GalleryPageLayout({ imagens, alt, activeIndex, onIndexChange }: 
           </div>
         )}
 
-        {/* Imagem principal */}
-        <div className={`relative order-1 overflow-hidden rounded-2xl bg-muted md:order-2 md:flex-1 ${hasMultiple ? '' : 'w-full'}`}>
-          <div className="relative aspect-[3/4]">
+        {/* flex-1 + min-w-0: ocupa só o espaço restante após os thumbs, sem estourar o grid */}
+        <div className="relative min-w-0 flex-1 overflow-hidden rounded-2xl bg-white">
+          <div className="relative max-w-full">
             <Image
               src={imagens[activeIndex]}
               alt={`${alt} — foto ${activeIndex + 1} de ${total}`}
-              fill
+              width={0}
+              height={0}
               priority
-              className="object-cover object-center"
               sizes="(max-width: 768px) 100vw, 50vw"
+              className="h-auto max-w-full w-full"
+              style={{ width: '100%', height: 'auto' }}
             />
 
             {/* Botão zoom */}
@@ -104,7 +106,7 @@ export function GalleryPageLayout({ imagens, alt, activeIndex, onIndexChange }: 
                   type="button"
                   onClick={prev}
                   aria-label="Foto anterior"
-                  className="absolute left-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-black/10 bg-white shadow-md transition hover:scale-105"
+                  className="absolute left-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-secondary text-white shadow-md transition hover:brightness-110"
                 >
                   <ChevronLeft />
                 </button>
@@ -112,7 +114,7 @@ export function GalleryPageLayout({ imagens, alt, activeIndex, onIndexChange }: 
                   type="button"
                   onClick={next}
                   aria-label="Próxima foto"
-                  className="absolute right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-black/10 bg-white shadow-md transition hover:scale-105"
+                  className="absolute right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-secondary text-white shadow-md transition hover:brightness-110"
                 >
                   <ChevronRight />
                 </button>

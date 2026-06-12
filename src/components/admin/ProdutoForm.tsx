@@ -1,15 +1,22 @@
 'use client';
 
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import type { AdminProduct, AdminProductColor } from '@/lib/admin/product-repository';
 import type { ProductBadge, ProductCategory } from '@/lib/supabase/database.types';
 import { DEFAULT_WHATSAPP_MESSAGE } from '@/lib/supabase/map-product';
 import { slugify } from '@/lib/admin/slug';
-import { deleteImageAction, saveProductAction, type ActionState } from '@/app/admin/(protected)/produtos/actions';
+import { saveProductAction, type ActionState } from '@/app/admin/(protected)/produtos/actions';
 import { AdminButton, AdminCard, adminInputClass, adminLabelClass } from '@/components/admin/admin-ui';
+import { ImageSortManager, type GalleryItem } from '@/components/admin/ImageSortManager';
+
+function toGalleryItems(product?: AdminProduct): GalleryItem[] {
+  if (!product?.images?.length) return [];
+  return [...product.images]
+    .sort((a, b) => a.sort_order - b.sort_order)
+    .map((img) => ({ kind: 'saved' as const, id: img.id, url: img.url, alt: img.alt }));
+}
 
 const CATEGORIES: { value: ProductCategory; label: string }[] = [
   { value: 'camisetas', label: 'Camisetas' },
@@ -55,12 +62,25 @@ export function ProdutoForm({
       ? product.colors
       : [{ name: 'Roxo', hex_code: '#3a184f', available: true, sort_order: 0 }]
   );
-  const [primaryImageId, setPrimaryImageId] = useState(
-    product?.images.find((i) => i.is_primary)?.id ?? product?.images[0]?.id ?? ''
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>(() => toGalleryItems(product));
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const submittingRef = useRef(false);
+
+  const serverImagesKey = useMemo(
+    () => product?.images?.map((i) => `${i.id}:${i.sort_order}`).join('|') ?? '',
+    [product?.images]
   );
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
   const colorsJson = useMemo(() => JSON.stringify(colors), [colors]);
+  const imageOrderJson = useMemo(
+    () =>
+      JSON.stringify(
+        galleryItems.map((item) =>
+          item.kind === 'saved' ? { kind: 'saved', id: item.id } : { kind: 'pending' }
+        )
+      ),
+    [galleryItems]
+  );
 
   const handleNameChange = (value: string) => {
     setName(value);
@@ -80,21 +100,58 @@ export function ProdutoForm({
   };
 
   const handleFiles = (files: FileList | null) => {
-    if (!files) return;
-    setPreviewUrls(Array.from(files).map((f) => URL.createObjectURL(f)));
+    if (!files?.length) return;
+    const newItems: GalleryItem[] = Array.from(files).map((file) => ({
+      kind: 'pending',
+      clientId: `${file.name}-${file.size}-${Date.now()}-${Math.random()}`,
+      previewUrl: URL.createObjectURL(file),
+      file,
+    }));
+    setGalleryItems((items) => [...items, ...newItems]);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (submittingRef.current) return;
+    submittingRef.current = true;
+
+    const formData = new FormData(e.currentTarget);
+    formData.delete('new_images');
+    for (const item of galleryItems) {
+      if (item.kind === 'pending') formData.append('new_images', item.file);
+    }
+    formData.set('image_order_json', imageOrderJson);
+    formAction(formData);
+  };
+
+  // Após save, o servidor devolve novas imagens — limpa previews pendentes para não reenviar
+  useEffect(() => {
+    setGalleryItems((prev) => {
+      for (const item of prev) {
+        if (item.kind === 'pending') URL.revokeObjectURL(item.previewUrl);
+      }
+      return toGalleryItems(product);
+    });
+  }, [product?.id, serverImagesKey]);
+
+  useEffect(() => {
+    if (formState.error) submittingRef.current = false;
+  }, [formState.error]);
 
   useEffect(() => {
     if (formState.redirectTo) {
+      submittingRef.current = false;
+      if (fileInputRef.current) fileInputRef.current.value = '';
       router.push(formState.redirectTo);
     }
   }, [formState.redirectTo, router]);
 
   return (
-    <form action={formAction} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6">
       {product && <input type="hidden" name="product_id" value={product.id} />}
       <input type="hidden" name="colors_json" value={colorsJson} readOnly />
-      <input type="hidden" name="primary_image_id" value={primaryImageId} readOnly />
+      <input type="hidden" name="image_order_json" value={imageOrderJson} readOnly />
 
       {formState.error && (
         <p className="rounded-xl bg-red-50 px-4 py-3 font-sans text-sm text-red-700" role="alert">
@@ -304,64 +361,24 @@ export function ProdutoForm({
       <AdminCard>
         <h2 className="mb-4 font-serif text-xl font-bold text-ink">Fotos</h2>
 
-        {product?.images && product.images.length > 0 && (
-          <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {product.images.map((img) => (
-              <div
-                key={img.id}
-                className={`relative overflow-hidden rounded-xl border-2 ${
-                  primaryImageId === img.id ? 'border-primary' : 'border-transparent'
-                }`}
-              >
-                <div className="relative aspect-[3/4] bg-muted">
-                  <Image src={img.url} alt="" fill className="object-cover" sizes="120px" />
-                </div>
-                <div className="flex gap-1 p-2">
-                  <button
-                    type="button"
-                    onClick={() => setPrimaryImageId(img.id)}
-                    className="flex-1 rounded-lg bg-primary/10 py-1 font-sans text-[10px] font-medium text-primary"
-                  >
-                    {primaryImageId === img.id ? 'Principal' : 'Capa'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      await deleteImageAction(img.id, product.id);
-                      router.refresh();
-                    }}
-                    className="rounded-lg bg-red-50 px-2 py-1 font-sans text-[10px] text-red-600"
-                  >
-                    ×
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        <ImageSortManager
+          productId={product?.id}
+          items={galleryItems}
+          onChange={setGalleryItems}
+        />
 
         <label className={adminLabelClass} htmlFor="new_images">Adicionar fotos</label>
         <input
+          ref={fileInputRef}
           id="new_images"
-          name="new_images"
           type="file"
           accept="image/jpeg,image/png,image/webp"
           multiple
           onChange={(e) => handleFiles(e.target.files)}
           className="font-sans text-sm"
         />
-        {previewUrls.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-2">
-            {previewUrls.map((url) => (
-              <div key={url} className="relative h-20 w-16 overflow-hidden rounded-lg">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={url} alt="" className="h-full w-full object-cover" />
-              </div>
-            ))}
-          </div>
-        )}
-        <p className="mt-2 font-sans text-xs text-muted-fg">
-          JPG, PNG ou WebP. Proporção recomendada 3:4 (900×1200px).
+        <p className="mt-3 font-sans text-xs text-muted-fg">
+          JPG, PNG ou WebP. Proporção recomendada 3:4 (900×1200px). Você pode selecionar várias de uma vez.
         </p>
       </AdminCard>
 

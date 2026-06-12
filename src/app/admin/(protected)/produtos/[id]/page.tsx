@@ -11,7 +11,7 @@ export default async function EditarProdutoPage({
   searchParams,
 }: {
   params: { id: string };
-  searchParams: { saved?: string };
+  searchParams: { saved?: string; t?: string };
 }) {
   let product;
   try {
@@ -35,7 +35,7 @@ export default async function EditarProdutoPage({
         ]}
       />
 
-      {searchParams.saved === '1' && (
+      {searchParams.saved && (
         <div className="mb-6">
           <AdminAlert variant="success">
             Produto salvo! As alterações aparecem na{' '}

@@ -47,7 +47,7 @@ export function ProductImageGallery({
   const thumbSize = isModal ? 'h-[72px] w-[56px]' : 'h-14 w-11';
   const arrowBtn = isModal
     ? 'h-12 w-12 border border-black/10 bg-white text-ink shadow-lg hover:bg-off-white'
-    : 'h-10 w-10 border border-white/80 bg-white/95 text-ink shadow-md hover:bg-white';
+    : 'h-10 w-10 bg-secondary text-white shadow-md hover:brightness-110';
 
   return (
     <div className={`flex flex-col ${className}`}>
@@ -102,7 +102,7 @@ export function ProductImageGallery({
                 prev();
               }}
               aria-label="Foto anterior"
-              className={`absolute left-2 top-1/2 z-20 flex -translate-y-1/2 items-center justify-center rounded-full transition hover:scale-105 active:scale-95 ${arrowBtn} ${
+              className={`pointer-events-auto absolute left-2 top-1/2 z-20 flex -translate-y-1/2 items-center justify-center rounded-full transition hover:scale-105 active:scale-95 ${arrowBtn} ${
                 isModal ? 'md:left-4' : ''
               }`}
             >
@@ -115,7 +115,7 @@ export function ProductImageGallery({
                 next();
               }}
               aria-label="Próxima foto"
-              className={`absolute right-2 top-1/2 z-20 flex -translate-y-1/2 items-center justify-center rounded-full transition hover:scale-105 active:scale-95 ${arrowBtn} ${
+              className={`pointer-events-auto absolute right-2 top-1/2 z-20 flex -translate-y-1/2 items-center justify-center rounded-full transition hover:scale-105 active:scale-95 ${arrowBtn} ${
                 isModal ? 'md:right-4' : ''
               }`}
             >
@@ -131,7 +131,7 @@ export function ProductImageGallery({
 
       {hasMultiple && (
         <div
-          className={`flex gap-2 overflow-x-auto bg-white scrollbar-thin ${
+          className={`pointer-events-auto relative z-20 flex gap-2 overflow-x-auto bg-white scrollbar-thin ${
             isModal ? 'border-t border-black/5 p-3 md:p-4' : 'border-t border-black/5 p-2'
           }`}
           role="tablist"

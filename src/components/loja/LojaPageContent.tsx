@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { SiteNav } from '@/components/layout/SiteNav';
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import { ColorSwatches } from '@/components/loja/product/ColorSwatches';
@@ -47,7 +46,6 @@ function ProdutoCard({
   produto: ProdutoLoja;
   index: number;
 }) {
-  const router = useRouter();
   const imagens = produto.imagens.length ? produto.imagens : [produto.imagem];
   const [imgAtiva, setImgAtiva] = useState(0);
   const [corAtiva, setCorAtiva] = useState(0);
@@ -57,34 +55,42 @@ function ProdutoCard({
   });
 
   return (
+    // position:relative + Link overlay é o padrão para card clicável com botão interno
     <article
-      className="group animate-fadeUp overflow-hidden rounded-3xl bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+      className="group animate-fadeUp relative overflow-hidden rounded-3xl bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
       style={{ animationDelay: `${index * 0.08}s` }}
     >
-      <div className="relative">
+      {/* Link atrás do conteúdo — cliques passam via pointer-events-none nos filhos */}
+      <Link
+        href={`/loja/${produto.slug}`}
+        className="absolute inset-0 z-0"
+        aria-label={`Ver detalhes de ${produto.nome}`}
+      />
+
+      {/* Imagem — pointer-events-none deixa cliques irem ao Link, exceto controles com pointer-events-auto */}
+      <div className="relative z-10 pointer-events-none">
         <ProductImageGallery
           variant="card"
           imagens={imagens}
           alt={produto.nome}
           activeIndex={imgAtiva}
           onIndexChange={setImgAtiva}
-          onMainImageClick={() => router.push(`/loja/${produto.slug}`)}
         />
 
         {produto.badge && (
-          <span className="pointer-events-none absolute left-3 top-3 z-10 rounded-full bg-primary px-3 py-1 font-sans text-xs font-semibold uppercase tracking-wide text-white">
+          <span className="absolute left-3 top-3 z-10 rounded-full bg-primary px-3 py-1 font-sans text-xs font-semibold uppercase tracking-wide text-white">
             {produto.badge}
           </span>
         )}
 
-        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-primary/0 opacity-0 transition-all duration-300 group-hover:bg-primary/20 group-hover:opacity-100">
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-primary/0 opacity-0 transition-all duration-300 group-hover:bg-primary/20 group-hover:opacity-100">
           <span className="translate-y-2 rounded-full bg-white px-5 py-2.5 font-sans text-sm font-semibold text-primary shadow-md transition group-hover:translate-y-0">
             Ver Detalhes
           </span>
         </div>
       </div>
 
-      <Link href={`/loja/${produto.slug}`} className="block p-4">
+      <div className="relative z-10 pointer-events-none p-4">
         <p className="mb-1 font-sans text-xs font-semibold uppercase tracking-widest text-muted-fg">
           {produto.categoria}
         </p>
@@ -96,7 +102,7 @@ function ProdutoCard({
           selectedIndex={corAtiva}
           onSelect={(i) => { setCorAtiva(i); }}
           size="sm"
-          className="mb-4"
+          className="pointer-events-auto relative z-10 mb-4"
         />
 
         <div className="flex items-center justify-between">
@@ -106,13 +112,12 @@ function ProdutoCard({
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`Comprar ${produto.nome} via WhatsApp`}
-            onClick={(e) => e.stopPropagation()}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-accent text-white transition hover:brightness-95"
+            className="pointer-events-auto relative z-10 flex h-10 w-10 items-center justify-center rounded-full bg-accent text-white transition hover:brightness-95"
           >
             <WhatsAppIcon />
           </a>
         </div>
-      </Link>
+      </div>
     </article>
   );
 }

@@ -44,6 +44,10 @@ export type AdminProduct = {
   whatsapp: AdminProductWhatsapp | null;
 };
 
+export type ImageOrderEntry =
+  | { kind: 'saved'; id: string }
+  | { kind: 'pending' };
+
 export type ProductFormInput = {
   name: string;
   slug: string;
@@ -59,6 +63,7 @@ export type ProductFormInput = {
   colors: AdminProductColor[];
   whatsapp: AdminProductWhatsapp;
   primary_image_id?: string | null;
+  image_order: ImageOrderEntry[];
 };
 
 function dbRead() {
@@ -163,7 +168,8 @@ async function ensureUniqueSlug(baseSlug: string, excludeId?: string) {
 }
 
 async function saveColors(productId: string, colors: AdminProductColor[]) {
-  await dbWrite().from('product_colors').delete().eq('product_id', productId);
+  const { error: delError } = await dbWrite().from('product_colors').delete().eq('product_id', productId);
+  if (delError) throw new Error(`Erro ao limpar cores: ${delError.message}`);
   if (!colors.length) return;
   const { error } = await dbWrite().from('product_colors').insert(
     colors.map((c, i) => ({
@@ -178,7 +184,8 @@ async function saveColors(productId: string, colors: AdminProductColor[]) {
 }
 
 async function saveWhatsapp(productId: string, whatsapp: AdminProductWhatsapp) {
-  await dbWrite().from('whatsapp_ctas').delete().eq('product_id', productId);
+  const { error: delError } = await dbWrite().from('whatsapp_ctas').delete().eq('product_id', productId);
+  if (delError) throw new Error(`Erro ao limpar WhatsApp: ${delError.message}`);
   const { error } = await dbWrite().from('whatsapp_ctas').insert({
     product_id: productId,
     phone: whatsapp.phone,
@@ -187,53 +194,111 @@ async function saveWhatsapp(productId: string, whatsapp: AdminProductWhatsapp) {
   if (error) throw new Error(error.message);
 }
 
-async function uploadImages(productId: string, files: File[], startOrder: number) {
+async function uploadSingleImage(productId: string, file: File, sortOrder: number) {
+  if (!file.size) return null;
   const supabase = dbWrite();
-  const inserted: AdminProductImage[] = [];
+  const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+  const path = `${productId}/${Date.now()}-${sortOrder}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
 
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    if (!file.size) continue;
-    const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-    const path = `${productId}/${Date.now()}-${i}.${ext}`;
+  const { error: uploadError } = await supabase.storage
+    .from(SUPABASE_STORAGE_BUCKET)
+    .upload(path, file, { upsert: false, contentType: file.type });
 
-    const { error: uploadError } = await supabase.storage
-      .from(SUPABASE_STORAGE_BUCKET)
-      .upload(path, file, { upsert: false, contentType: file.type });
+  if (uploadError) throw new Error(`Upload falhou: ${uploadError.message}`);
 
-    if (uploadError) throw new Error(`Upload falhou: ${uploadError.message}`);
+  const url = storagePublicUrl(path);
+  const { data, error } = await supabase
+    .from('product_images')
+    .insert({
+      product_id: productId,
+      url,
+      alt: file.name,
+      sort_order: sortOrder,
+      is_primary: false,
+    })
+    .select('*')
+    .single();
 
-    const url = storagePublicUrl(path);
-    const { data, error } = await supabase
+  if (error) throw new Error(error.message);
+  return data as AdminProductImage;
+}
+
+/** Alinha arquivos enviados com slots "pending" da ordem — evita upload duplicado ou órfão */
+export function normalizeImageUpload(order: ImageOrderEntry[], files: File[]) {
+  const validFiles = files.filter((f) => f.size > 0);
+  if (!order.length) {
+    return { order, files: validFiles };
+  }
+  const pendingSlots = order.filter((e) => e.kind === 'pending').length;
+  if (pendingSlots === 0) {
+    return { order, files: [] as File[] };
+  }
+  return { order, files: validFiles.slice(0, pendingSlots) };
+}
+
+async function applyImageOrder(productId: string, order: ImageOrderEntry[], files: File[]) {
+  const { order: safeOrder, files: safeFiles } = normalizeImageUpload(order, files);
+
+  if (!safeOrder.length) {
+    if (!safeFiles.length) return;
+    const { count } = await dbWrite()
       .from('product_images')
-      .insert({
-        product_id: productId,
-        url,
-        alt: file.name,
-        sort_order: startOrder + i,
-        is_primary: false,
-      })
-      .select('*')
-      .single();
-
-    if (error) throw new Error(error.message);
-    inserted.push(data as AdminProductImage);
+      .select('*', { count: 'exact', head: true })
+      .eq('product_id', productId);
+    // Produto já tem fotos: ignora arquivos sem ordem explícita (evita duplicar no re-save)
+    if ((count ?? 0) > 0) return;
+    for (let i = 0; i < safeFiles.length; i++) {
+      await uploadSingleImage(productId, safeFiles[i], i);
+    }
+    await ensurePrimaryImage(productId, null);
+    return;
   }
 
-  return inserted;
+  const supabase = dbWrite();
+  let fileIdx = 0;
+  let primaryId: string | null = null;
+
+  for (let i = 0; i < safeOrder.length; i++) {
+    const entry = safeOrder[i];
+    if (entry.kind === 'saved') {
+      const { error } = await supabase
+        .from('product_images')
+        .update({ sort_order: i, is_primary: i === 0 })
+        .eq('id', entry.id)
+        .eq('product_id', productId);
+      if (error) throw new Error(error.message);
+      if (i === 0) primaryId = entry.id;
+    } else {
+      const file = safeFiles[fileIdx++];
+      if (!file) continue;
+      const inserted = await uploadSingleImage(productId, file, i);
+      if (inserted && i === 0) primaryId = inserted.id;
+    }
+  }
+
+  if (primaryId) {
+    await supabase.from('product_images').update({ is_primary: false }).eq('product_id', productId);
+    await supabase.from('product_images').update({ is_primary: true }).eq('id', primaryId);
+  }
 }
 
 async function ensurePrimaryImage(productId: string, primaryId?: string | null) {
   const { data: images } = await dbWrite()
     .from('product_images')
-    .select('id')
-    .eq('product_id', productId);
+    .select('id, is_primary, sort_order')
+    .eq('product_id', productId)
+    .order('sort_order', { ascending: true });
 
   if (!images?.length) return;
 
-  const target = primaryId && images.some((i) => i.id === primaryId)
-    ? primaryId
-    : images[0].id;
+  // Se não foi informada uma preferência, verifica se já existe uma primária definida
+  if (!primaryId) {
+    const alreadyHasPrimary = images.some((i) => i.is_primary);
+    if (alreadyHasPrimary) return; // respeita a ordem gerenciada pelo ImageSortManager
+    primaryId = images[0].id; // fallback: primeira por sort_order
+  }
+
+  const target = images.some((i) => i.id === primaryId) ? primaryId : images[0].id;
 
   await dbWrite().from('product_images').update({ is_primary: false }).eq('product_id', productId);
   await dbWrite().from('product_images').update({ is_primary: true }).eq('id', target);
@@ -266,10 +331,7 @@ export async function createProduct(input: ProductFormInput, files: File[]) {
   await saveColors(productId, input.colors);
   await saveWhatsapp(productId, input.whatsapp);
 
-  if (files.length) {
-    await uploadImages(productId, files, 0);
-    await ensurePrimaryImage(productId, input.primary_image_id);
-  }
+  await applyImageOrder(productId, input.image_order, files);
 
   return productId;
 }
@@ -299,16 +361,7 @@ export async function updateProduct(id: string, input: ProductFormInput, files: 
   await saveColors(id, input.colors);
   await saveWhatsapp(id, input.whatsapp);
 
-  const { count } = await dbWrite()
-    .from('product_images')
-    .select('*', { count: 'exact', head: true })
-    .eq('product_id', id);
-
-  if (files.length) {
-    await uploadImages(id, files, count ?? 0);
-  }
-
-  await ensurePrimaryImage(id, input.primary_image_id);
+  await applyImageOrder(id, input.image_order, files);
 }
 
 export async function deleteProduct(id: string) {
@@ -333,6 +386,23 @@ export async function deleteProductImage(imageId: string, productId: string) {
 
   if (image?.is_primary) {
     await ensurePrimaryImage(productId, null);
+  }
+}
+
+export async function reorderProductImages(productId: string, orderedIds: string[]) {
+  const supabase = dbWrite();
+  await Promise.all(
+    orderedIds.map((id, index) =>
+      supabase.from('product_images').update({ sort_order: index }).eq('id', id).eq('product_id', productId)
+    )
+  );
+  // primeira da lista vira principal
+  const [first, ...rest] = orderedIds;
+  if (first) {
+    await supabase.from('product_images').update({ is_primary: true }).eq('id', first);
+    if (rest.length) {
+      await supabase.from('product_images').update({ is_primary: false }).in('id', rest);
+    }
   }
 }
 
@@ -373,9 +443,30 @@ export function parseProductFormData(formData: FormData): ProductFormInput {
       message_template: String(formData.get('whatsapp_message') ?? '').trim(),
     },
     primary_image_id: String(formData.get('primary_image_id') ?? '') || null,
+    image_order: parseImageOrderJson(formData),
   };
 }
 
+function parseImageOrderJson(formData: FormData): ImageOrderEntry[] {
+  try {
+    const raw = JSON.parse(String(formData.get('image_order_json') ?? '[]'));
+    if (!Array.isArray(raw)) return [];
+    return raw.filter(
+      (entry): entry is ImageOrderEntry =>
+        (entry?.kind === 'saved' && typeof entry.id === 'string') || entry?.kind === 'pending'
+    );
+  } catch {
+    return [];
+  }
+}
+
 export function getImageFiles(formData: FormData): File[] {
-  return formData.getAll('new_images').filter((f): f is File => f instanceof File && f.size > 0);
+  const seen = new Set<string>();
+  return formData.getAll('new_images').filter((f): f is File => {
+    if (!(f instanceof File) || !f.size) return false;
+    const key = `${f.name}:${f.size}:${f.lastModified}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }

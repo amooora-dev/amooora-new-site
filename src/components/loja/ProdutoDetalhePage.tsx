@@ -129,18 +129,20 @@ export function ProdutoDetalhePage({ produto, relacionados }: Props) {
 
         {/* Layout principal */}
         <div className="mx-auto max-w-7xl px-5 py-8 md:px-12 md:py-14">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-14 lg:gap-20">
+          <div className="grid min-w-0 grid-cols-1 items-start gap-8 md:grid-cols-2 md:gap-14 lg:gap-20">
 
-            {/* Galeria — thumbnails verticais no desktop */}
-            <GalleryPageLayout
-              imagens={imagens}
-              alt={produto.nome}
-              activeIndex={imgAtiva}
-              onIndexChange={setImgAtiva}
-            />
+            {/* Galeria — self-start evita stretch do grid igualar altura com o painel */}
+            <div className="min-w-0 w-full self-start overflow-hidden">
+              <GalleryPageLayout
+                imagens={imagens}
+                alt={produto.nome}
+                activeIndex={imgAtiva}
+                onIndexChange={setImgAtiva}
+              />
+            </div>
 
             {/* Painel de compra */}
-            <div className="flex flex-col gap-6">
+            <div className="relative z-10 flex min-w-0 flex-col gap-6">
               {/* Categoria + badge */}
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-sans text-xs font-semibold uppercase tracking-[0.2em] text-muted-fg">

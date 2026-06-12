@@ -24,8 +24,9 @@ function validateInput(input: ReturnType<typeof parseProductFormData>) {
   return null;
 }
 
-function revalidateLoja() {
+function revalidateLoja(slug?: string) {
   revalidatePath('/loja');
+  if (slug) revalidatePath(`/loja/${slug}`);
   revalidatePath('/admin/produtos');
   revalidatePath('/admin/dashboard');
 }
@@ -44,16 +45,17 @@ export async function saveProductAction(_prev: ActionState, formData: FormData):
 
     if (productId) {
       await updateProduct(productId, input, files);
-      redirectTo = `/admin/produtos/${productId}?saved=1`;
+      // Timestamp garante URL única a cada save → Next.js Router sempre navega de verdade
+      redirectTo = `/admin/produtos/${productId}?saved=${Date.now()}`;
     } else {
       const newId = await createProduct(input, files);
-      redirectTo = `/admin/produtos/${newId}?saved=1`;
+      redirectTo = `/admin/produtos/${newId}?saved=${Date.now()}`;
     }
   } catch (e) {
     return { error: e instanceof Error ? e.message : 'Erro ao salvar produto.' };
   }
 
-  revalidateLoja();
+  revalidateLoja(input.slug);
   return { redirectTo };
 }
 
@@ -76,4 +78,20 @@ export async function toggleActiveAction(productId: string, active: boolean) {
   await toggleProductActive(productId, active);
   revalidateLoja();
   revalidatePath('/admin/produtos');
+}
+
+export async function reorderImagesAction(
+  productId: string,
+  orderedIds: string[]
+): Promise<ActionState> {
+  await requireAdminSession();
+  try {
+    const { reorderProductImages } = await import('@/lib/admin/product-repository');
+    await reorderProductImages(productId, orderedIds);
+    revalidateLoja();
+    revalidatePath(`/admin/produtos/${productId}`);
+    return { success: 'Ordem atualizada.' };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Erro ao reordenar.' };
+  }
 }
