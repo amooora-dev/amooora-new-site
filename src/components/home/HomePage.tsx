@@ -779,7 +779,7 @@ function Values({ accent, isMobile }: SectionProps) {
     <section id="valores" ref={ref} style={{ padding: isMobile ? '80px 0' : '120px 0', background: 'var(--white)', overflow: 'hidden' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '0 20px' : '0 48px' }}>
 
-        {C.values.image &&
+        {isMobile && C.values.image &&
         <div style={{
           display: 'flex', justifyContent: 'center', marginBottom: isMobile ? 40 : 56,
           opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(20px)',

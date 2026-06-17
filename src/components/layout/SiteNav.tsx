@@ -22,6 +22,25 @@ function navHref(id: string, page: 'home' | 'loja') {
   return page === 'home' ? `#${id}` : `/#${id}`;
 }
 
+function HomeMenuIcon({ className = 'h-5 w-5' }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M3 10.75 12 3l9 7.75" />
+      <path d="M5.5 9.5V20h13V9.5" />
+      <path d="M9.5 20v-6h5v6" />
+    </svg>
+  );
+}
+
 function NavIcon({ id, className = 'h-5 w-5' }: { id: NavLinkId; className?: string }) {
   const props = { className, fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', strokeWidth: 1.75, 'aria-hidden': true as const };
 
@@ -287,6 +306,18 @@ export function SiteNav({
 
             <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Seções do site">
               <ul className="space-y-1">
+                <li>
+                  <Link
+                    href="/"
+                    onClick={closeMenu}
+                    className="flex min-h-[52px] items-center gap-3 rounded-xl px-3 font-sans text-[15px] font-medium text-ink transition hover:bg-primary/5 active:bg-primary/10"
+                  >
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                      <HomeMenuIcon className="h-5 w-5" />
+                    </span>
+                    Amooora
+                  </Link>
+                </li>
                 {links.map((link) => (
                   <li key={link.id}>
                     <Link

@@ -12,6 +12,11 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const port = process.env.PORT ?? '3000';
 const forceClean = process.argv.includes('--clean');
+const devDistDir = process.env.NEXT_DIST_DIR ?? '.next-dev';
+
+function sleepSync(ms) {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
+}
 
 function killListenersOnPort(p) {
   try {
@@ -41,15 +46,23 @@ function killProjectNextDev() {
 }
 
 function cleanNextCache() {
-  const nextDir = path.join(root, '.next');
-  if (fs.existsSync(nextDir)) {
-    fs.rmSync(nextDir, { recursive: true, force: true });
-    console.log('[dev] cache .next removido');
+  const nextDir = path.join(root, devDistDir);
+  if (!fs.existsSync(nextDir)) return;
+
+  for (let attempt = 1; attempt <= 5; attempt++) {
+    try {
+      fs.rmSync(nextDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 150 });
+      console.log(`[dev] cache ${devDistDir} removido`);
+      return;
+    } catch (error) {
+      if (attempt === 5) throw error;
+      sleepSync(250);
+    }
   }
 }
 
 function cacheLooksCorrupt() {
-  const nextDir = path.join(root, '.next');
+  const nextDir = path.join(root, devDistDir);
   if (!fs.existsSync(nextDir)) return false;
 
   const serverDir = path.join(nextDir, 'server');
@@ -86,7 +99,7 @@ setTimeout(() => {
     cwd: root,
     stdio: 'inherit',
     shell: false,
-    env: process.env,
+    env: { ...process.env, NEXT_DIST_DIR: devDistDir },
   });
 
   child.on('exit', (code, signal) => {
