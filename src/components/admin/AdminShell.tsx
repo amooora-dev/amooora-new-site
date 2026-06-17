@@ -216,7 +216,7 @@ export function AdminShell({ email, children }: { email: string; children: React
           </div>
           <Link
             href="/admin/produtos/novo"
-            className="hidden items-center gap-1.5 rounded-xl bg-accent px-4 py-2 font-sans text-sm font-semibold text-white shadow-sm transition hover:brightness-95 hover:shadow md:inline-flex"
+            className="hidden items-center gap-1.5 rounded-xl bg-primary px-4 py-2 font-sans text-sm font-semibold text-white shadow-sm transition hover:brightness-95 hover:shadow md:inline-flex"
           >
             + Produto
           </Link>

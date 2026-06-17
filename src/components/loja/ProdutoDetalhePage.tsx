@@ -239,7 +239,7 @@ export function ProdutoDetalhePage({ produto, relacionados }: Props) {
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-3 rounded-2xl bg-accent px-6 py-4 font-sans text-base font-semibold text-white shadow-md transition hover:brightness-95 active:scale-[0.98]"
+                className="flex items-center justify-center gap-3 rounded-2xl bg-primary px-6 py-4 font-sans text-base font-semibold text-white shadow-md transition hover:brightness-95 active:scale-[0.98]"
               >
                 <WhatsAppIcon />
                 Comprar via WhatsApp
