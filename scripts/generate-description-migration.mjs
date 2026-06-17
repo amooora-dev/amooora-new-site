@@ -9,8 +9,13 @@ import { dirname, join } from 'node:path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+/** Campos omitidos na seção "Detalhes do produto" (solicitação editorial) */
+const DETAIL_LABELS_OMIT = new Set(['Gola', 'Estampa']);
+
 function detailsTable(rows) {
-  const lines = rows.map(([label, value]) => `<strong>${label}:</strong> ${value}`);
+  const lines = rows
+    .filter(([label]) => !DETAIL_LABELS_OMIT.has(label))
+    .map(([label, value]) => `<strong>${label}:</strong> ${value}`);
   return `<h4>Detalhes do produto</h4>\n<p>${lines.join('<br>')}</p>`;
 }
 
@@ -340,13 +345,13 @@ WHERE name = '${sqlEscape(p.name)}';`
   )
   .join('\n\n');
 
-const sql = `-- Atualiza descrições curta e longa dos produtos da loja
+const sql = `-- Remove "Gola" e "Estampa" da seção Detalhes do produto (description_full)
 -- Rodar no SQL Editor do Supabase (schema ecommerce-amooora)
 -- Gerado por: node scripts/generate-description-migration.mjs
 -- Seguro para rodar mais de uma vez (idempotente)
 --
--- O QUE FAZ: 11 comandos UPDATE, cada um com WHERE name = '...'
--- NÃO altera nome, preço, fotos nem outros produtos fora da lista.
+-- O QUE FAZ: 11 comandos UPDATE (mesmos 11 produtos do 003), só description_full muda
+-- NÃO altera description_short, nome, preço, fotos nem outros produtos.
 
 -- PRÉ-CHECK: deve retornar 11 linhas. Se faltar alguma, o nome no banco está diferente.
 SELECT name
@@ -367,6 +372,6 @@ WHERE name IN (
 ORDER BY name;
 `;
 
-const outPath = join(__dirname, '../supabase/migrations/003_update_product_descriptions.sql');
+const outPath = join(__dirname, '../supabase/migrations/004_remove_gola_estampa_from_descriptions.sql');
 writeFileSync(outPath, sql, 'utf8');
 console.log(`Wrote ${outPath} (${products.length} products)`);

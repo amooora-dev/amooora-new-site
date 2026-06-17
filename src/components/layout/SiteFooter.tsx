@@ -16,6 +16,10 @@ function footerHref(id: string, page: 'home' | 'loja') {
   return page === 'home' ? `#${id}` : `/#${id}`;
 }
 
+function appLinkHref(label: string) {
+  return label === 'Política de Privacidade' ? '/politica-de-cookies' : '#';
+}
+
 export function SiteFooter({ accent, isMobile, page = 'home' }: SiteFooterProps) {
   return (
     <footer style={{ background: 'var(--secondary)', color: 'white', padding: isMobile ? '56px 20px 28px' : '80px 48px 40px' }}>
@@ -73,15 +77,27 @@ export function SiteFooter({ accent, isMobile, page = 'home' }: SiteFooterProps)
               letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 20 }}>
               {C.footer.appLabel}
             </div>
-            {C.footer.appLinks.map((l) =>
-            <a key={l} href="#" style={{ display: 'block', fontFamily: "var(--sans)",
-              fontSize: 14, color: 'rgba(255,255,255,0.6)', textDecoration: 'none',
-              marginBottom: 12, transition: 'color 0.2s' }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = 'white'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}>
-                {l}
-              </a>
-            )}
+            {C.footer.appLinks.map((l) => {
+              const href = appLinkHref(l);
+
+              return href.startsWith('/') ? (
+                <Link key={l} href={href} style={{ display: 'block', fontFamily: "var(--sans)",
+                  fontSize: 14, color: 'rgba(255,255,255,0.6)', textDecoration: 'none',
+                  marginBottom: 12, transition: 'color 0.2s' }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = 'white'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}>
+                  {l}
+                </Link>
+              ) : (
+                <a key={l} href={href} style={{ display: 'block', fontFamily: "var(--sans)",
+                  fontSize: 14, color: 'rgba(255,255,255,0.6)', textDecoration: 'none',
+                  marginBottom: 12, transition: 'color 0.2s' }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = 'white'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}>
+                  {l}
+                </a>
+              );
+            })}
           </div>
         </div>
 

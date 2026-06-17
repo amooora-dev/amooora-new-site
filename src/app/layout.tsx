@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { playfair, rubik } from '@/lib/fonts';
+import { CookieConsentBanner } from '@/components/layout/CookieConsentBanner';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -15,7 +16,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR" className={`${playfair.variable} ${rubik.variable}`}>
-      <body className={`${rubik.className} font-sans min-h-screen antialiased`}>{children}</body>
+      <body className={`${rubik.className} font-sans min-h-screen antialiased`}>
+        {children}
+        <CookieConsentBanner />
+      </body>
     </html>
   );
 }
