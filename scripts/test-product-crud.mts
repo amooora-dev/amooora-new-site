@@ -62,7 +62,7 @@ async function main() {
     featured: false,
     sizes: ['P', 'M', 'G', 'GG'],
     sort_order: 99,
-    colors: [{ name: 'Roxo', hex_code: '#93296F', available: true, sort_order: 0 }],
+    colors: [{ name: 'Roxo', hex_code: '#932D6F', available: true, sort_order: 0 }],
     whatsapp: { phone: '5511970548406', message_template: whatsappTemplate },
   };
 

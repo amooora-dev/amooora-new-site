@@ -1,7 +1,7 @@
 export const TWEAK_DEFAULTS = {
   direction: 'A' as 'A' | 'B',
   heroLayout: 'centered',
-  accentColor: '#93296F',
+  accentColor: '#932D6F',
   showParticles: true,
   fontStyle: 'serif-led',
 };

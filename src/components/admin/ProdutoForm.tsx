@@ -88,7 +88,7 @@ export function ProdutoForm({
   };
 
   const addColor = () => {
-    setColors((c) => [...c, { name: '', hex_code: '#93296F', available: true, sort_order: c.length }]);
+    setColors((c) => [...c, { name: '', hex_code: '#932D6F', available: true, sort_order: c.length }]);
   };
 
   const updateColor = (index: number, patch: Partial<AdminProductColor>) => {

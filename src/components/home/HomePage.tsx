@@ -1075,7 +1075,7 @@ function Newsletter({ cta, isMobile }: CtaProps & MobileProps) {
 export default function HomePage() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
   const [isMobile, setIsMobile] = useState(false);
-  const [accent, setAccent] = useState('#93296F');
+  const [accent, setAccent] = useState('#932D6F');
   const [cta, setCta] = useState('#c4532f');
   const dir = t.direction;
   const particles = t.showParticles;
@@ -1085,7 +1085,7 @@ export default function HomePage() {
     const sync = () => {
       setIsMobile(window.innerWidth <= 900);
       const root = getComputedStyle(document.documentElement);
-      setAccent(root.getPropertyValue('--primary').trim() || '#93296F');
+      setAccent(root.getPropertyValue('--primary').trim() || '#932D6F');
       setCta(root.getPropertyValue('--accent').trim() || '#c4532f');
     };
     sync();

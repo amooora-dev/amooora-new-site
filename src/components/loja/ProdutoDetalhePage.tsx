@@ -11,7 +11,7 @@ import { ColorSwatches } from '@/components/loja/product/ColorSwatches';
 import { ProductDescription } from '@/components/loja/product/ProductDescription';
 import { GalleryPageLayout } from '@/components/loja/product/GalleryPageLayout';
 
-const ACCENT = '#93296F';
+const ACCENT = '#932D6F';
 
 function ChevronRight({ className = 'h-4 w-4' }: { className?: string }) {
   return (

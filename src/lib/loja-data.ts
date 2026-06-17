@@ -119,7 +119,7 @@ const PRODUTOS_BASE: ProdutoLojaBase[] = [
       'Camiseta roxa com a palavra "sapatão" repetida em sete cores do arco-íris. Modelagem unissex, 100% algodão, ideal para o dia a dia com muito orgulho.',
     cores: [
       { nome: 'Roxo', hex: '#3a184f' },
-      { nome: 'Vinho', hex: '#93296F' },
+      { nome: 'Vinho', hex: '#932D6F' },
     ],
     tamanhos: ['P', 'M', 'G', 'GG'],
     imagem: IMG.camisetaSapataoArcoIris,
@@ -136,7 +136,7 @@ const PRODUTOS_BASE: ProdutoLojaBase[] = [
       'Camiseta preta com estampa "sapatão" em branco e círculo rosa no peito. Corte confortável, tecido de alta qualidade.',
     cores: [
       { nome: 'Preto', hex: '#1a1a1a' },
-      { nome: 'Vinho', hex: '#93296F' },
+      { nome: 'Vinho', hex: '#932D6F' },
     ],
     tamanhos: ['P', 'M', 'G', 'GG'],
     imagem: IMG.camisetaSapataoPreta,
@@ -187,7 +187,7 @@ const PRODUTOS_BASE: ProdutoLojaBase[] = [
       'Regata em tom roxo profundo com estampa "vagitariana" em letras brancas e detalhes em rosa. Tecido leve e confortável para o calor.',
     cores: [
       { nome: 'Roxo', hex: '#3a184f' },
-      { nome: 'Vinho', hex: '#93296F' },
+      { nome: 'Vinho', hex: '#932D6F' },
     ],
     tamanhos: ['P', 'M', 'G', 'GG'],
     imagem: IMG.regataVagitariana,
@@ -204,7 +204,7 @@ const PRODUTOS_BASE: ProdutoLojaBase[] = [
       'Moletom roxo com estampa "sapatão" em branco e círculo rosa no peito. Soft fleece, capuz com cordão e bolso frontal.',
     cores: [
       { nome: 'Roxo', hex: '#3a184f' },
-      { nome: 'Vinho', hex: '#93296F' },
+      { nome: 'Vinho', hex: '#932D6F' },
     ],
     tamanhos: ['P', 'M', 'G', 'GG'],
     imagem: IMG.moletomSapataoRoxo,

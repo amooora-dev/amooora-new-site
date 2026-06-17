@@ -17,7 +17,7 @@ import {
 } from '@/lib/loja-data';
 import { buildWhatsappUrl } from '@/lib/supabase/map-product';
 
-const ACCENT = '#93296F';
+const ACCENT = '#932D6F';
 const { hero, filtros } = CONTEUDO_LOJA;
 
 function SectionLabel({ children, light = false }: { children: React.ReactNode; light?: boolean }) {

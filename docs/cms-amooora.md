@@ -11,7 +11,7 @@
 | Framework | Next.js 14 App Router (`src/app/`) |
 | Estilização | Tailwind CSS + tokens em `src/app/globals.css` |
 | Fontes | Helvetica Compressed (títulos) + `--font-rubik` (Rubik) |
-| Cor primária | `#93296F` (`--primary`) |
+| Cor primária | `#932D6F` (`--primary`) |
 | Loja | `src/app/loja/page.tsx` + `src/components/loja/*` |
 | Dados atuais | `src/lib/loja-data.ts` (estático, fallback até o CMS estar ativo) |
 

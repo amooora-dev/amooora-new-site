@@ -86,17 +86,17 @@ select p.id, c.name, c.hex, c.ord
 from "ecommerce-amooora".products p
 join (values
   ('camiseta-sapatao-arco-iris', 'Roxo', '#3a184f', 0),
-  ('camiseta-sapatao-arco-iris', 'Vinho', '#93296F', 1),
+  ('camiseta-sapatao-arco-iris', 'Vinho', '#932D6F', 1),
   ('camiseta-sapatao-preta', 'Preto', '#1a1a1a', 0),
-  ('camiseta-sapatao-preta', 'Vinho', '#93296F', 1),
+  ('camiseta-sapatao-preta', 'Vinho', '#932D6F', 1),
   ('camiseta-sapatao-ringer-amarela', 'Amarelo', '#f5c842', 0),
   ('camiseta-sapatao-ringer-amarela', 'Verde', '#2d5016', 1),
   ('camiseta-quenga-ringer', 'Amarelo', '#f5c842', 0),
   ('camiseta-quenga-ringer', 'Verde', '#2d5016', 1),
   ('regata-vagitariana', 'Roxo', '#3a184f', 0),
-  ('regata-vagitariana', 'Vinho', '#93296F', 1),
+  ('regata-vagitariana', 'Vinho', '#932D6F', 1),
   ('moletom-sapatao-roxo', 'Roxo', '#3a184f', 0),
-  ('moletom-sapatao-roxo', 'Vinho', '#93296F', 1),
+  ('moletom-sapatao-roxo', 'Vinho', '#932D6F', 1),
   ('bone-trucker-sapatao', 'Roxo', '#3a184f', 0),
   ('bone-trucker-sapatao', 'Branco', '#ffffff', 1),
   ('capacete-sapatao-uvex', 'Vermelho', '#c41e3a', 0)
