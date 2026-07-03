@@ -23,7 +23,7 @@ export const CONTEUDO_HOME = {
 
   hero: {
     background: '/images/0_header_grande2.png',
-    eyebrow: 'Por nós e para nós',
+    eyebrow: 'Por nós e para nós!!!',
     titleLine1: 'Um mundo inteiro',
     titleHighlight: 'de acolhimento',
     titleLine3: 'e liberdade',
