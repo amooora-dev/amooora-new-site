@@ -966,11 +966,6 @@ function Gallery({ accent, cta, isMobile }: SectionProps & CtaProps) {
             lineHeight: 1.1, marginBottom: 12 }}>
             {C.gallery.title}
           </h2>
-          <p style={{ fontFamily: "var(--serif)",
-            fontSize: 'clamp(18px,2vw,28px)', fontStyle: 'italic', color: accent,
-            fontWeight: 400, maxWidth: 720 }}>
-            {C.gallery.subtitle}
-          </p>
         </div>
 
         <div style={{
