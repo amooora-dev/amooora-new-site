@@ -236,22 +236,6 @@ export function LojaPageContent({
         )}
       </section>
 
-      {/* Nossa Essência */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-tertiary to-primary py-20 text-white">
-        <div className="pointer-events-none absolute -left-10 top-10 h-40 w-40 rounded-full bg-white/10" aria-hidden="true" />
-        <div className="pointer-events-none absolute -bottom-16 right-10 h-56 w-56 rounded-full bg-white/10" aria-hidden="true" />
-
-        <div className="relative z-10 mx-auto max-w-3xl px-6 text-center md:px-12">
-          <SectionLabel light>FEITO COM AMOR</SectionLabel>
-          <h2 className="mb-4 font-serif text-3xl font-bold md:text-5xl">
-            Cada peça conta uma história sáfica
-          </h2>
-          <p className="font-sans text-lg text-white/80">
-            Produtos sustentáveis, produção ética, identidade real.
-          </p>
-        </div>
-      </section>
-
       {/* CTA Final */}
       <section className="bg-muted py-20">
         <div className="mx-auto max-w-2xl px-6 text-center md:px-12">
