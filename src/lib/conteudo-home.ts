@@ -57,7 +57,7 @@ export const CONTEUDO_HOME = {
       {
         big: false,
         text:
-          'É onde você pode ser quem é — sem medo, sem julgamentos, com acolhimento. É onde a gente se encontra para existir com coragem, afeto e em todo o nosso potencial.'
+          'É onde você pode ser quem é — sem medo, sem julgamentos, com acolhimento. \nÉ onde a gente se encontra para existir com coragem, afeto e em todo o nosso potencial.'
       }
     ]
     // Use \n para quebrar linha em qualquer parágrafo do manifesto (ex.: 'texto linha 1\nlinha 2')
@@ -68,12 +68,12 @@ export const CONTEUDO_HOME = {
     title: 'AMOOORA',
     subtitle: 'Mi brejo, su brejo',
     intro: [
-      'A gente quer se encontrar, trocar e se reconhecer. Criamos um espaço seguro, afetuoso e com a nossa cara para reunir toda a comunidade sáfica.Mais do que visibilidade, a gente quer construir conexões. Trocas reais. Entretenimento, informação útil, apoio psicológico, saúde íntima, orientação jurídica, e muito mais.',
+      'A gente quer se encontrar, trocar e se reconhecer. Criamos um espaço seguro, afetuoso e com a nossa cara para reunir toda a comunidade sáfica. Mais do que visibilidade, a gente quer construir conexões. Trocas reais. Entretenimento, informação útil, apoio psicológico, saúde íntima, orientação jurídica, e muito mais.',
       'As conexões aqui vão além do virtual! O virtual é a porta de entrada, mas incentivamos as conexões no mundo real. Ou seja, o olho no olho, o toque na pele e a conversa ao pé de uma mesa sem hora para acabar!',
-      'Porque existem muitos brejos, e sempre vai ter um com a sua cara. A Amooora oferece:'
+      'Porque existem muitos brejos, e sempre vai ter um com a sua cara. \nA Amooora oferece:'
     ],
     pilot: {
-      text: 'Gostaria de me cadastrar para fazer parte do grupo piloto para uso da Amooora.',
+      text: 'Gostaria de se cadastrar para fazer parte do grupo piloto para uso da Amooora?',
       cta: 'Quero me cadastrar!',
       placeholder: 'Seu melhor email',
       submit: 'Enviar',
@@ -203,7 +203,7 @@ export const CONTEUDO_HOME = {
   },
 
   gallery: {
-    title: 'LOJA AMOOORA',
+    title: 'Loja Amooora',
     subtitle: 'Vista sua identidade sáfica com muito mais orgulho',
     cta: 'Acesse Nossa Loja',
     ctaUrl: '/loja',
@@ -284,8 +284,8 @@ export const CONTEUDO_HOME = {
       { label: 'FAQ', id: 'faq' }
     ],
     appLabel: 'App',
-    appLinks: ['Política de Privacidade', 'Termos de Uso'],
-    copyright: '© 2025 Amooora. Todos os direitos reservados.',
+    appLinks: ['Política de Privacidade'],
+    copyright: '© 2026 Amooora. Todos os direitos reservados.',
     signature: 'feito com amor ✦'
   }
 } as const;

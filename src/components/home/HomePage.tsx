@@ -536,7 +536,7 @@ function Manifesto({ accent, dir, isMobile }: ManifestoProps) {
           <TextWithBreaks text={p.text} />
         </p> :
       <p style={{ fontFamily: "var(--sans)",
-        fontSize: 'clamp(16px,1.5vw,20px)', fontWeight: 300,
+        fontSize: 'clamp(14px,1.2vw,16px)', fontWeight: 300,
         lineHeight: 1.8, color: '#717182' }}>
           <TextWithBreaks text={p.text} />
         </p>
@@ -630,7 +630,7 @@ function AppSection({ accent, cta, isMobile }: SectionProps & CtaProps) {
   const introSplit = C.app.intro.slice(2);
   const introParagraphStyle = (marginBottom: number): CSSProperties => ({
     fontFamily: "var(--sans)",
-    fontSize: 'clamp(16px,1.5vw,20px)', fontWeight: 300,
+    fontSize: 'clamp(14px,1.2vw,16px)', fontWeight: 300,
     lineHeight: 1.8, color: '#717182', marginBottom
   });
 
@@ -660,7 +660,7 @@ function AppSection({ accent, cta, isMobile }: SectionProps & CtaProps) {
           </p>
 
           {introFull.map((paragraph, i) =>
-          <p key={i} style={introParagraphStyle(i === introFull.length - 1 ? 48 : 20)}>
+          <p key={i} style={introParagraphStyle(i === introFull.length - 1 ? 20 : 20)}>
               <TextWithBreaks text={paragraph} />
             </p>
           )}
@@ -694,7 +694,7 @@ function AppSection({ accent, cta, isMobile }: SectionProps & CtaProps) {
                     width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                     padding: '18px 0', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', gap: 12
                   }}>
-                    <span style={{ fontFamily: "var(--sans)", fontSize: 16, fontWeight: 600,
+                    <span style={{ fontFamily: "var(--serif)", fontSize: 20, fontWeight: 700,
                       color: isOpen ? accent : 'var(--ink)', transition: 'color 0.2s' }}>
                       {item.label}
                     </span>
@@ -912,7 +912,7 @@ function FAQ({ accent, isMobile }: SectionProps) {
                   padding: '20px 0', background: 'none', border: 'none', cursor: 'pointer',
                   textAlign: 'left', gap: 16
                 }}>
-                  <span style={{ fontFamily: "var(--sans)", fontSize: 16, fontWeight: 500,
+                  <span style={{ fontFamily: "var(--serif)", fontSize: 20, fontWeight: 700,
                     color: isOpen ? accent : 'var(--ink)', transition: 'color 0.2s' }}>
                     {item.q}
                   </span>
