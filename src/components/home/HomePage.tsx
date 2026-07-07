@@ -809,7 +809,7 @@ function Values({ accent, isMobile }: SectionProps) {
           </div>
           <h2 style={{ fontFamily: "var(--serif)",
             fontSize: 'clamp(32px,4vw,56px)', fontWeight: 900, color: 'var(--ink)', lineHeight: 1.1 }}>
-            {C.values.titleLine1}<br /><em style={{ color: accent }}>{C.values.titleHighlight}</em>
+            {C.values.titleLine1}
           </h2>
         </div>
 
