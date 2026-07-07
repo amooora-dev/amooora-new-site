@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { CONTEUDO_HOME as C } from '@/lib/conteudo-home';
+import { PrivacyModal } from '@/components/layout/PrivacyModal';
 
 type SiteFooterProps = {
   accent: string;
@@ -16,15 +18,14 @@ function footerHref(id: string, page: 'home' | 'loja') {
   return page === 'home' ? `#${id}` : `/#${id}`;
 }
 
-function appLinkHref(label: string) {
-  return label === 'Política de Privacidade' ? '/politica-de-cookies' : '#';
-}
 
 export function SiteFooter({ accent, isMobile, page = 'home' }: SiteFooterProps) {
-  return (
+  const [privacyOpen, setPrivacyOpen] = useState(false);
+
+  return (<>
     <footer style={{ background: 'var(--primary)', color: 'white', padding: isMobile ? '56px 20px 28px' : '80px 48px 40px' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr 1fr', gap: isMobile ? 36 : 60, marginBottom: 64 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr', gap: isMobile ? 36 : 60, marginBottom: 64 }}>
           <div>
             <Image
               src="/images/logo.png"
@@ -85,33 +86,20 @@ export function SiteFooter({ accent, isMobile, page = 'home' }: SiteFooterProps)
                 </a>
               )
             )}
-          </div>
-          <div>
-            <div style={{ fontFamily: "var(--sans)", fontSize: 11, fontWeight: 600,
-              letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 20 }}>
-              {C.footer.appLabel}
-            </div>
-            {C.footer.appLinks.map((l) => {
-              const href = appLinkHref(l);
-
-              return href.startsWith('/') ? (
-                <Link key={l} href={href} style={{ display: 'block', fontFamily: "var(--sans)",
-                  fontSize: 14, color: 'rgba(255,255,255,0.6)', textDecoration: 'none',
-                  marginBottom: 12, transition: 'color 0.2s' }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = 'white'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}>
-                  {l}
-                </Link>
-              ) : (
-                <a key={l} href={href} style={{ display: 'block', fontFamily: "var(--sans)",
-                  fontSize: 14, color: 'rgba(255,255,255,0.6)', textDecoration: 'none',
-                  marginBottom: 12, transition: 'color 0.2s' }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = 'white'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}>
-                  {l}
-                </a>
-              );
-            })}
+            <button
+              onClick={() => setPrivacyOpen(true)}
+              style={{
+                display: 'block', fontFamily: 'var(--sans)',
+                fontSize: 14, color: 'rgba(255,255,255,0.6)',
+                background: 'none', border: 'none', cursor: 'pointer',
+                padding: 0, marginBottom: 12, textAlign: 'left',
+                transition: 'color 0.2s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = 'white'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
+            >
+              Política de Privacidade
+            </button>
           </div>
         </div>
 
@@ -125,5 +113,8 @@ export function SiteFooter({ accent, isMobile, page = 'home' }: SiteFooterProps)
           </span>
         </div>
       </div>
-    </footer>);
+    </footer>
+
+    {privacyOpen && <PrivacyModal onClose={() => setPrivacyOpen(false)} />}
+    </>);
 }

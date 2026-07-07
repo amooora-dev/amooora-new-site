@@ -653,12 +653,6 @@ function AppSection({ accent, cta, isMobile }: SectionProps & CtaProps) {
             lineHeight: 1.1, marginBottom: 12 }}>
             {C.app.title}
           </h2>
-          <p style={{ fontFamily: "var(--serif)",
-            fontSize: 'clamp(18px,2vw,28px)', fontStyle: 'italic', color: accent,
-            marginBottom: 28, fontWeight: 400 }}>
-            {C.app.subtitle}
-          </p>
-
           {introFull.map((paragraph, i) =>
           <p key={i} style={introParagraphStyle(i === introFull.length - 1 ? 20 : 20)}>
               <TextWithBreaks text={paragraph} />
@@ -960,6 +954,13 @@ function Gallery({ accent, cta, isMobile }: SectionProps & CtaProps) {
     <section id="loja" ref={ref} style={{ padding: isMobile ? '80px 0' : '120px 0', background: '#faf7fb' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '0 20px' : '0 48px' }}>
         <div style={{ marginBottom: 48, opacity: visible ? 1 : 0, transition: 'all 0.7s ease' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+            <div style={{ width: 36, height: 1.5, background: accent }} />
+            <span style={{ fontFamily: 'var(--sans)', fontSize: 11, fontWeight: 600,
+              letterSpacing: '0.2em', textTransform: 'uppercase', color: accent }}>
+              {C.gallery.label}
+            </span>
+          </div>
           <h2 style={{ fontFamily: "var(--serif)",
             fontSize: 'clamp(28px,3.5vw,50px)', fontWeight: 900, color: 'var(--ink)',
             lineHeight: 1.1, marginBottom: 12 }}>

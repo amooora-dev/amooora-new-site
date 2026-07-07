@@ -14,7 +14,7 @@ export const CONTEUDO_HOME = {
     links: [
       { label: 'Manifesto', id: 'manifesto' },
       { label: 'Aplicativo', id: 'aplicativo' },
-      { label: 'Valores', id: 'valores' },
+      { label: 'Nossos Valores', id: 'valores' },
       { label: 'Loja Amooora', id: 'loja' },
       { label: 'FAQ', id: 'faq' }
     ],
@@ -23,7 +23,7 @@ export const CONTEUDO_HOME = {
 
   hero: {
     background: '/images/0_header_grande2.png',
-    eyebrow: 'Por nós e para nós!!!',
+    eyebrow: 'Por nós e para nós',
     titleLine1: 'Um mundo inteiro',
     titleHighlight: 'de acolhimento',
     titleLine3: 'e liberdade',
@@ -38,7 +38,7 @@ export const CONTEUDO_HOME = {
     label: 'Manifesto',
     image: '/images/manifesto.png',
     paragraphs: [
-      { big: true, text: 'Nós somos Amooora.' },
+      { big: true, text: 'Nós somos Amooora' },
       {
         big: false,
         text:
@@ -65,8 +65,7 @@ export const CONTEUDO_HOME = {
 
   app: {
     label: 'O Aplicativo Sáfico',
-    title: 'AMOOORA',
-    subtitle: 'Mi brejo, su brejo',
+    title: 'Amoooora - Mi brejo, su brejo',
     intro: [
       'A gente quer se encontrar, trocar e se reconhecer. Criamos um espaço seguro, afetuoso e com a nossa cara para reunir toda a comunidade sáfica. Mais do que visibilidade, a gente quer construir conexões. Trocas reais. Entretenimento, informação útil, apoio psicológico, saúde íntima, orientação jurídica, e muito mais.',
       'As conexões aqui vão além do virtual! O virtual é a porta de entrada, mas incentivamos as conexões no mundo real. Ou seja, o olho no olho, o toque na pele e a conversa ao pé de uma mesa sem hora para acabar!',
@@ -203,8 +202,8 @@ export const CONTEUDO_HOME = {
   },
 
   gallery: {
-    title: 'Loja Amooora',
-    subtitle: 'Vista sua identidade sáfica com muito mais orgulho',
+    label: 'Loja Amooora',
+    title: 'Vista sua identidade sáfica',
     cta: 'Acesse Nossa Loja',
     ctaUrl: '/loja',
     // Fotos do mosaico — troque os arquivos em public/images/loja/ mantendo os mesmos nomes
@@ -274,11 +273,11 @@ export const CONTEUDO_HOME = {
     instagram: '@n.amooora',
     instagramUrl: 'https://instagram.com/n.amooora',
     email: 'amooora@amooora.com.br',
-    navLabel: 'Navegação',
+    navLabel: 'Menu',
     navLinks: [
       { label: 'Manifesto', id: 'manifesto' },
       { label: 'Aplicativo', id: 'aplicativo' },
-      { label: 'Valores', id: 'valores' },
+      { label: 'Nossos Valores', id: 'valores' },
       { label: 'Loja Amooora', id: 'loja' },
       { label: 'Quem Somos', id: '' },
       { label: 'FAQ', id: 'faq' }
