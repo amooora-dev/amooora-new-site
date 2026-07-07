@@ -156,8 +156,8 @@ export const CONTEUDO_HOME = {
   values: {
     label: 'Nossos Valores',
     image: '/images/valores.png',
-    titleLine1: 'No que',
-    titleHighlight: 'acreditamos',
+    titleLine1: 'No que acreditamos',
+ 
     items: [
       {
         title: 'Segurança essencial',

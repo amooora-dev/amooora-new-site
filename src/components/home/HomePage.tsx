@@ -694,8 +694,8 @@ function AppSection({ accent, cta, isMobile }: SectionProps & CtaProps) {
                     width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                     padding: '18px 0', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', gap: 12
                   }}>
-                    <span style={{ fontFamily: "var(--serif)", fontSize: 20, fontWeight: 700,
-                      color: isOpen ? accent : 'var(--ink)', transition: 'color 0.2s' }}>
+                    <span style={{ fontFamily: "var(--sans)", fontSize: 'clamp(14px,1.2vw,16px)', fontWeight: 600,
+                      color: isOpen ? accent : '#717182', transition: 'color 0.2s' }}>
                       {item.label}
                     </span>
                     <span style={{
@@ -851,8 +851,8 @@ function Values({ accent, isMobile }: SectionProps) {
                 </div>
                 {/* Content */}
                 <div>
-                  <h3 style={{ fontFamily: "var(--serif)", fontSize: 20, fontWeight: 700,
-                    color: 'var(--ink)', marginBottom: 10, lineHeight: 1.2,
+                  <h3 style={{ fontFamily: "var(--sans)", fontSize: 'clamp(14px,1.2vw,16px)', fontWeight: 600,
+                    color: '#717182', marginBottom: 10, lineHeight: 1.8,
                     transition: 'color 0.25s', ...(isHov ? { color: accent } : {}) }}>
                     {v.title}
                   </h3>
@@ -912,8 +912,8 @@ function FAQ({ accent, isMobile }: SectionProps) {
                   padding: '20px 0', background: 'none', border: 'none', cursor: 'pointer',
                   textAlign: 'left', gap: 16
                 }}>
-                  <span style={{ fontFamily: "var(--serif)", fontSize: 20, fontWeight: 700,
-                    color: isOpen ? accent : 'var(--ink)', transition: 'color 0.2s' }}>
+                  <span style={{ fontFamily: "var(--sans)", fontSize: 'clamp(14px,1.2vw,16px)', fontWeight: 600,
+                    color: isOpen ? accent : '#717182', transition: 'color 0.2s' }}>
                     {item.q}
                   </span>
                   <span style={{
@@ -1024,8 +1024,8 @@ function Newsletter({ cta, isMobile }: CtaProps & MobileProps) {
         display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.1fr 1.9fr', gap: 24, alignItems: 'center'
       }}>
         <h3 style={{
-          fontFamily: "var(--sans)", fontSize: isMobile ? '22px' : 'clamp(14px,1.6vw,21px)',
-          lineHeight: 1.2, fontWeight: 700, color: '#0f1b3d'
+          fontFamily: "var(--sans)", fontSize: 'clamp(14px,1.2vw,16px)',
+          lineHeight: 1.8, fontWeight: 600, color: '#717182'
         }}>
           {C.newsletter.title}
         </h3>
