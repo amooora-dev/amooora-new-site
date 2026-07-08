@@ -135,19 +135,52 @@ function HeroA({ accent, particles, isMobile, dir }: HeroProps & { dir: 'A' | 'B
       backgroundColor: 'var(--white)',
       paddingTop: navOffset,
     }}>
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          inset: 0,
-          zIndex: 0,
-          pointerEvents: 'none',
-          backgroundImage: `url(${heroBackground})`,
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: isMobile ? 'min(165vw, 960px) auto' : 'cover',
-          backgroundPosition: isMobile ? 'center top' : 'center',
-        }}
-      />
+      {isMobile ? (
+        <>
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 0,
+              pointerEvents: 'none',
+              backgroundImage: `url(${heroBackground})`,
+              backgroundRepeat: 'no-repeat',
+              backgroundSize: 'min(165vw, 960px) auto',
+              backgroundPosition: '38% top',
+              clipPath: 'inset(0 42% 0 0)',
+            }}
+          />
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 0,
+              pointerEvents: 'none',
+              backgroundImage: `url(${heroBackground})`,
+              backgroundRepeat: 'no-repeat',
+              backgroundSize: 'min(165vw, 960px) auto',
+              backgroundPosition: '50% top',
+              clipPath: 'inset(0 0 0 42%)',
+            }}
+          />
+        </>
+      ) : (
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 0,
+            pointerEvents: 'none',
+            backgroundImage: `url(${heroBackground})`,
+            backgroundRepeat: 'no-repeat',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
+      )}
 
       <SiteNav accent={accent} dir={dir} isMobile={isMobile} layout="hero" />
 
@@ -198,8 +231,8 @@ function HeroA({ accent, particles, isMobile, dir }: HeroProps & { dir: 'A' | 'B
           {isMobile ? (
             <>
               Um mundo<br />
-              Inteiro<br />
-              <em style={{ color: accent, fontStyle: 'italic' }}>de acolhimento</em><br />
+              inteiro de<br />
+              <em style={{ color: accent, fontStyle: 'italic' }}>acolhimento</em><br />
               e liberdade
             </>
           ) : (
@@ -330,6 +363,34 @@ function HeroB({ accent, particles }: HeroBProps) {
 }
 
 /* ── VIDEO PARALLAX SECTION ── */
+const YT_VIDEO_ID = 'PHO5TkLfpKg';
+
+function applyMobileVideoCover(container: HTMLElement | null) {
+  if (!container) return;
+  const iframe = container.querySelector('iframe');
+  if (!iframe) return;
+
+  const width = container.offsetWidth;
+  const height = container.offsetHeight;
+  if (!width || !height) return;
+
+  const videoRatio = 16 / 9;
+  const containerRatio = width / height;
+  const coverWidth = containerRatio > videoRatio ? width : height * videoRatio;
+  const coverHeight = containerRatio > videoRatio ? width / videoRatio : height;
+
+  Object.assign(iframe.style, {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    width: `${coverWidth}px`,
+    height: `${coverHeight}px`,
+    transform: 'translate(-50%, -50%)',
+    border: 'none',
+    pointerEvents: 'none',
+  });
+}
+
 function VideoSection({ isMobile }: MobileProps) {
   const [offset, setOffset] = useState(0);
   const [muted, setMuted] = useState(true);
@@ -355,6 +416,8 @@ function VideoSection({ isMobile }: MobileProps) {
     try {
       player.mute();
       player.playVideo();
+      const state = player.getPlayerState?.();
+      if (state === 1) setPaused(false);
     } catch {
       /* player ainda não disponível */
     }
@@ -365,27 +428,37 @@ function VideoSection({ isMobile }: MobileProps) {
     const init = () => {
       if (!divRef.current) return;
       playerRef.current = new window.YT!.Player(divRef.current, {
-        videoId: 'PHO5TkLfpKg',
+        videoId: YT_VIDEO_ID,
         playerVars: {
           autoplay: 1,
           mute: 1,
           loop: 1,
-          playlist: 'PHO5TkLfpKg',
+          playlist: YT_VIDEO_ID,
           controls: 0,
           disablekb: 1,
           rel: 0,
           playsinline: 1,
           modestbranding: 1,
           iv_load_policy: 3,
-          origin: typeof window !== 'undefined' ? window.location.origin : '',
+          enablejsapi: 1,
         },
         events: {
           onReady: (e) => {
             e.target.mute();
+            if (isMobile) {
+              applyMobileVideoCover(divRef.current);
+              window.setTimeout(() => applyMobileVideoCover(divRef.current), 100);
+            }
             e.target.playVideo();
             setReady(true);
-            window.setTimeout(() => e.target.playVideo(), 400);
-            window.setTimeout(() => e.target.playVideo(), 1200);
+            setPaused(false);
+            [200, 600, 1200, 2500].forEach((delay) => {
+              window.setTimeout(() => {
+                e.target.mute();
+                e.target.playVideo();
+                if (isMobile) applyMobileVideoCover(divRef.current);
+              }, delay);
+            });
           },
           onStateChange: (e) => {
             if (e.data === 0) e.target.playVideo();
@@ -408,32 +481,61 @@ function VideoSection({ isMobile }: MobileProps) {
       window.onYouTubeIframeAPIReady = init;
     }
     return () => { if (playerRef.current?.destroy) playerRef.current.destroy(); };
-  }, []);
+  }, [isMobile]);
 
-  // Retoma o vídeo quando a seção entra na tela (essencial no mobile)
+  // Cover responsivo no mobile
   useEffect(() => {
-    if (!ready || !ref.current) return;
+    if (!isMobile || !divRef.current) return;
+    const onResize = () => applyMobileVideoCover(divRef.current);
+    onResize();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [isMobile, ready]);
+
+  // Autoplay agressivo no mobile (iOS/Android bloqueiam com frequência)
+  useEffect(() => {
+    if (!ready) return;
+
+    playVideo();
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) playVideo();
       },
-      { threshold: 0.2 }
+      { threshold: 0.05 }
     );
-    observer.observe(ref.current);
+    if (ref.current) observer.observe(ref.current);
 
     const onVisible = () => {
       if (document.visibilityState === 'visible') playVideo();
     };
     document.addEventListener('visibilitychange', onVisible);
 
-    playVideo();
+    const resumeOnInteraction = () => playVideo();
+    document.addEventListener('touchstart', resumeOnInteraction, { passive: true });
+    window.addEventListener('scroll', resumeOnInteraction, { passive: true });
+
+    const retryId = window.setInterval(() => {
+      const player = playerRef.current;
+      if (!player?.getPlayerState) return;
+      const state = player.getPlayerState();
+      if (state !== 1) {
+        player.mute();
+        player.playVideo();
+      }
+    }, isMobile ? 700 : 1500);
+
+    const stopRetryId = window.setTimeout(() => window.clearInterval(retryId), isMobile ? 12000 : 8000);
 
     return () => {
       observer.disconnect();
       document.removeEventListener('visibilitychange', onVisible);
+      document.removeEventListener('touchstart', resumeOnInteraction);
+      window.removeEventListener('scroll', resumeOnInteraction);
+      window.clearInterval(retryId);
+      window.clearTimeout(stopRetryId);
     };
-  }, [ready]);
+  }, [ready, isMobile]);
 
   // React to mute state
   useEffect(() => {
@@ -467,20 +569,26 @@ function VideoSection({ isMobile }: MobileProps) {
     <section ref={ref} style={{
       position: 'relative', height: isMobile ? '56vh' : '70vh', overflow: 'hidden',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      userSelect: 'none'
+      userSelect: 'none',
+      background: isMobile ? '#c5b4d8' : 'transparent',
     }}>
       {/* Video layer — pointer-events: none so clicks never reach iframe */}
       <div style={{
         position: 'absolute', inset: 0,
         transform: `translateY(${isMobile ? 0 : offset}px)`,
         pointerEvents: 'none',
-        zIndex: 0
+        zIndex: 0,
+        overflow: 'hidden',
       }}>
         <div ref={divRef} style={{
           position: 'absolute',
-          top: isMobile ? '0%' : '-20%', left: isMobile ? '0%' : '-10%',
-          width: isMobile ? '100%' : '120%', height: isMobile ? '100%' : '140%',
-          border: 'none'
+          ...(isMobile ? { inset: 0 } : {
+            top: '-20%',
+            left: '-10%',
+            width: '120%',
+            height: '140%',
+          }),
+          border: 'none',
         }} />
       </div>
 
