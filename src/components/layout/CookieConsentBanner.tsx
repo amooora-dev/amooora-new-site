@@ -2,20 +2,23 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-
-const COOKIE_CONSENT_KEY = 'amooora-cookie-consent';
-
-type ConsentChoice = 'accepted' | 'rejected';
+import {
+  getStoredConsent,
+  setStoredConsent,
+  type ConsentChoice,
+} from '@/lib/cookie-consent';
+import { trackConsent } from '@/lib/analytics';
 
 export function CookieConsentBanner() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    setIsVisible(!window.localStorage.getItem(COOKIE_CONSENT_KEY));
+    setIsVisible(!getStoredConsent());
   }, []);
 
   function handleConsent(choice: ConsentChoice) {
-    window.localStorage.setItem(COOKIE_CONSENT_KEY, choice);
+    setStoredConsent(choice);
+    trackConsent(choice);
     setIsVisible(false);
   }
 

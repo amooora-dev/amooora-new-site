@@ -16,6 +16,7 @@ import {
   type ProdutoLoja,
 } from '@/lib/loja-data';
 import { buildWhatsappUrl } from '@/lib/supabase/map-product';
+import { trackLinkClick, trackWhatsappClick } from '@/lib/analytics';
 import { isProdutoEsgotado, PRODUTO_ESGOTADO_LABEL } from '@/lib/loja/product-availability';
 
 const ACCENT = '#932D6F';
@@ -58,6 +59,17 @@ function ProdutoCard({
   });
   const esgotado = isProdutoEsgotado(produto);
 
+  const trackProductOpen = (location: 'product_card' | 'product_card_gallery') => {
+    trackLinkClick({
+      linkText: produto.nome,
+      linkUrl: produtoHref,
+      linkType: 'product',
+      location,
+      productSlug: produto.slug,
+      productName: produto.nome,
+    });
+  };
+
   return (
     // position:relative + Link overlay é o padrão para card clicável com botão interno
     <article
@@ -69,6 +81,7 @@ function ProdutoCard({
         href={produtoHref}
         className="absolute inset-0 z-0"
         aria-label={`Ver detalhes de ${produto.nome}`}
+        onClick={() => trackProductOpen('product_card')}
       />
 
       {/* Imagem — swipe no mobile; setas no desktop; toque na imagem abre o produto */}
@@ -79,7 +92,10 @@ function ProdutoCard({
           alt={produto.nome}
           activeIndex={imgAtiva}
           onIndexChange={setImgAtiva}
-          onCardNavigate={() => router.push(produtoHref)}
+          onCardNavigate={() => {
+            trackProductOpen('product_card_gallery');
+            router.push(produtoHref);
+          }}
         />
 
         {produto.badge && (
@@ -122,6 +138,12 @@ function ProdutoCard({
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackWhatsappClick({
+                productSlug: produto.slug,
+                productName: produto.nome,
+                location: 'store_card',
+                value: produto.precoNumerico,
+              })}
               aria-label={`Comprar ${produto.nome} via WhatsApp`}
               className="pointer-events-auto relative z-10 flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white transition hover:brightness-95"
             >
@@ -264,12 +286,25 @@ export function LojaPageContent({
             <Link
               href="/#aplicativo"
               className="rounded-full bg-primary px-6 py-3 font-sans text-sm font-semibold text-white transition hover:brightness-95"
+              onClick={() => trackLinkClick({
+                linkText: 'Baixar o App',
+                linkUrl: '/#aplicativo',
+                linkType: 'nav_anchor',
+                location: 'store_cta_bottom',
+                sectionId: 'aplicativo',
+              })}
             >
               Baixar o App
             </Link>
             <Link
               href="/"
               className="rounded-full border border-primary px-6 py-3 font-sans text-sm font-semibold text-primary transition hover:bg-primary/5"
+              onClick={() => trackLinkClick({
+                linkText: 'Conhecer a Plataforma',
+                linkUrl: '/',
+                linkType: 'internal',
+                location: 'store_cta_bottom',
+              })}
             >
               Conhecer a Plataforma
             </Link>

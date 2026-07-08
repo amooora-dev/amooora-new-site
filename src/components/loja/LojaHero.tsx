@@ -1,6 +1,6 @@
 import Image from 'next/image';
-import Link from 'next/link';
 import { CONTEUDO_LOJA, type LojaHeroModelo } from '@/lib/loja-data';
+import { LojaHeroCTAs } from '@/components/loja/LojaHeroCTAs';
 
 const { hero } = CONTEUDO_LOJA;
 
@@ -16,23 +16,7 @@ function SectionLabel({ children, light = false }: { children: React.ReactNode; 
 }
 
 function HeroCTAs({ variant }: { variant: 'dark' | 'light' }) {
-  const primaryClass =
-    'rounded-full bg-primary px-6 py-3 font-sans text-sm font-semibold text-white transition hover:brightness-95';
-  const secondaryClass =
-    variant === 'dark'
-      ? 'rounded-full border border-white/70 px-6 py-3 font-sans text-sm font-semibold text-white transition hover:bg-white/10'
-      : 'rounded-full border border-primary bg-white px-6 py-3 font-sans text-sm font-semibold text-primary transition hover:bg-primary/5';
-
-  return (
-    <div className="flex flex-wrap gap-4">
-      <a href="#produtos" className={primaryClass}>
-        {hero.ctaPrimario}
-      </a>
-      <Link href="/#manifesto" className={secondaryClass}>
-        {hero.ctaSecundario}
-      </Link>
-    </div>
-  );
+  return <LojaHeroCTAs variant={variant} />;
 }
 
 function HeroModelo1({ navOffset }: { navOffset: number }) {

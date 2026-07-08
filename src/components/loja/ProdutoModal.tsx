@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { ProdutoLoja } from '@/lib/loja-data';
 import { isProdutoEsgotado, PRODUTO_ESGOTADO_LABEL } from '@/lib/loja/product-availability';
 import { buildWhatsappUrl } from '@/lib/supabase/map-product';
+import { trackWhatsappClick } from '@/lib/analytics';
 import { ColorSwatches } from '@/components/loja/product/ColorSwatches';
 import { ProductDescription } from '@/components/loja/product/ProductDescription';
 import { ProductImageGallery } from '@/components/loja/product/ProductImageGallery';
@@ -143,6 +144,12 @@ export function ProdutoModal({ produto, onClose }: ProdutoModalProps) {
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackWhatsappClick({
+                  productSlug: produto.slug,
+                  productName: produto.nome,
+                  location: 'product_modal',
+                  value: produto.precoNumerico,
+                })}
                 className="mt-auto w-full rounded-full bg-primary px-6 py-3 text-center font-sans text-sm font-semibold text-white transition hover:brightness-95"
               >
                 Encomendar via WhatsApp

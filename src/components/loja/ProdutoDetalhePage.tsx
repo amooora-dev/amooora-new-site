@@ -7,6 +7,7 @@ import type { ProdutoLoja } from '@/lib/loja-data';
 import { getBadgeBgClass } from '@/lib/loja/badge-display';
 import { isProdutoEsgotado, PRODUTO_ESGOTADO_LABEL } from '@/lib/loja/product-availability';
 import { buildWhatsappUrl } from '@/lib/supabase/map-product';
+import { trackLinkClick, trackWhatsappClick } from '@/lib/analytics';
 import { SiteNav } from '@/components/layout/SiteNav';
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import { ColorSwatches } from '@/components/loja/product/ColorSwatches';
@@ -120,11 +121,44 @@ export function ProdutoDetalhePage({ produto, relacionados }: Props) {
         {/* Breadcrumb */}
         <nav aria-label="Navegação estrutural" className="border-b border-black/5 bg-off-white">
           <div className="mx-auto flex max-w-7xl items-center gap-1.5 px-5 py-3 md:px-12">
-            <Link href="/" className="font-sans text-xs text-muted-fg transition hover:text-ink">Início</Link>
+            <Link
+              href="/"
+              className="font-sans text-xs text-muted-fg transition hover:text-ink"
+              onClick={() => trackLinkClick({
+                linkText: 'Início',
+                linkUrl: '/',
+                linkType: 'internal',
+                location: 'product_breadcrumb',
+              })}
+            >
+              Início
+            </Link>
             <ChevronRight className="h-3 w-3 text-muted-fg/60" />
-            <Link href="/loja" className="font-sans text-xs text-muted-fg transition hover:text-ink">Loja</Link>
+            <Link
+              href="/loja"
+              className="font-sans text-xs text-muted-fg transition hover:text-ink"
+              onClick={() => trackLinkClick({
+                linkText: 'Loja',
+                linkUrl: '/loja',
+                linkType: 'nav_route',
+                location: 'product_breadcrumb',
+              })}
+            >
+              Loja
+            </Link>
             <ChevronRight className="h-3 w-3 text-muted-fg/60" />
-            <Link href={`/loja?categoria=${produto.categoria}`} className="font-sans text-xs text-muted-fg transition hover:text-ink">{produto.categoria}</Link>
+            <Link
+              href={`/loja?categoria=${produto.categoria}`}
+              className="font-sans text-xs text-muted-fg transition hover:text-ink"
+              onClick={() => trackLinkClick({
+                linkText: produto.categoria,
+                linkUrl: `/loja?categoria=${produto.categoria}`,
+                linkType: 'internal',
+                location: 'product_breadcrumb',
+              })}
+            >
+              {produto.categoria}
+            </Link>
             <ChevronRight className="h-3 w-3 text-muted-fg/60" />
             <span className="font-sans text-xs font-medium text-ink">{produto.nome}</span>
           </div>
@@ -255,6 +289,12 @@ export function ProdutoDetalhePage({ produto, relacionados }: Props) {
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => trackWhatsappClick({
+                    productSlug: produto.slug,
+                    productName: produto.nome,
+                    location: 'product_detail',
+                    value: produto.precoNumerico,
+                  })}
                   className="flex items-center justify-center gap-3 rounded-2xl bg-primary px-6 py-4 font-sans text-base font-semibold text-white shadow-md transition hover:brightness-95 active:scale-[0.98]"
                 >
                   <WhatsAppIcon />
@@ -309,6 +349,12 @@ export function ProdutoDetalhePage({ produto, relacionados }: Props) {
                 <Link
                   href="/loja"
                   className="hidden font-sans text-sm font-medium text-primary transition hover:underline md:block"
+                  onClick={() => trackLinkClick({
+                    linkText: 'Ver tudo',
+                    linkUrl: '/loja',
+                    linkType: 'nav_route',
+                    location: 'product_related',
+                  })}
                 >
                   Ver tudo →
                 </Link>
@@ -324,6 +370,12 @@ export function ProdutoDetalhePage({ produto, relacionados }: Props) {
                 <Link
                   href="/loja"
                   className="font-sans text-sm font-medium text-primary transition hover:underline"
+                  onClick={() => trackLinkClick({
+                    linkText: 'Ver toda a coleção',
+                    linkUrl: '/loja',
+                    linkType: 'nav_route',
+                    location: 'product_related',
+                  })}
                 >
                   Ver toda a coleção →
                 </Link>
@@ -339,10 +391,20 @@ export function ProdutoDetalhePage({ produto, relacionados }: Props) {
 }
 
 function RelatedCard({ produto }: { produto: ProdutoLoja }) {
+  const href = `/loja/${produto.slug}`;
+
   return (
     <Link
-      href={`/loja/${produto.slug}`}
+      href={href}
       className="group block overflow-hidden rounded-2xl bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+      onClick={() => trackLinkClick({
+        linkText: produto.nome,
+        linkUrl: href,
+        linkType: 'product',
+        location: 'product_related',
+        productSlug: produto.slug,
+        productName: produto.nome,
+      })}
     >
       <div className="relative aspect-[3/4] overflow-hidden bg-muted">
         <Image

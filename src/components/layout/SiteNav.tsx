@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, type CSSProperties } from 'react';
 import Link from 'next/link';
 import { AmoooraLogoHeader } from '@/components/brand/AmoooraLogoHeader';
 import { CONTEUDO_HOME as C } from '@/lib/conteudo-home';
+import { trackLinkClick, type LinkClickLocation } from '@/lib/analytics';
 
 type SiteNavProps = {
   accent: string;
@@ -96,6 +97,25 @@ function MenuToggleIcon({ open }: { open: boolean }) {
   );
 }
 
+function navLinkType(id: string, href: string): 'nav_anchor' | 'nav_route' {
+  return id === 'loja' || !href.includes('#') ? 'nav_route' : 'nav_anchor';
+}
+
+function trackNavLink(
+  label: string,
+  href: string,
+  location: LinkClickLocation,
+  sectionId?: string
+) {
+  trackLinkClick({
+    linkText: label,
+    linkUrl: href,
+    linkType: navLinkType(sectionId ?? '', href),
+    location,
+    sectionId: sectionId && sectionId !== 'loja' ? sectionId : undefined,
+  });
+}
+
 export function SiteNav({
   accent,
   isMobile,
@@ -153,6 +173,11 @@ export function SiteNav({
   const logoHeight = isMobile ? 34 : 44;
 
   const links = C.nav.links;
+
+  const trackNavItem = (link: (typeof links)[number], location: LinkClickLocation) => {
+    trackNavLink(link.label, navHref(link.id, page), location, link.id);
+  };
+
   const [ctaColor, setCtaColor] = useState('#932D6F');
 
   useEffect(() => {
@@ -175,6 +200,7 @@ export function SiteNav({
       textDecoration: 'none', transition: 'transform 0.2s, box-shadow 0.2s',
       boxShadow: `0 4px 20px ${ctaColor}44`, whiteSpace: 'nowrap'
     }}
+    onClick={() => trackNavLink(C.nav.ctaDownload, ctaHref, 'header_cta', 'aplicativo')}
     onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = `0 8px 28px ${ctaColor}66`; }}
     onMouseLeave={(e) => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = `0 4px 20px ${ctaColor}44`; }}>
       {C.nav.ctaDownload}
@@ -220,7 +246,10 @@ export function SiteNav({
           gap: isMobile ? 12 : 32,
           position: 'relative',
         }}>
-          <Link href="/" style={{ justifySelf: 'start', background: 'transparent', boxShadow: 'none' }} onClick={closeMenu}>
+          <Link href="/" style={{ justifySelf: 'start', background: 'transparent', boxShadow: 'none' }} onClick={() => {
+            closeMenu();
+            trackNavLink('Amooora', '/', 'header_logo');
+          }}>
             <AmoooraLogoHeader height={logoHeight} priority />
           </Link>
 
@@ -236,6 +265,7 @@ export function SiteNav({
                 <Link key={link.id}
                   href={navHref(link.id, page)}
                   style={linkStyle}
+                  onClick={() => trackNavItem(link, 'header_desktop')}
                   onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }}
                   onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7'; }}>
                   {link.label}
@@ -250,6 +280,7 @@ export function SiteNav({
                 <Link key={link.id}
                   href={navHref(link.id, page)}
                   style={{ ...linkStyle, whiteSpace: 'normal' }}
+                  onClick={() => trackNavItem(link, 'header_desktop')}
                   onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }}
                   onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7'; }}>
                   {link.label}
@@ -309,7 +340,10 @@ export function SiteNav({
                 <li>
                   <Link
                     href="/"
-                    onClick={closeMenu}
+                    onClick={() => {
+                      closeMenu();
+                      trackNavLink('Amooora', '/', 'header_mobile');
+                    }}
                     className="flex min-h-[52px] items-center gap-3 rounded-xl px-3 font-sans text-[15px] font-medium text-ink transition hover:bg-primary/5 active:bg-primary/10"
                   >
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -322,7 +356,10 @@ export function SiteNav({
                   <li key={link.id}>
                     <Link
                       href={navHref(link.id, page)}
-                      onClick={closeMenu}
+                      onClick={() => {
+                        closeMenu();
+                        trackNavItem(link, 'header_mobile');
+                      }}
                       className="flex min-h-[52px] items-center gap-3 rounded-xl px-3 font-sans text-[15px] font-medium text-ink transition hover:bg-primary/5 active:bg-primary/10"
                     >
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -338,7 +375,10 @@ export function SiteNav({
             <div className="border-t border-black/5 p-5">
               <Link
                 href={ctaHref}
-                onClick={closeMenu}
+                onClick={() => {
+                  closeMenu();
+                  trackNavLink(C.nav.ctaDownload, ctaHref, 'header_cta', 'aplicativo');
+                }}
                 className="flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-primary font-sans text-sm font-semibold text-white shadow-md transition hover:brightness-95"
               >
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75} aria-hidden="true">

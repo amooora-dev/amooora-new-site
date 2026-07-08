@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from 'react';
 import { CONTEUDO_HOME as C } from '@/lib/conteudo-home';
+import { trackPilotSignup } from '@/lib/analytics';
 
 type PilotSignupProps = {
   accent: string;
@@ -22,6 +23,7 @@ export function PilotSignup({ accent, cta, isMobile }: PilotSignupProps) {
 
     // TODO: enviar para o BD quando a API estiver pronta
     console.info('[pilot-signup]', { email: email.trim() });
+    trackPilotSignup();
     setSubmitted(true);
     setEmail('');
   };

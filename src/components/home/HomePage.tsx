@@ -13,6 +13,7 @@ import {
   TweakToggle,
 } from '@/components/tweaks/tweaks-panel';
 import { PilotSignup } from '@/components/home/PilotSignup';
+import { trackNewsletterSignup } from '@/lib/analytics';
 import { SiteNav } from '@/components/layout/SiteNav';
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import type {
@@ -1311,7 +1312,10 @@ function Newsletter({ cta, isMobile }: CtaProps & MobileProps) {
         </p>
 
         <form
-          onSubmit={(e) => e.preventDefault()}
+          onSubmit={(e) => {
+            e.preventDefault();
+            trackNewsletterSignup();
+          }}
           style={{
             display: 'flex',
             gap: 10,

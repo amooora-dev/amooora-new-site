@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { CONTEUDO_HOME as C } from '@/lib/conteudo-home';
 import { PrivacyModal } from '@/components/layout/PrivacyModal';
+import { trackLinkClick } from '@/lib/analytics';
 
 type SiteFooterProps = {
   accent: string;
@@ -43,8 +44,20 @@ function FooterNavLink({
   };
 
   if (id) {
+    const href = footerHref(id, page);
     return (
-      <Link href={footerHref(id, page)} style={linkStyle} {...hover}>
+      <Link
+        href={href}
+        style={linkStyle}
+        onClick={() => trackLinkClick({
+          linkText: label,
+          linkUrl: href,
+          linkType: id === 'loja' || !href.includes('#') ? 'nav_route' : 'nav_anchor',
+          location: 'footer',
+          sectionId: id !== 'loja' ? id : undefined,
+        })}
+        {...hover}
+      >
         {label}
       </Link>
     );
