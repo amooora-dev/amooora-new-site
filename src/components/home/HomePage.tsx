@@ -599,15 +599,6 @@ function VideoSection({ isMobile }: MobileProps) {
         }} />
       </div>
 
-      {/* Overlay escuro — só no desktop */}
-      {!isMobile && (
-        <div style={{
-          position: 'absolute', inset: 0, zIndex: 1,
-          background: 'linear-gradient(to bottom, rgba(26,15,46,0.55) 0%, rgba(147,45,111,0.35) 50%, rgba(26,15,46,0.7) 100%)',
-          pointerEvents: 'none'
-        }} />
-      )}
-
       {/* Video controls */}
       <div style={{
         position: 'absolute', bottom: 28, right: 28, zIndex: 10,

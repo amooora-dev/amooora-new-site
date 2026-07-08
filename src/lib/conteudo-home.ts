@@ -272,17 +272,17 @@ export const CONTEUDO_HOME = {
   },
 
   footer: {
-    description: 'Um mundo inteiro de acolhimento e liberdade para a comunidade sáfica.',
+    description: 'Um mundo inteiro de acolhimento e liberdade.',
     instagram: '@n.amooora',
     instagramUrl: 'https://instagram.com/n.amooora',
     email: 'amooora@amooora.com.br',
     navLabel: 'Menu',
     navLinks: [
+      { label: 'Quem Somos', id: '' },
       { label: 'Manifesto', id: 'manifesto' },
       { label: 'Aplicativo', id: 'aplicativo' },
       { label: 'Nossos Valores', id: 'valores' },
       { label: 'Loja Amooora', id: 'loja' },
-      { label: 'Quem Somos', id: '' },
       { label: 'FAQ', id: 'faq' }
     ],
     appLabel: 'App',

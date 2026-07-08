@@ -61,8 +61,8 @@ function FooterNavLink({
 export function SiteFooter({ accent, isMobile, page = 'home' }: SiteFooterProps) {
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const navLinks = C.footer.navLinks;
-  const navCol1 = navLinks.slice(0, 3);
-  const navCol2 = navLinks.slice(3);
+  const navCol1 = navLinks.slice(0, 4);
+  const navCol2 = navLinks.slice(4);
 
   return (<>
     <footer style={{ background: 'var(--primary)', color: 'white', padding: isMobile ? '40px 20px 20px' : '48px 48px 24px' }}>
