@@ -57,7 +57,7 @@ async function main() {
       'Esta camiseta foi criada automaticamente para validar o fluxo de CRUD do CMS Amooora.',
     price: 99.9,
     category: 'camisetas' as const,
-    badge: 'novo' as const,
+    badge: 'Novo',
     active: true,
     featured: false,
     sizes: ['P', 'M', 'G', 'GG'],
@@ -85,7 +85,7 @@ async function main() {
       name: 'Camiseta Teste Admin (Editada)',
       description_short: 'Produto fake editado — teste OK',
       price: 109.9,
-      badge: 'mais_vendido',
+      badge: 'Mais vendido',
     },
     []
   );

@@ -1,10 +1,12 @@
 import { ProdutoForm } from '@/components/admin/ProdutoForm';
 import { AdminPageHeader } from '@/components/admin/admin-ui';
+import { listProductBadges } from '@/lib/admin/badge-repository';
 
 export const metadata = { title: 'Novo produto — CMS Amooora' };
 
-export default function NovoProdutoPage() {
+export default async function NovoProdutoPage() {
   const defaultWhatsappPhone = process.env.WHATSAPP_DEFAULT_PHONE ?? '';
+  const availableBadges = await listProductBadges();
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -17,7 +19,7 @@ export default function NovoProdutoPage() {
           { label: 'Novo' },
         ]}
       />
-      <ProdutoForm defaultWhatsappPhone={defaultWhatsappPhone} />
+      <ProdutoForm defaultWhatsappPhone={defaultWhatsappPhone} availableBadges={availableBadges} />
     </div>
   );
 }

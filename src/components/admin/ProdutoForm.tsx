@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
 import type { AdminProduct, AdminProductColor } from '@/lib/admin/product-repository';
-import type { ProductBadge, ProductCategory } from '@/lib/supabase/database.types';
+import type { ProductCategory } from '@/lib/supabase/database.types';
 import { DEFAULT_WHATSAPP_MESSAGE } from '@/lib/supabase/map-product';
 import { slugify } from '@/lib/admin/slug';
 import { saveProductAction, type ActionState } from '@/app/admin/(protected)/produtos/actions';
@@ -24,13 +24,6 @@ const CATEGORIES: { value: ProductCategory; label: string }[] = [
   { value: 'acessorios', label: 'Acessórios' },
 ];
 
-const BADGES: { value: ProductBadge | ''; label: string }[] = [
-  { value: '', label: 'Nenhum' },
-  { value: 'novo', label: 'Novo' },
-  { value: 'mais_vendido', label: 'Mais vendido' },
-  { value: 'edicao_limitada', label: 'Edição limitada' },
-];
-
 const DEFAULT_WHATSAPP_MSG = DEFAULT_WHATSAPP_MESSAGE;
 
 function SubmitButton({ label }: { label: string }) {
@@ -47,15 +40,18 @@ const INITIAL_FORM_STATE: ActionState = {};
 export function ProdutoForm({
   product,
   defaultWhatsappPhone,
+  availableBadges,
 }: {
   product?: AdminProduct;
   defaultWhatsappPhone: string;
+  availableBadges: string[];
 }) {
   const router = useRouter();
   const [state, formAction] = useFormState<ActionState, FormData>(saveProductAction, INITIAL_FORM_STATE);
   const formState = state ?? INITIAL_FORM_STATE;
   const [name, setName] = useState(product?.name ?? '');
   const [slug, setSlug] = useState(product?.slug ?? '');
+  const [badge, setBadge] = useState(product?.badge ?? '');
   const [slugTouched, setSlugTouched] = useState(Boolean(product?.slug));
   const [colors, setColors] = useState<AdminProductColor[]>(
     product?.colors?.length
@@ -228,16 +224,23 @@ export function ProdutoForm({
           </div>
           <div>
             <label className={adminLabelClass} htmlFor="badge">Badge</label>
-            <select
+            <input
               id="badge"
               name="badge"
-              defaultValue={product?.badge ?? ''}
+              list="badge-suggestions"
+              value={badge}
+              onChange={(e) => setBadge(e.target.value)}
+              placeholder="Nenhum — ou digite / escolha uma badge"
               className={adminInputClass}
-            >
-              {BADGES.map((b) => (
-                <option key={b.value || 'none'} value={b.value}>{b.label}</option>
+            />
+            <datalist id="badge-suggestions">
+              {availableBadges.map((label) => (
+                <option key={label} value={label} />
               ))}
-            </select>
+            </datalist>
+            <p className="mt-1.5 font-sans text-xs text-muted-fg">
+              Digite uma badge nova ou escolha uma existente. Ao salvar, ela fica disponível para outros produtos.
+            </p>
           </div>
           <div>
             <label className={adminLabelClass} htmlFor="price">Preço (R$) *</label>

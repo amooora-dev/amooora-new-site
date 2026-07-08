@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ProdutoForm } from '@/components/admin/ProdutoForm';
 import { AdminAlert, AdminPageHeader } from '@/components/admin/admin-ui';
+import { listProductBadges } from '@/lib/admin/badge-repository';
 import { getAdminProduct } from '@/lib/admin/product-repository';
 
 export const metadata = { title: 'Editar produto — CMS Amooora' };
@@ -22,6 +23,7 @@ export default async function EditarProdutoPage({
   if (!product) notFound();
 
   const defaultWhatsappPhone = process.env.WHATSAPP_DEFAULT_PHONE ?? '';
+  const availableBadges = await listProductBadges();
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -47,7 +49,7 @@ export default async function EditarProdutoPage({
         </div>
       )}
 
-      <ProdutoForm product={product} defaultWhatsappPhone={defaultWhatsappPhone} />
+      <ProdutoForm product={product} defaultWhatsappPhone={defaultWhatsappPhone} availableBadges={availableBadges} />
     </div>
   );
 }

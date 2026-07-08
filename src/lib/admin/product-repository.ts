@@ -1,6 +1,7 @@
 import { createAdminReadClient, createAdminWriteClient } from '@/lib/supabase/client';
 import { isSupabaseAdminConfigured } from '@/lib/supabase/config';
 import { SUPABASE_STORAGE_BUCKET } from '@/lib/supabase/config';
+import { ensureProductBadge, normalizeBadgeLabel } from '@/lib/admin/badge-repository';
 import type { ProductBadge, ProductCategory } from '@/lib/supabase/database.types';
 import { slugify } from './slug';
 
@@ -329,6 +330,8 @@ export async function createProduct(input: ProductFormInput, files: File[]) {
   if (error) throw new Error(error.message);
   const productId = data.id;
 
+  if (input.badge) await ensureProductBadge(input.badge);
+
   await saveColors(productId, input.colors);
   await saveWhatsapp(productId, input.whatsapp);
 
@@ -357,6 +360,8 @@ export async function updateProduct(id: string, input: ProductFormInput, files: 
     .eq('id', id);
 
   if (error) throw new Error(error.message);
+
+  if (input.badge) await ensureProductBadge(input.badge);
 
   await saveColors(id, input.colors);
   await saveWhatsapp(id, input.whatsapp);
@@ -455,7 +460,7 @@ export async function toggleProductActive(id: string, active: boolean) {
 }
 
 export function parseProductFormData(formData: FormData): ProductFormInput {
-  const badgeRaw = String(formData.get('badge') ?? '').trim();
+  const badgeRaw = normalizeBadgeLabel(String(formData.get('badge') ?? ''));
   const sizesRaw = String(formData.get('sizes') ?? 'P, M, G, GG');
 
   let colors: AdminProductColor[] = [];
@@ -472,7 +477,7 @@ export function parseProductFormData(formData: FormData): ProductFormInput {
     description_full: String(formData.get('description_full') ?? '').trim(),
     price: Number.parseFloat(String(formData.get('price') ?? '0')),
     category: String(formData.get('category') ?? 'camisetas') as ProductCategory,
-    badge: badgeRaw ? (badgeRaw as ProductBadge) : null,
+    badge: badgeRaw || null,
     active: formData.get('active') === 'on',
     featured: formData.get('featured') === 'on',
     sizes: sizesRaw

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
 import { saveProductOrderAction } from '@/app/admin/(protected)/produtos/actions';
 import { AdminBadge, AdminButton } from '@/components/admin/admin-ui';
-import type { ProductBadge, ProductCategory } from '@/lib/supabase/database.types';
+import type { ProductCategory } from '@/lib/supabase/database.types';
 
 const CATEGORY_LABEL: Record<ProductCategory, string> = {
   camisetas: 'Camisetas',
@@ -13,17 +13,11 @@ const CATEGORY_LABEL: Record<ProductCategory, string> = {
   acessorios: 'Acessórios',
 };
 
-const BADGE_LABEL: Record<ProductBadge, string> = {
-  novo: 'NOVO',
-  mais_vendido: 'MAIS VENDIDO',
-  edicao_limitada: 'EDIÇÃO LIMITADA',
-};
-
 export type ProductOrderItem = {
   id: string;
   name: string;
   category: ProductCategory;
-  badge: ProductBadge | null;
+  badge: string | null;
   active: boolean;
   sort_order: number;
   thumb: string | null;
@@ -205,7 +199,7 @@ export function ProductOrderManager({ products: initial }: { products: ProductOr
                     {CATEGORY_LABEL[product.category]}
                   </span>
                   {product.badge && (
-                    <AdminBadge>{BADGE_LABEL[product.badge]}</AdminBadge>
+                    <AdminBadge>{product.badge}</AdminBadge>
                   )}
                   {!product.active && (
                     <span className="font-sans text-xs text-red-600">Inativo</span>

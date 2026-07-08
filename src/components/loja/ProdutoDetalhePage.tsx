@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { ProdutoLoja } from '@/lib/loja-data';
+import { getBadgeBgClass } from '@/lib/loja/badge-display';
 import { buildWhatsappUrl } from '@/lib/supabase/map-product';
 import { SiteNav } from '@/components/layout/SiteNav';
 import { SiteFooter } from '@/components/layout/SiteFooter';
@@ -149,9 +150,7 @@ export function ProdutoDetalhePage({ produto, relacionados }: Props) {
                   {produto.categoria}
                 </span>
                 {produto.badge && (
-                  <span className={`rounded-full px-3 py-1 font-sans text-xs font-semibold uppercase tracking-wide text-white ${
-                    produto.badge === 'EDIÇÃO LIMITADA' ? 'bg-accent' : 'bg-primary'
-                  }`}>
+                  <span className={`rounded-full px-3 py-1 font-sans text-xs font-semibold uppercase tracking-wide text-white ${getBadgeBgClass(produto.badge)}`}>
                     {produto.badge}
                   </span>
                 )}

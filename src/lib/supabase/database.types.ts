@@ -4,7 +4,8 @@
  */
 
 export type ProductCategory = 'camisetas' | 'moletons' | 'acessorios';
-export type ProductBadge = 'novo' | 'mais_vendido' | 'edicao_limitada';
+/** Texto livre — rótulo exibido na loja (ex.: "Novo", "Promoção") */
+export type ProductBadge = string;
 
 export type DbProduct = {
   id: string;

@@ -1,17 +1,12 @@
 import type { ProdutoLoja } from '@/lib/loja-data';
+import { formatProductBadge } from '@/lib/loja/badge-display';
 import { buildAbsoluteSiteUrl } from '@/lib/site-url';
-import type { ProductBadge, ProductCategory, StoreProduct } from './database.types';
+import type { ProductCategory, StoreProduct } from './database.types';
 
 const CATEGORY_LABEL: Record<ProductCategory, ProdutoLoja['categoria']> = {
   camisetas: 'Camisetas',
   moletons: 'Moletons',
   acessorios: 'Acessórios',
-};
-
-const BADGE_LABEL: Record<ProductBadge, NonNullable<ProdutoLoja['badge']>> = {
-  novo: 'NOVO',
-  mais_vendido: 'MAIS VENDIDO',
-  edicao_limitada: 'EDIÇÃO LIMITADA',
 };
 
 export function formatPrecoBRL(value: number): string {
@@ -69,7 +64,7 @@ export function mapStoreProductToProdutoLoja(row: StoreProduct, index = 0): Prod
     categoria: CATEGORY_LABEL[row.category],
     preco: formatPrecoBRL(precoNumerico),
     precoNumerico,
-    badge: row.badge ? BADGE_LABEL[row.badge] : null,
+    badge: row.badge ? formatProductBadge(row.badge) : null,
     desc: row.description_short,
     descricaoCompleta: row.description_full,
     imagem: primary?.url ?? imagens[0] ?? '/images/loja/produtos/placeholder.png',

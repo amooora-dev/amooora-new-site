@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { deleteProductAction, toggleActiveAction } from '@/app/admin/(protected)/produtos/actions';
 import { AdminBadge, AdminButton } from '@/components/admin/admin-ui';
-import type { ProductBadge, ProductCategory } from '@/lib/supabase/database.types';
+import type { ProductCategory } from '@/lib/supabase/database.types';
 
 const CATEGORY_LABEL: Record<ProductCategory, string> = {
   camisetas: 'Camisetas',
@@ -13,18 +13,12 @@ const CATEGORY_LABEL: Record<ProductCategory, string> = {
   acessorios: 'Acessórios',
 };
 
-const BADGE_LABEL: Record<ProductBadge, string> = {
-  novo: 'NOVO',
-  mais_vendido: 'MAIS VENDIDO',
-  edicao_limitada: 'EDIÇÃO LIMITADA',
-};
-
 type Row = {
   id: string;
   name: string;
   price: number;
   category: ProductCategory;
-  badge: ProductBadge | null;
+  badge: string | null;
   active: boolean;
   thumb: string | null;
 };
@@ -98,7 +92,7 @@ export function ProdutosTable({ products }: { products: Row[] }) {
                       <p className="truncate font-sans text-sm font-medium text-ink">{p.name}</p>
                       {p.badge && (
                         <span className="font-sans text-[10px] font-semibold uppercase tracking-wide text-primary">
-                          {BADGE_LABEL[p.badge]}
+                          {p.badge}
                         </span>
                       )}
                     </div>

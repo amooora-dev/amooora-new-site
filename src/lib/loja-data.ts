@@ -21,6 +21,7 @@
  *   No CMS, cada produto terá o campo imagem próprio.
  */
 import { buildWhatsappUrl, DEFAULT_WHATSAPP_MESSAGE } from '@/lib/supabase/map-product';
+import { isEdicaoLimitadaBadge } from '@/lib/loja/badge-display';
 
 const IMG = {
   regataVagitariana: '/images/loja/produtos/regata-vagitariana.png',
@@ -78,7 +79,7 @@ export type ProdutoLoja = {
   categoria: 'Camisetas' | 'Moletons' | 'Acessórios';
   preco: string;
   precoNumerico: number;
-  badge: 'NOVO' | 'EDIÇÃO LIMITADA' | 'MAIS VENDIDO' | null;
+  badge: string | null;
   desc: string;
   descricaoCompleta: string;
   imagem: string;
@@ -269,7 +270,7 @@ export const PRODUTOS_LOJA: ProdutoLoja[] = PRODUTOS_BASE.map(enrichProduto);
 export function filtrarProdutos(produtos: ProdutoLoja[], filtro: CategoriaFiltro) {
   if (filtro === 'Todos') return produtos;
   if (filtro === 'Edição Limitada') {
-    return produtos.filter((p) => p.badge === 'EDIÇÃO LIMITADA');
+    return produtos.filter((p) => isEdicaoLimitadaBadge(p.badge));
   }
   return produtos.filter((p) => p.categoria === filtro);
 }
