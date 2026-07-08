@@ -122,10 +122,7 @@ function ParticleCanvas({ color, active }: ParticleCanvasProps) {
 /* ── HERO - Direction A: Editorial clean ── */
 function HeroA({ accent, cta, particles, isMobile, dir }: HeroProps & CtaProps & { dir: 'A' | 'B' }) {
   const navOffset = isMobile ? 72 : 84;
-  const heroBackground =
-    isMobile && 'backgroundMobile' in C.hero && C.hero.backgroundMobile
-      ? C.hero.backgroundMobile
-      : C.hero.background;
+  const heroBackground = C.hero.background;
 
   return (
     <section style={{
