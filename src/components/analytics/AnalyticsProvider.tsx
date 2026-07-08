@@ -21,14 +21,12 @@ export function AnalyticsProvider() {
   useEffect(() => {
     if (getStoredConsent() === 'accepted') {
       initAnalytics();
-      trackPageView(window.location.pathname + window.location.search);
     }
 
     const handleConsent = (event: Event) => {
       const choice = (event as CustomEvent<'accepted' | 'rejected'>).detail;
       if (choice === 'accepted') {
         initAnalytics();
-        trackPageView(window.location.pathname + window.location.search);
       }
     };
 
