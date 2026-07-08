@@ -24,7 +24,7 @@ const linkStyle: CSSProperties = {
   fontSize: 14,
   color: 'rgba(255,255,255,0.6)',
   textDecoration: 'none',
-  marginBottom: 10,
+  marginBottom: 8,
   transition: 'color 0.2s',
 };
 
@@ -65,13 +65,13 @@ export function SiteFooter({ accent, isMobile, page = 'home' }: SiteFooterProps)
   const navCol2 = navLinks.slice(3);
 
   return (<>
-    <footer style={{ background: 'var(--primary)', color: 'white', padding: isMobile ? '40px 20px 20px' : '80px 48px 40px' }}>
+    <footer style={{ background: 'var(--primary)', color: 'white', padding: isMobile ? '40px 20px 20px' : '48px 48px 24px' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <div style={{
           display: 'grid',
           gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr',
-          gap: isMobile ? 28 : 60,
-          marginBottom: isMobile ? 20 : 64,
+          gap: isMobile ? 28 : 40,
+          marginBottom: isMobile ? 20 : 28,
         }}>
           <div>
             <Image
@@ -79,7 +79,7 @@ export function SiteFooter({ accent, isMobile, page = 'home' }: SiteFooterProps)
               alt="Amooora"
               width={1984}
               height={1467}
-              style={{ height: 52, width: 'auto', objectFit: 'contain', marginBottom: 16, filter: 'brightness(0) invert(1)' }}
+              style={{ height: 52, width: 'auto', objectFit: 'contain', marginBottom: 12, filter: 'brightness(0) invert(1)' }}
             />
             <p style={{ fontFamily: "var(--sans)", fontSize: 14, color: 'rgba(255,255,255,0.5)',
               lineHeight: 1.8, maxWidth: 320, fontWeight: 300 }}>
@@ -91,7 +91,7 @@ export function SiteFooter({ accent, isMobile, page = 'home' }: SiteFooterProps)
               flexWrap: 'wrap',
               alignItems: 'center',
               gap: 16,
-              marginTop: 24,
+              marginTop: isMobile ? 24 : 16,
             }}>
               <a href={C.footer.instagramUrl} target="_blank" rel="noopener noreferrer" style={{
                 display: 'flex', alignItems: 'center', gap: 8,
@@ -118,41 +118,17 @@ export function SiteFooter({ accent, isMobile, page = 'home' }: SiteFooterProps)
           </div>
           <div>
             <div style={{ fontFamily: 'var(--sans)', fontSize: 11, fontWeight: 600,
-              letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 16 }}>
+              letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 12 }}>
               {C.footer.navLabel}
             </div>
-            {isMobile ? (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 24px' }}>
-                <div>
-                  {navCol1.map((link) => (
-                    <FooterNavLink key={link.label} label={link.label} id={link.id} page={page} />
-                  ))}
-                </div>
-                <div>
-                  {navCol2.map((link) => (
-                    <FooterNavLink key={link.label} label={link.label} id={link.id} page={page} />
-                  ))}
-                  <button
-                    onClick={() => setPrivacyOpen(true)}
-                    style={{
-                      ...linkStyle,
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      padding: 0,
-                      textAlign: 'left',
-                      marginBottom: 0,
-                    }}
-                    onMouseEnter={(e) => { e.currentTarget.style.color = 'white'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
-                  >
-                    Política de Privacidade
-                  </button>
-                </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 24px' }}>
+              <div>
+                {navCol1.map((link) => (
+                  <FooterNavLink key={link.label} label={link.label} id={link.id} page={page} />
+                ))}
               </div>
-            ) : (
-              <>
-                {navLinks.map((link) => (
+              <div>
+                {navCol2.map((link) => (
                   <FooterNavLink key={link.label} label={link.label} id={link.id} page={page} />
                 ))}
                 <button
@@ -164,20 +140,21 @@ export function SiteFooter({ accent, isMobile, page = 'home' }: SiteFooterProps)
                     cursor: 'pointer',
                     padding: 0,
                     textAlign: 'left',
+                    marginBottom: 0,
                   }}
                   onMouseEnter={(e) => { e.currentTarget.style.color = 'white'; }}
                   onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
                 >
                   Política de Privacidade
                 </button>
-              </>
-            )}
+              </div>
+            </div>
           </div>
         </div>
 
         <div style={{
           borderTop: '1px solid rgba(255,255,255,0.08)',
-          paddingTop: isMobile ? 16 : 32,
+          paddingTop: isMobile ? 16 : 20,
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: isMobile ? 'flex-start' : 'center',

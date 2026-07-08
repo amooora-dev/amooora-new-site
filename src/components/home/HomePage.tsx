@@ -1042,7 +1042,7 @@ function FAQ({ accent, isMobile }: SectionProps) {
 
 
   return (
-    <section id="faq" ref={ref} style={{ padding: isMobile ? '80px 0' : '120px 0', background: 'var(--white)' }}>
+    <section id="faq" ref={ref} style={{ padding: isMobile ? '80px 0 24px' : '120px 0 32px', background: 'var(--white)' }}>
       <div style={{ maxWidth: 860, margin: '0 auto', padding: isMobile ? '0 20px' : '0 48px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24,
           opacity: visible ? 1 : 0, transition: 'all 0.7s ease' }}>
@@ -1178,51 +1178,88 @@ function Gallery({ accent, cta, isMobile }: SectionProps & CtaProps) {
 /* ── FOOTER ── */
 function Newsletter({ cta, isMobile }: CtaProps & MobileProps) {
   return (
-    <section style={{ background: 'var(--white)', padding: '48px 48px 36px' }}>
+    <section style={{ background: 'var(--white)', padding: isMobile ? '24px 20px 36px' : '24px 0 36px' }}>
       <div style={{
-        maxWidth: 1200, margin: '0 auto',
-        display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.1fr 1.9fr', gap: 24, alignItems: 'center'
+        maxWidth: 860,
+        margin: '0 auto',
+        padding: isMobile ? 0 : '0 48px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: isMobile ? 'flex-start' : 'center',
+        textAlign: isMobile ? 'left' : 'center',
       }}>
-        <h3 style={{
-          fontFamily: "var(--sans)", fontSize: 'clamp(14px,1.2vw,16px)',
-          lineHeight: 1.8, fontWeight: 600, color: '#717182'
+        <p style={{
+          fontFamily: "var(--sans)",
+          fontSize: 'clamp(15px,1.4vw,17px)',
+          fontWeight: 400,
+          lineHeight: 1.7,
+          color: '#717182',
+          maxWidth: isMobile ? 480 : 'none',
+          marginBottom: 20,
+          whiteSpace: isMobile ? 'normal' : 'nowrap',
         }}>
           {C.newsletter.title}
-        </h3>
+        </p>
 
-        <form onSubmit={(e) => e.preventDefault()} style={{ display: 'flex', gap: 10, alignItems: 'center', flexDirection: isMobile ? 'column' : 'row' }}>
+        <form
+          onSubmit={(e) => e.preventDefault()}
+          style={{
+            display: 'flex',
+            gap: 10,
+            flexDirection: isMobile ? 'column' : 'row',
+            alignItems: isMobile ? 'stretch' : 'center',
+            justifyContent: isMobile ? 'flex-start' : 'center',
+            width: isMobile ? '100%' : 'auto',
+            maxWidth: isMobile ? 480 : 520,
+          }}
+        >
           <input
             type="email"
             placeholder={C.newsletter.placeholder}
             aria-label={C.newsletter.placeholder}
             style={{
-              flex: 1,
-              minHeight: 54,
+              flex: isMobile ? undefined : 1,
+              minHeight: 48,
               borderRadius: 8,
               border: '1px solid #e8eaf2',
               padding: '0 16px',
               fontFamily: "var(--sans)",
-              fontSize: 18,
+              fontSize: 16,
               color: '#0f1b3d',
               outline: 'none',
-              width: '100%'
+              width: isMobile ? '100%' : 'auto',
+              minWidth: 0,
+              background: 'white',
             }}
           />
-          <button type="submit" style={{
-            minHeight: 54,
-            padding: '0 20px',
-            borderRadius: 8,
-            border: 'none',
-            background: cta,
-            color: 'white',
-            fontFamily: "var(--sans)",
-            fontSize: 15,
-            fontWeight: 700,
-            letterSpacing: '0.02em',
-            cursor: 'pointer',
-            whiteSpace: 'nowrap',
-            width: isMobile ? '100%' : 'auto'
-          }}>
+          <button
+            type="submit"
+            style={{
+              alignSelf: isMobile ? 'flex-start' : 'auto',
+              flexShrink: 0,
+              minHeight: 48,
+              padding: '0 24px',
+              borderRadius: 100,
+              border: 'none',
+              background: cta,
+              color: 'white',
+              fontFamily: "var(--sans)",
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: 'pointer',
+              boxShadow: `0 8px 32px ${cta}44`,
+              transition: 'all 0.25s',
+              whiteSpace: 'nowrap',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = `0 12px 40px ${cta}55`;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = '';
+              e.currentTarget.style.boxShadow = `0 8px 32px ${cta}44`;
+            }}
+          >
             {C.newsletter.button}
           </button>
         </form>
