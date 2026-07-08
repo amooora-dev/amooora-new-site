@@ -1,12 +1,14 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { POLITICA_DE_COOKIES } from '@/lib/politica-de-cookies';
+import { createPageMetadata } from '@/lib/seo';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createPageMetadata({
   title: 'Política de Cookies e Privacidade — Amooora',
   description:
     'Leia a política de cookies e privacidade da Amooora e entenda como tratamos informações de contato e dados de navegação.',
-};
+  path: '/politica-de-cookies',
+});
 
 export default function PoliticaDeCookiesPage() {
   return (

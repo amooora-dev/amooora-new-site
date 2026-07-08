@@ -3,6 +3,12 @@ import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import { fetchSingleProduct, fetchStoreProducts } from '@/lib/supabase/products';
 import { ProdutoDetalhePage } from '@/components/loja/ProdutoDetalhePage';
+import { JsonLd } from '@/components/seo/JsonLd';
+import {
+  buildBreadcrumbJsonLd,
+  buildProductJsonLd,
+  createPageMetadata,
+} from '@/lib/seo';
 
 export const revalidate = 60;
 
@@ -15,16 +21,22 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { produto } = await fetchSingleProduct(params.slug);
-  if (!produto) return { title: 'Produto não encontrado — Loja Amooora' };
-  return {
+  if (!produto) {
+    return createPageMetadata({
+      title: 'Produto não encontrado — Loja Amooora',
+      path: `/loja/${params.slug}`,
+      noIndex: true,
+    });
+  }
+
+  const images = produto.imagens.length ? produto.imagens : [produto.imagem];
+
+  return createPageMetadata({
     title: `${produto.nome} — Loja Amooora`,
     description: produto.desc,
-    openGraph: {
-      title: produto.nome,
-      description: produto.desc,
-      images: produto.imagem ? [{ url: produto.imagem }] : [],
-    },
-  };
+    path: `/loja/${produto.slug}`,
+    ogImage: images,
+  });
 }
 
 export default async function ProdutoPage({ params }: Props) {
@@ -39,9 +51,22 @@ export default async function ProdutoPage({ params }: Props) {
     .filter((p) => p.slug !== produto.slug && p.categoria === produto.categoria)
     .slice(0, 4);
 
+  const structuredData = [
+    buildProductJsonLd(produto),
+    buildBreadcrumbJsonLd([
+      { name: 'Início', path: '/' },
+      { name: 'Loja', path: '/loja' },
+      { name: produto.categoria, path: `/loja?categoria=${encodeURIComponent(produto.categoria)}` },
+      { name: produto.nome, path: `/loja/${produto.slug}` },
+    ]),
+  ];
+
   return (
-    <Suspense fallback={<div className="min-h-screen bg-white" />}>
-      <ProdutoDetalhePage produto={produto} relacionados={relacionados} />
-    </Suspense>
+    <>
+      <JsonLd data={structuredData} />
+      <Suspense fallback={<div className="min-h-screen bg-white" />}>
+        <ProdutoDetalhePage produto={produto} relacionados={relacionados} />
+      </Suspense>
+    </>
   );
 }
