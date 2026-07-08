@@ -768,6 +768,82 @@ function Manifesto({ accent, dir, isMobile }: ManifestoProps) {
 
 }
 
+/* ── APP ACCORDION ── */
+type AppAccordionProps = {
+  accent: string;
+  items: typeof C.app.items;
+  open: number | null;
+  setOpen: (index: number | null) => void;
+  variant: 'desktop' | 'mobile';
+};
+
+function AppAccordion({ accent, items, open, setOpen, variant }: AppAccordionProps) {
+  const isMobileCard = variant === 'mobile';
+
+  return (
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      gap: isMobileCard ? 12 : 0
+    }}>
+      {items.map((item, i) => {
+        const isOpen = open === i;
+        return (
+          <div key={i} style={isMobileCard ? {
+            background: '#fff',
+            borderRadius: 12,
+            boxShadow: '0 2px 12px rgba(96,16,59,0.06)',
+            overflow: 'hidden'
+          } : {
+            borderTop: `1px solid ${accent}20`,
+            borderBottom: i === items.length - 1 ? `1px solid ${accent}20` : 'none'
+          }}>
+            <button onClick={() => setOpen(isOpen ? null : i)} style={{
+              width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              padding: isMobileCard ? '18px 20px' : '18px 0',
+              background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', gap: 12
+            }}>
+              <span style={{ fontFamily: "var(--sans)", fontSize: 'clamp(14px,1.2vw,16px)', fontWeight: 600,
+                color: isOpen ? accent : '#717182', transition: 'color 0.2s' }}>
+                {item.label}
+              </span>
+              <span style={{
+                width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
+                background: isOpen ? accent : `${accent}14`,
+                color: isOpen ? 'white' : accent,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 18, fontWeight: 300,
+                transition: 'all 0.22s',
+                transform: isOpen ? 'rotate(45deg)' : 'none'
+              }}>+</span>
+            </button>
+
+            {isOpen &&
+            <div style={{
+              padding: isMobileCard ? '0 20px 20px' : '0 0 20px',
+              animation: 'fadeUp 0.3s ease both'
+            }}>
+                {item.blocks.map((b, bi) =>
+              <div key={bi} style={{
+                padding: '14px 0 14px 16px',
+                borderLeft: `2px solid ${accent}`,
+                marginBottom: bi < item.blocks.length - 1 ? 12 : 0
+              }}>
+                    <p style={{ fontFamily: "var(--sans)", fontSize: 13, fontWeight: 600,
+                  color: 'var(--ink)', marginBottom: 6 }}>{b.q}</p>
+                    <p style={{ fontFamily: "var(--sans)", fontSize: 13, color: '#717182',
+                  lineHeight: 1.7, fontWeight: 300 }}>{b.a}</p>
+                  </div>
+              )}
+              </div>
+            }
+          </div>);
+
+      })}
+    </div>
+  );
+}
+
 /* ── APP SECTION ── */
 function AppSection({ accent, cta, isMobile }: SectionProps & CtaProps) {
   const ref = useRef<HTMLElement>(null);
@@ -783,18 +859,115 @@ function AppSection({ accent, cta, isMobile }: SectionProps & CtaProps) {
   const items = C.app.items;
   const introFull = C.app.intro.slice(0, 2);
   const introSplit = C.app.intro.slice(2);
-  const introParagraphStyle = (marginBottom: number): CSSProperties => ({
+  const introParagraphStyle = (marginBottom: number, centered = false): CSSProperties => ({
     fontFamily: "var(--sans)",
     fontSize: 'clamp(14px,1.2vw,16px)', fontWeight: 300,
-    lineHeight: 1.8, color: '#717182', marginBottom
+    lineHeight: 1.8, color: '#717182', marginBottom,
+    ...(centered ? { textAlign: 'center' as const } : {})
   });
+
+  const mockupImage = (
+    <Image
+      src="/images/app-mockup.png"
+      alt="Amooora App"
+      width={520}
+      height={1040}
+      style={{
+        width: '100%',
+        maxWidth: isMobile ? 320 : 520,
+        height: 'auto',
+        objectFit: 'contain',
+        filter: isMobile ? 'none' : 'drop-shadow(0 32px 64px rgba(147,45,111,0.25))',
+        animation: isMobile ? 'none' : 'floatY 5s ease-in-out infinite'
+      }}
+    />
+  );
+
+  if (isMobile) {
+    const { mobile } = C.app;
+    return (
+      <section id="aplicativo" ref={ref} style={{
+        padding: '80px 0', background: '#faf7fb',
+        position: 'relative', overflow: 'hidden'
+      }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', paddingInline: 20 }}>
+          <div style={{
+            textAlign: 'center',
+            opacity: visible ? 1 : 0,
+            transform: visible ? 'none' : 'translateY(24px)',
+            transition: 'all 0.7s ease'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 24 }}>
+              <div style={{ width: 36, height: 1.5, background: accent }} />
+              <span style={{ fontFamily: "var(--sans)", fontSize: 11, fontWeight: 600,
+                letterSpacing: '0.2em', textTransform: 'uppercase', color: accent }}>{C.app.label}</span>
+            </div>
+            <h2 style={{ fontFamily: "var(--serif)",
+              fontSize: 'clamp(28px,3.5vw,50px)', fontWeight: 900, color: 'var(--ink)',
+              lineHeight: 1.1, marginBottom: 24 }}>
+              {C.app.title}
+            </h2>
+            <p style={introParagraphStyle(40, true)}>
+              {mobile.intro}
+            </p>
+
+            <div style={{
+              display: 'flex', justifyContent: 'center', marginBottom: 40
+            }}>
+              {mockupImage}
+            </div>
+
+            <span style={{
+              display: 'inline-block',
+              fontFamily: "var(--sans)",
+              fontSize: 14,
+              fontWeight: 600,
+              color: accent,
+              background: `${accent}14`,
+              padding: '10px 22px',
+              borderRadius: 100,
+              marginBottom: 16
+            }}>
+              {mobile.comingSoonTitle}
+            </span>
+            <p style={introParagraphStyle(40, true)}>
+              {mobile.comingSoonSubtitle}
+            </p>
+          </div>
+
+          <div style={{ textAlign: 'left' }}>
+            <h3 style={{
+              fontFamily: "var(--sans)",
+              fontSize: 'clamp(20px,4.5vw,24px)',
+              fontWeight: 800,
+              color: 'var(--ink)',
+              lineHeight: 1.2,
+              marginBottom: 20
+            }}>
+              {mobile.offersTitle}
+            </h3>
+
+            <AppAccordion
+              accent={accent}
+              items={items}
+              open={open}
+              setOpen={setOpen}
+              variant="mobile"
+            />
+
+            <PilotSignup accent={accent} cta={cta} isMobile={isMobile} />
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="aplicativo" ref={ref} style={{
-      padding: isMobile ? '80px 0' : '120px 0', background: '#faf7fb',
+      padding: '120px 0', background: '#faf7fb',
       position: 'relative', overflow: 'hidden'
     }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', paddingInline: isMobile ? 20 : 48 }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', paddingInline: 48 }}>
 
         {/* Cabeçalho + 2 primeiros parágrafos em largura total */}
         <div style={{ opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(24px)', transition: 'all 0.7s ease' }}>
@@ -818,8 +991,8 @@ function AppSection({ accent, cta, isMobile }: SectionProps & CtaProps) {
         {/* A partir do 3º parágrafo: texto + mockup lado a lado */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
-          gap: isMobile ? 48 : 80,
+          gridTemplateColumns: '1fr 1fr',
+          gap: 80,
           alignItems: 'start'
         }}>
         <div style={{ opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateY(24px)', transition: 'all 0.7s ease' }}>
@@ -830,78 +1003,23 @@ function AppSection({ accent, cta, isMobile }: SectionProps & CtaProps) {
             </p>
           )}
 
-          {/* Accordion items */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-            {items.map((item, i) => {
-              const isOpen = open === i;
-              return (
-                <div key={i} style={{
-                  borderTop: `1px solid ${accent}20`,
-                  borderBottom: i === items.length - 1 ? `1px solid ${accent}20` : 'none'
-                }}>
-                  <button onClick={() => setOpen(isOpen ? null : i)} style={{
-                    width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                    padding: '18px 0', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', gap: 12
-                  }}>
-                    <span style={{ fontFamily: "var(--sans)", fontSize: 'clamp(14px,1.2vw,16px)', fontWeight: 600,
-                      color: isOpen ? accent : '#717182', transition: 'color 0.2s' }}>
-                      {item.label}
-                    </span>
-                    <span style={{
-                      width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
-                      background: isOpen ? accent : `${accent}14`,
-                      color: isOpen ? 'white' : accent,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 18, fontWeight: 300,
-                      transition: 'all 0.22s',
-                      transform: isOpen ? 'rotate(45deg)' : 'none'
-                    }}>+</span>
-                  </button>
+          <AppAccordion
+            accent={accent}
+            items={items}
+            open={open}
+            setOpen={setOpen}
+            variant="desktop"
+          />
 
-                  {isOpen &&
-                  <div style={{ paddingBottom: 20, animation: 'fadeUp 0.3s ease both' }}>
-                      {item.blocks.map((b, bi) =>
-                    <div key={bi} style={{
-                      padding: '14px 0 14px 16px',
-                      borderLeft: `2px solid ${accent}`,
-                      marginBottom: bi < item.blocks.length - 1 ? 12 : 0
-                    }}>
-                          <p style={{ fontFamily: "var(--sans)", fontSize: 13, fontWeight: 600,
-                        color: 'var(--ink)', marginBottom: 6 }}>{b.q}</p>
-                          <p style={{ fontFamily: "var(--sans)", fontSize: 13, color: '#717182',
-                        lineHeight: 1.7, fontWeight: 300 }}>{b.a}</p>
-                        </div>
-                    )}
-                    </div>
-                  }
-                </div>);
-
-            })}
-          </div>
-
-              <PilotSignup accent={accent} cta={cta} isMobile={isMobile} />
+          <PilotSignup accent={accent} cta={cta} isMobile={isMobile} />
         </div>
 
-        {/* Mockup alinhado ao 3º parágrafo */}
         <div style={{
           display: 'flex', justifyContent: 'center', alignItems: 'flex-start',
           opacity: visible ? 1 : 0, transform: visible ? 'none' : 'translateX(40px)',
           transition: 'all 1s 0.2s ease'
         }}>
-          <Image
-            src="/images/app-mockup.png"
-            alt="Amooora App"
-            width={520}
-            height={1040}
-            style={{
-              width: '100%',
-              maxWidth: 520,
-              height: 'auto',
-              objectFit: 'contain',
-              filter: 'drop-shadow(0 32px 64px rgba(147,45,111,0.25))',
-              animation: isMobile ? 'none' : 'floatY 5s ease-in-out infinite'
-            }}
-          />
+          {mockupImage}
         </div>
         </div>
       </div>
