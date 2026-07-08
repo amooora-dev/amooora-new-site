@@ -370,22 +370,13 @@ function applyMobileVideoCover(container: HTMLElement | null) {
   const iframe = container.querySelector('iframe');
   if (!iframe) return;
 
-  const width = container.offsetWidth;
-  const height = container.offsetHeight;
-  if (!width || !height) return;
-
-  const videoRatio = 16 / 9;
-  const containerRatio = width / height;
-  const coverWidth = containerRatio > videoRatio ? width : height * videoRatio;
-  const coverHeight = containerRatio > videoRatio ? width / videoRatio : height;
-
   Object.assign(iframe.style, {
     position: 'absolute',
-    top: '50%',
-    left: '50%',
-    width: `${coverWidth}px`,
-    height: `${coverHeight}px`,
-    transform: 'translate(-50%, -50%)',
+    top: '0',
+    left: '0',
+    width: '100%',
+    height: '100%',
+    transform: 'none',
     border: 'none',
     pointerEvents: 'none',
   });
@@ -441,10 +432,17 @@ function VideoSection({ isMobile }: MobileProps) {
           modestbranding: 1,
           iv_load_policy: 3,
           enablejsapi: 1,
+          cc_load_policy: 0,
         },
         events: {
           onReady: (e) => {
             e.target.mute();
+            try {
+              e.target.unloadModule?.('captions');
+              e.target.setOption?.('captions', 'track', {});
+            } catch {
+              /* legendas indisponíveis neste player */
+            }
             if (isMobile) {
               applyMobileVideoCover(divRef.current);
               window.setTimeout(() => applyMobileVideoCover(divRef.current), 100);
@@ -567,14 +565,18 @@ function VideoSection({ isMobile }: MobileProps) {
 
   return (
     <section ref={ref} style={{
-      position: 'relative', height: isMobile ? '56vh' : '70vh', overflow: 'hidden',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      position: 'relative',
+      height: isMobile ? '56.25vw' : '70vh',
+      overflow: 'hidden',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
       userSelect: 'none',
-      background: isMobile ? '#c5b4d8' : 'transparent',
     }}>
       {/* Video layer — pointer-events: none so clicks never reach iframe */}
       <div style={{
-        position: 'absolute', inset: 0,
+        position: 'absolute',
+        inset: 0,
         transform: `translateY(${isMobile ? 0 : offset}px)`,
         pointerEvents: 'none',
         zIndex: 0,
@@ -582,7 +584,12 @@ function VideoSection({ isMobile }: MobileProps) {
       }}>
         <div ref={divRef} style={{
           position: 'absolute',
-          ...(isMobile ? { inset: 0 } : {
+          ...(isMobile ? {
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+          } : {
             top: '-20%',
             left: '-10%',
             width: '120%',
@@ -592,12 +599,14 @@ function VideoSection({ isMobile }: MobileProps) {
         }} />
       </div>
 
-      {/* Overlay — also blocks clicks to iframe */}
-      <div style={{
-        position: 'absolute', inset: 0, zIndex: 1,
-        background: 'linear-gradient(to bottom, rgba(26,15,46,0.55) 0%, rgba(147,45,111,0.35) 50%, rgba(26,15,46,0.7) 100%)',
-        pointerEvents: 'none'
-      }} />
+      {/* Overlay escuro — só no desktop */}
+      {!isMobile && (
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 1,
+          background: 'linear-gradient(to bottom, rgba(26,15,46,0.55) 0%, rgba(147,45,111,0.35) 50%, rgba(26,15,46,0.7) 100%)',
+          pointerEvents: 'none'
+        }} />
+      )}
 
       {/* Video controls */}
       <div style={{

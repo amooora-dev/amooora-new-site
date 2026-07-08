@@ -25,6 +25,8 @@ declare global {
     pauseVideo: () => void;
     setVolume: (volume: number) => void;
     getPlayerState: () => number;
+    unloadModule?: (module: string) => void;
+    setOption?: (module: string, option: string, value: unknown) => void;
     destroy: () => void;
   }
 }
