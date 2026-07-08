@@ -29,8 +29,7 @@ export function CookieConsentBanner() {
       <div className="mx-auto flex max-w-6xl flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <p className="font-sans text-sm leading-6 text-ink-mid md:max-w-4xl">
           Este site usa cookies para melhorar sua experiência de navegação, analisar o tráfego do site
-          e oferecer melhores experiências de usuário. Ao continuar a usar este site, você concorda com
-          o uso de cookies. Saiba mais em nossa{' '}
+          e oferecer melhores experiências de usuário. Saiba mais em nossa{' '}
           <Link
             href="/politica-de-cookies"
             className="font-semibold text-primary underline underline-offset-4 transition hover:text-secondary"

@@ -27,45 +27,26 @@ export default function PoliticaDeCookiesPage() {
             {POLITICA_DE_COOKIES.title}
           </h1>
           <p className="mt-4 text-sm font-medium text-ink-soft">
-            Data de Vigência: {POLITICA_DE_COOKIES.effectiveDate}
+            Última atualização: {POLITICA_DE_COOKIES.lastUpdate}
           </p>
-          <p className="mt-6 text-base leading-8 text-ink-mid">{POLITICA_DE_COOKIES.intro}</p>
+          <div className="mt-6 space-y-4">
+            {POLITICA_DE_COOKIES.intro.map((paragraph) => (
+              <p key={paragraph} className="text-base leading-8 text-ink-mid">
+                {paragraph}
+              </p>
+            ))}
+          </div>
         </header>
 
         <div className="space-y-8">
           {POLITICA_DE_COOKIES.sections.map((section) => (
             <section key={section.title}>
-              <h2 className="font-serif text-2xl font-bold text-secondary">{section.title}</h2>
-
-              {'paragraphs' in section &&
-                section.paragraphs.map((paragraph) => (
-                  <p key={paragraph} className="mt-3 text-base leading-8 text-ink-mid">
-                    {paragraph}
-                  </p>
-                ))}
-
-              {'bullets' in section && (
-                <ul className="mt-4 list-disc space-y-3 pl-5 text-base leading-8 text-ink-mid">
-                  {section.bullets.map((bullet) => (
-                    <li key={bullet}>{bullet}</li>
-                  ))}
-                </ul>
-              )}
-
-              {'subsections' in section && (
-                <div className="mt-5 space-y-5">
-                  {section.subsections.map((subsection) => (
-                    <section key={subsection.title}>
-                      <h3 className="font-sans text-lg font-semibold text-ink">{subsection.title}</h3>
-                      {subsection.paragraphs.map((paragraph) => (
-                        <p key={paragraph} className="mt-2 text-base leading-8 text-ink-mid">
-                          {paragraph}
-                        </p>
-                      ))}
-                    </section>
-                  ))}
-                </div>
-              )}
+              <h2 className="font-sans text-base font-semibold text-ink">{section.title}</h2>
+              {section.paragraphs.map((paragraph) => (
+                <p key={paragraph} className="mt-3 text-base leading-8 text-ink-mid">
+                  {paragraph}
+                </p>
+              ))}
             </section>
           ))}
         </div>

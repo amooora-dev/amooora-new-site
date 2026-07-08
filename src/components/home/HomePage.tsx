@@ -122,22 +122,36 @@ function ParticleCanvas({ color, active }: ParticleCanvasProps) {
 /* ── HERO - Direction A: Editorial clean ── */
 function HeroA({ accent, cta, particles, isMobile, dir }: HeroProps & CtaProps & { dir: 'A' | 'B' }) {
   const navOffset = isMobile ? 72 : 84;
+  const heroBackground =
+    isMobile && 'backgroundMobile' in C.hero && C.hero.backgroundMobile
+      ? C.hero.backgroundMobile
+      : C.hero.background;
 
   return (
     <section style={{
       position: 'relative',
-      minHeight: isMobile ? 'auto' : 'min(100vh, 920px)',
+      minHeight: isMobile ? 'min(88svh, 780px)' : 'min(100vh, 920px)',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       overflow: 'hidden',
       backgroundColor: 'var(--white)',
       paddingTop: navOffset,
-      backgroundImage: `url(${C.hero.background})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
     }}>
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 0,
+          pointerEvents: 'none',
+          backgroundImage: `url(${heroBackground})`,
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: isMobile ? 'min(165vw, 960px) auto' : 'cover',
+          backgroundPosition: isMobile ? 'center top' : 'center',
+        }}
+      />
+
       <SiteNav accent={accent} dir={dir} isMobile={isMobile} layout="hero" />
 
       <div style={{

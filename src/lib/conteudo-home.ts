@@ -22,7 +22,10 @@ export const CONTEUDO_HOME = {
   },
 
   hero: {
+    // Imagem de fundo do banner (desktop). Arquivo em public/images/
     background: '/images/0_header_grande2.png',
+    // Opcional: imagem específica para mobile. Se omitido, usa `background` com recorte responsivo.
+    // backgroundMobile: '/images/0_header_mobile.png',
     eyebrow: 'Por nós e para nós',
     titleLine1: 'Um mundo inteiro',
     titleHighlight: 'de acolhimento',

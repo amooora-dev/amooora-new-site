@@ -36,16 +36,6 @@ export function PrivacyModal({ onClose }: PrivacyModalProps) {
     marginTop: 28,
   };
 
-  const subTitle: React.CSSProperties = {
-    fontFamily: 'var(--sans)',
-    fontSize: 'clamp(14px,1.2vw,16px)',
-    fontWeight: 600,
-    color: '#717182',
-    lineHeight: 1.8,
-    marginBottom: 6,
-    marginTop: 20,
-  };
-
   return (
     <div
       onClick={onClose}
@@ -105,38 +95,23 @@ export function PrivacyModal({ onClose }: PrivacyModalProps) {
           {P.title}
         </h2>
 
+        {/* Última atualização */}
+        <p style={{ ...bodyText, fontSize: 13, marginBottom: 16 }}>
+          Última atualização: {P.lastUpdate}
+        </p>
+
         {/* Intro */}
-        <p style={{ ...bodyText, marginBottom: 0 }}>{P.intro}</p>
+        {P.intro.map((paragraph) => (
+          <p key={paragraph} style={{ ...bodyText, marginBottom: 12 }}>{paragraph}</p>
+        ))}
 
         {/* Seções */}
         {P.sections.map((section) => (
           <div key={section.title}>
             <p style={sectionTitle}>{section.title}</p>
-
-            {'paragraphs' in section && section.paragraphs.map((p) => (
+            {section.paragraphs.map((p) => (
               <p key={p} style={{ ...bodyText, marginBottom: 8 }}>{p}</p>
             ))}
-
-            {'bullets' in section && (
-              <ul style={{ paddingLeft: 20, marginTop: 8 }}>
-                {section.bullets.map((b) => (
-                  <li key={b} style={{ ...bodyText, marginBottom: 6 }}>{b}</li>
-                ))}
-              </ul>
-            )}
-
-            {'subsections' in section && (
-              <div style={{ marginTop: 8 }}>
-                {section.subsections.map((sub) => (
-                  <div key={sub.title}>
-                    <p style={subTitle}>{sub.title}</p>
-                    {sub.paragraphs.map((p) => (
-                      <p key={p} style={{ ...bodyText, marginBottom: 8 }}>{p}</p>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         ))}
       </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type CSSProperties, type MouseEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { CONTEUDO_HOME as C } from '@/lib/conteudo-home';
@@ -18,14 +18,61 @@ function footerHref(id: string, page: 'home' | 'loja') {
   return page === 'home' ? `#${id}` : `/#${id}`;
 }
 
+const linkStyle: CSSProperties = {
+  display: 'block',
+  fontFamily: 'var(--sans)',
+  fontSize: 14,
+  color: 'rgba(255,255,255,0.6)',
+  textDecoration: 'none',
+  marginBottom: 10,
+  transition: 'color 0.2s',
+};
+
+function FooterNavLink({
+  label,
+  id,
+  page,
+}: {
+  label: string;
+  id: string;
+  page: 'home' | 'loja';
+}) {
+  const hover = {
+    onMouseEnter: (e: MouseEvent<HTMLElement>) => { e.currentTarget.style.color = 'white'; },
+    onMouseLeave: (e: MouseEvent<HTMLElement>) => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; },
+  };
+
+  if (id) {
+    return (
+      <Link href={footerHref(id, page)} style={linkStyle} {...hover}>
+        {label}
+      </Link>
+    );
+  }
+
+  return (
+    <a href="#" style={linkStyle} {...hover}>
+      {label}
+    </a>
+  );
+}
+
 
 export function SiteFooter({ accent, isMobile, page = 'home' }: SiteFooterProps) {
   const [privacyOpen, setPrivacyOpen] = useState(false);
+  const navLinks = C.footer.navLinks;
+  const navCol1 = navLinks.slice(0, 3);
+  const navCol2 = navLinks.slice(3);
 
   return (<>
-    <footer style={{ background: 'var(--primary)', color: 'white', padding: isMobile ? '56px 20px 28px' : '80px 48px 40px' }}>
+    <footer style={{ background: 'var(--primary)', color: 'white', padding: isMobile ? '40px 20px 20px' : '80px 48px 40px' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr', gap: isMobile ? 36 : 60, marginBottom: 64 }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr',
+          gap: isMobile ? 28 : 60,
+          marginBottom: isMobile ? 20 : 64,
+        }}>
           <div>
             <Image
               src="/images/logo.png"
@@ -38,7 +85,14 @@ export function SiteFooter({ accent, isMobile, page = 'home' }: SiteFooterProps)
               lineHeight: 1.8, maxWidth: 320, fontWeight: 300 }}>
               {C.footer.description}
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 24 }}>
+            <div style={{
+              display: 'flex',
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              gap: 16,
+              marginTop: 24,
+            }}>
               <a href={C.footer.instagramUrl} target="_blank" rel="noopener noreferrer" style={{
                 display: 'flex', alignItems: 'center', gap: 8,
                 fontFamily: "var(--sans)", fontSize: 12, color: 'white',
@@ -63,54 +117,82 @@ export function SiteFooter({ accent, isMobile, page = 'home' }: SiteFooterProps)
             </div>
           </div>
           <div>
-            <div style={{ fontFamily: "var(--sans)", fontSize: 11, fontWeight: 600,
-              letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 20 }}>
+            <div style={{ fontFamily: 'var(--sans)', fontSize: 11, fontWeight: 600,
+              letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 16 }}>
               {C.footer.navLabel}
             </div>
-            {C.footer.navLinks.map((link) =>
-              link.id ? (
-                <Link key={link.label} href={footerHref(link.id, page)} style={{ display: 'block', fontFamily: "var(--sans)",
-                  fontSize: 14, color: 'rgba(255,255,255,0.6)', textDecoration: 'none',
-                  marginBottom: 12, transition: 'color 0.2s' }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = 'white'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}>
-                  {link.label}
-                </Link>
-              ) : (
-                <a key={link.label} href="#" style={{ display: 'block', fontFamily: "var(--sans)",
-                  fontSize: 14, color: 'rgba(255,255,255,0.6)', textDecoration: 'none',
-                  marginBottom: 12, transition: 'color 0.2s' }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = 'white'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}>
-                  {link.label}
-                </a>
-              )
+            {isMobile ? (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 24px' }}>
+                <div>
+                  {navCol1.map((link) => (
+                    <FooterNavLink key={link.label} label={link.label} id={link.id} page={page} />
+                  ))}
+                </div>
+                <div>
+                  {navCol2.map((link) => (
+                    <FooterNavLink key={link.label} label={link.label} id={link.id} page={page} />
+                  ))}
+                  <button
+                    onClick={() => setPrivacyOpen(true)}
+                    style={{
+                      ...linkStyle,
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
+                      textAlign: 'left',
+                      marginBottom: 0,
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.color = 'white'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
+                  >
+                    Política de Privacidade
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                {navLinks.map((link) => (
+                  <FooterNavLink key={link.label} label={link.label} id={link.id} page={page} />
+                ))}
+                <button
+                  onClick={() => setPrivacyOpen(true)}
+                  style={{
+                    ...linkStyle,
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: 0,
+                    textAlign: 'left',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = 'white'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
+                >
+                  Política de Privacidade
+                </button>
+              </>
             )}
-            <button
-              onClick={() => setPrivacyOpen(true)}
-              style={{
-                display: 'block', fontFamily: 'var(--sans)',
-                fontSize: 14, color: 'rgba(255,255,255,0.6)',
-                background: 'none', border: 'none', cursor: 'pointer',
-                padding: 0, marginBottom: 12, textAlign: 'left',
-                transition: 'color 0.2s',
-              }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = 'white'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}
-            >
-              Política de Privacidade
-            </button>
           </div>
         </div>
 
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 32,
-          display: 'flex', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', flexDirection: isMobile ? 'column' : 'row', flexWrap: 'wrap', gap: 12 }}>
-          <span style={{ fontFamily: "var(--sans)", fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>
+        <div style={{
+          borderTop: '1px solid rgba(255,255,255,0.08)',
+          paddingTop: isMobile ? 16 : 32,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: isMobile ? 'flex-start' : 'center',
+          flexDirection: isMobile ? 'column' : 'row',
+          flexWrap: 'wrap',
+          gap: isMobile ? 8 : 12,
+        }}>
+          <span style={{ fontFamily: 'var(--sans)', fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>
             {C.footer.copyright}
           </span>
-          <span style={{ fontFamily: "var(--serif)", fontSize: 12, color: accent, fontStyle: 'italic', opacity: 0.6 }}>
-            {C.footer.signature}
-          </span>
+          {!isMobile && (
+            <span style={{ fontFamily: 'var(--serif)', fontSize: 12, color: accent, fontStyle: 'italic', opacity: 0.6 }}>
+              {C.footer.signature}
+            </span>
+          )}
         </div>
       </div>
     </footer>
