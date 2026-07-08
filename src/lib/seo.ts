@@ -113,9 +113,11 @@ export function buildProductJsonLd(produto: ProdutoLoja) {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: produto.nome,
-    description: produto.desc,
+    description: produto.descricaoCompleta || produto.desc,
+    url,
     image: images,
     sku: produto.slug,
+    category: produto.categoria,
     brand: {
       '@type': 'Brand',
       name: SEO.siteName,
@@ -128,6 +130,10 @@ export function buildProductJsonLd(produto: ProdutoLoja) {
       availability: isProdutoEsgotado(produto)
         ? 'https://schema.org/OutOfStock'
         : 'https://schema.org/InStock',
+      seller: {
+        '@type': 'Organization',
+        name: SEO.siteName,
+      },
     },
   };
 }
@@ -141,6 +147,37 @@ export function buildBreadcrumbJsonLd(items: Array<{ name: string; path: string 
       position: index + 1,
       name: item.name,
       item: toAbsoluteUrl(item.path),
+    })),
+  };
+}
+
+export function buildFaqPageJsonLd(items: ReadonlyArray<{ q: string; a: string }>) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: items.map((item) => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.a,
+      },
+    })),
+  };
+}
+
+export function buildItemListJsonLd(produtos: ProdutoLoja[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Loja Amooora — Coleção',
+    url: toAbsoluteUrl('/loja'),
+    numberOfItems: produtos.length,
+    itemListElement: produtos.map((produto, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      url: toAbsoluteUrl(`/loja/${produto.slug}`),
+      name: produto.nome,
     })),
   };
 }

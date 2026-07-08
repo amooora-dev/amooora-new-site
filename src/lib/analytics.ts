@@ -24,14 +24,15 @@ export function initAnalytics() {
   initialized = true;
 
   if (GA_ID) {
-    // Padrão exato do snippet do Google
+    // Padrão exato do snippet do Google — usa arguments para compatibilidade
     window.dataLayer = window.dataLayer ?? [];
     window.gtag = function gtag() {
       // eslint-disable-next-line prefer-rest-params
       window.dataLayer!.push(arguments as unknown as IArguments);
     };
     window.gtag('js', new Date());
-    window.gtag('config', GA_ID);
+    // send_page_view: false evita double-count — pageview manual via trackPageView
+    window.gtag('config', GA_ID, { send_page_view: false });
 
     const script = document.createElement('script');
     script.id = 'ga-script';
@@ -52,7 +53,7 @@ export function initAnalytics() {
   }
 }
 
-/* ── helpers ── */
+/* ── helper interno ── */
 
 function gtag(...args: unknown[]) {
   if (!hasAnalyticsConsent() || !window.gtag) return;
@@ -64,16 +65,17 @@ function gtag(...args: unknown[]) {
 export function trackConsent(choice: 'accepted' | 'rejected') {
   if (choice === 'accepted') {
     initAnalytics();
+    // Dispara pageview da página atual logo após aceitar
+    trackPageView(window.location.pathname + window.location.search);
   }
 }
 
 export function trackPageView(path: string) {
-  if (!GA_ID) return;
-  gtag('event', 'page_view', {
-    page_path: path,
-    page_location: typeof window !== 'undefined' ? window.location.origin + path : path,
-    page_title: typeof document !== 'undefined' ? document.title : '',
-  });
+  const page_path = path.startsWith('/') ? path : `/${path}`;
+  const page_location = typeof window !== 'undefined' ? window.location.origin + page_path : page_path;
+  const page_title = typeof document !== 'undefined' ? document.title : '';
+
+  gtag('event', 'page_view', { page_path, page_location, page_title });
 }
 
 export function trackEvent(
@@ -86,12 +88,31 @@ export function trackEvent(
   gtag('event', event, cleaned);
 }
 
+/* ── conversões ── */
+
 export function trackNewsletterSignup() {
   trackEvent('generate_lead', { lead_type: 'newsletter', form_location: 'home_footer' });
 }
 
 export function trackPilotSignup() {
   trackEvent('generate_lead', { lead_type: 'pilot', form_location: 'home_app_section' });
+}
+
+/* ── loja ── */
+
+export function trackViewItem(params: {
+  productSlug: string;
+  productName: string;
+  category: string;
+  value?: number;
+}) {
+  trackEvent('view_item', {
+    item_id: params.productSlug,
+    item_name: params.productName,
+    item_category: params.category,
+    currency: 'BRL',
+    value: params.value,
+  });
 }
 
 export function trackWhatsappClick(params: {
@@ -109,12 +130,16 @@ export function trackWhatsappClick(params: {
   });
 }
 
+/* ── navegação ── */
+
 export type LinkClickLocation =
   | 'header_desktop'
   | 'header_mobile'
   | 'header_cta'
   | 'header_logo'
   | 'footer'
+  | 'footer_social'
+  | 'home_gallery'
   | 'store_hero'
   | 'store_cta_bottom'
   | 'product_breadcrumb'
@@ -122,7 +147,7 @@ export type LinkClickLocation =
   | 'product_card'
   | 'product_card_gallery';
 
-export type LinkClickType = 'nav_anchor' | 'nav_route' | 'product' | 'internal';
+export type LinkClickType = 'nav_anchor' | 'nav_route' | 'product' | 'internal' | 'external';
 
 export function sectionIdFromHref(href: string): string | undefined {
   return href.split('#')[1]?.split('?')[0] || undefined;
@@ -162,6 +187,14 @@ export function trackLinkClick(params: {
     trackEvent('select_item', {
       item_id: params.productSlug,
       item_name: params.productName,
+      click_location: params.location,
+    });
+  }
+
+  if (params.linkType === 'external') {
+    trackEvent('outbound_click', {
+      link_url: params.linkUrl,
+      link_text: params.linkText,
       click_location: params.location,
     });
   }

@@ -56,7 +56,6 @@ export default async function ProdutoPage({ params }: Props) {
     buildBreadcrumbJsonLd([
       { name: 'Início', path: '/' },
       { name: 'Loja', path: '/loja' },
-      { name: produto.categoria, path: `/loja?categoria=${encodeURIComponent(produto.categoria)}` },
       { name: produto.nome, path: `/loja/${produto.slug}` },
     ]),
   ];

@@ -13,7 +13,7 @@ import {
   TweakToggle,
 } from '@/components/tweaks/tweaks-panel';
 import { PilotSignup } from '@/components/home/PilotSignup';
-import { trackNewsletterSignup } from '@/lib/analytics';
+import { trackNewsletterSignup, trackLinkClick } from '@/lib/analytics';
 import { SiteNav } from '@/components/layout/SiteNav';
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import type {
@@ -303,7 +303,8 @@ function HeroB({ accent, particles }: HeroBProps) {
             transition: 'all 0.25s'
           }}
           onMouseEnter={(e) => {e.currentTarget.style.transform = 'translateY(-2px)';e.currentTarget.style.boxShadow = '0 12px 32px rgba(0,0,0,0.2)';}}
-          onMouseLeave={(e) => {e.currentTarget.style.transform = '';e.currentTarget.style.boxShadow = '';}}>
+          onMouseLeave={(e) => {e.currentTarget.style.transform = '';e.currentTarget.style.boxShadow = '';}}
+          onClick={() => trackLinkClick({ linkText: 'Baixar App', linkUrl: '#aplicativo', linkType: 'nav_anchor', location: 'header_cta', sectionId: 'aplicativo' })}>
             Baixar App
           </Link>
         </div>
@@ -1276,7 +1277,8 @@ function Gallery({ accent, cta, isMobile }: SectionProps & CtaProps) {
             transition: 'all 0.25s'
           }}
           onMouseEnter={(e) => {e.currentTarget.style.transform = 'translateY(-2px)';e.currentTarget.style.boxShadow = `0 12px 40px ${cta}55`;}}
-          onMouseLeave={(e) => {e.currentTarget.style.transform = '';e.currentTarget.style.boxShadow = `0 8px 32px ${cta}44`;}}>
+          onMouseLeave={(e) => {e.currentTarget.style.transform = '';e.currentTarget.style.boxShadow = `0 8px 32px ${cta}44`;}}
+          onClick={() => trackLinkClick({ linkText: C.gallery.cta, linkUrl: C.gallery.ctaUrl, linkType: 'nav_route', location: 'home_gallery' })}>
             {C.gallery.cta}
           </Link>
         </div>

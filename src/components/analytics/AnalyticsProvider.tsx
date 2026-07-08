@@ -3,7 +3,7 @@
 import { Suspense, useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { COOKIE_CONSENT_EVENT, getStoredConsent } from '@/lib/cookie-consent';
-import { initAnalytics, trackPageView } from '@/lib/analytics';
+import { initAnalytics, trackConsent, trackPageView } from '@/lib/analytics';
 
 function RouteTracker() {
   const pathname = usePathname();
@@ -20,17 +20,16 @@ function RouteTracker() {
 
 export function AnalyticsProvider() {
   useEffect(() => {
-    // Usuário já havia aceito em visita anterior
+    // Usuário já havia aceito em visita anterior — inicializa e envia pageview
     if (getStoredConsent() === 'accepted') {
       initAnalytics();
+      trackPageView(window.location.pathname + window.location.search);
     }
 
-    // Usuário aceita agora no banner
+    // Usuário aceita ou rejeita agora no banner
     const onConsent = (e: Event) => {
       const choice = (e as CustomEvent<'accepted' | 'rejected'>).detail;
-      if (choice === 'accepted') {
-        initAnalytics();
-      }
+      trackConsent(choice);
     };
 
     window.addEventListener(COOKIE_CONSENT_EVENT, onConsent);

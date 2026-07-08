@@ -7,7 +7,7 @@ import type { ProdutoLoja } from '@/lib/loja-data';
 import { getBadgeBgClass } from '@/lib/loja/badge-display';
 import { isProdutoEsgotado, PRODUTO_ESGOTADO_LABEL } from '@/lib/loja/product-availability';
 import { buildWhatsappUrl } from '@/lib/supabase/map-product';
-import { trackLinkClick, trackWhatsappClick } from '@/lib/analytics';
+import { trackLinkClick, trackViewItem, trackWhatsappClick } from '@/lib/analytics';
 import { SiteNav } from '@/components/layout/SiteNav';
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import { ColorSwatches } from '@/components/loja/product/ColorSwatches';
@@ -92,6 +92,15 @@ export function ProdutoDetalhePage({ produto, relacionados }: Props) {
     window.addEventListener('resize', sync);
     return () => window.removeEventListener('resize', sync);
   }, []);
+
+  useEffect(() => {
+    trackViewItem({
+      productSlug: produto.slug,
+      productName: produto.nome,
+      category: produto.categoria,
+      value: produto.precoNumerico,
+    });
+  }, [produto.slug, produto.nome, produto.categoria, produto.precoNumerico]);
 
   const whatsappUrl = useMemo(() =>
     buildWhatsappUrl(produto, {

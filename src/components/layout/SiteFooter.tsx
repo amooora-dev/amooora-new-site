@@ -106,10 +106,20 @@ export function SiteFooter({ accent, isMobile, page = 'home' }: SiteFooterProps)
               gap: 16,
               marginTop: isMobile ? 24 : 16,
             }}>
-              <a href={C.footer.instagramUrl} target="_blank" rel="noopener noreferrer" style={{
-                display: 'flex', alignItems: 'center', gap: 8,
-                fontFamily: "var(--sans)", fontSize: 12, color: 'white',
-                textDecoration: 'none', opacity: 0.8 }}>
+              <a
+                href={C.footer.instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ display: 'flex', alignItems: 'center', gap: 8,
+                  fontFamily: "var(--sans)", fontSize: 12, color: 'white',
+                  textDecoration: 'none', opacity: 0.8 }}
+                onClick={() => trackLinkClick({
+                  linkText: C.footer.instagram,
+                  linkUrl: C.footer.instagramUrl,
+                  linkType: 'external',
+                  location: 'footer_social',
+                })}
+              >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                   <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
                   <circle cx="12" cy="12" r="4"/>
@@ -117,10 +127,18 @@ export function SiteFooter({ accent, isMobile, page = 'home' }: SiteFooterProps)
                 </svg>
                 {C.footer.instagram}
               </a>
-              <a href={`mailto:${C.footer.email}`} style={{
-                display: 'flex', alignItems: 'center', gap: 8,
-                fontFamily: "var(--sans)", fontSize: 12, color: 'rgba(255,255,255,0.6)',
-                textDecoration: 'none' }}>
+              <a
+                href={`mailto:${C.footer.email}`}
+                style={{ display: 'flex', alignItems: 'center', gap: 8,
+                  fontFamily: "var(--sans)", fontSize: 12, color: 'rgba(255,255,255,0.6)',
+                  textDecoration: 'none' }}
+                onClick={() => trackLinkClick({
+                  linkText: C.footer.email,
+                  linkUrl: `mailto:${C.footer.email}`,
+                  linkType: 'external',
+                  location: 'footer_social',
+                })}
+              >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                   <rect x="2" y="4" width="20" height="16" rx="2"/>
                   <polyline points="2,4 12,13 22,4"/>
@@ -145,7 +163,15 @@ export function SiteFooter({ accent, isMobile, page = 'home' }: SiteFooterProps)
                   <FooterNavLink key={link.label} label={link.label} id={link.id} page={page} />
                 ))}
                 <button
-                  onClick={() => setPrivacyOpen(true)}
+                  onClick={() => {
+                    setPrivacyOpen(true);
+                    trackLinkClick({
+                      linkText: 'Política de Privacidade',
+                      linkUrl: '/politica-de-cookies',
+                      linkType: 'internal',
+                      location: 'footer',
+                    });
+                  }}
                   style={{
                     ...linkStyle,
                     background: 'none',

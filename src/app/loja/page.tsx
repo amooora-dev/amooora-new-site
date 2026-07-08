@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { LojaPageContent } from '@/components/loja/LojaPageContent';
 import { fetchStoreProducts } from '@/lib/supabase/products';
-import { createPageMetadata } from '@/lib/seo';
+import { buildItemListJsonLd, createPageMetadata } from '@/lib/seo';
+import { JsonLd } from '@/components/seo/JsonLd';
 
 export const metadata: Metadata = createPageMetadata({
   title: 'Loja Amooora — Vista sua identidade sáfica',
@@ -19,12 +20,15 @@ export default async function LojaPage() {
   const { produtos, source, error } = await fetchStoreProducts();
 
   return (
-    <Suspense fallback={<div className="min-h-screen bg-white" />}>
-      <LojaPageContent
-        produtos={produtos}
-        dataSource={source}
-        dataError={error}
-      />
-    </Suspense>
+    <>
+      <JsonLd data={[buildItemListJsonLd(produtos)]} />
+      <Suspense fallback={<div className="min-h-screen bg-white" />}>
+        <LojaPageContent
+          produtos={produtos}
+          dataSource={source}
+          dataError={error}
+        />
+      </Suspense>
+    </>
   );
 }
