@@ -49,7 +49,12 @@ export default async function EditarProdutoPage({
         </div>
       )}
 
-      <ProdutoForm product={product} defaultWhatsappPhone={defaultWhatsappPhone} availableBadges={availableBadges} />
+      <ProdutoForm
+        key={`${product.id}-${product.sold_out ? 'esgotado' : 'disponivel'}-${searchParams.saved ?? 'edit'}`}
+        product={product}
+        defaultWhatsappPhone={defaultWhatsappPhone}
+        availableBadges={availableBadges}
+      />
     </div>
   );
 }

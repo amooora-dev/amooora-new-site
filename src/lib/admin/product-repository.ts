@@ -37,6 +37,7 @@ export type AdminProduct = {
   badge: ProductBadge | null;
   active: boolean;
   featured: boolean;
+  sold_out: boolean;
   sizes: string[];
   sort_order: number;
   created_at: string;
@@ -59,6 +60,7 @@ export type ProductFormInput = {
   badge: ProductBadge | null;
   active: boolean;
   featured: boolean;
+  sold_out: boolean;
   sizes: string[];
   sort_order: number;
   colors: AdminProductColor[];
@@ -103,7 +105,7 @@ export async function listAdminProducts(opts?: {
 }) {
   let query = dbRead()
     .from('products')
-    .select('id, slug, name, price, category, badge, active, featured, sort_order, created_at')
+    .select('id, slug, name, price, category, badge, active, featured, sold_out, sort_order, created_at')
     .order('sort_order', { ascending: true });
 
   if (opts?.category) query = query.eq('category', opts.category);
@@ -124,7 +126,7 @@ export async function listAdminProducts(opts?: {
   return products.map((p) => {
     const imgs = (images ?? []).filter((i) => i.product_id === p.id);
     const primary = imgs.find((i) => i.is_primary) ?? imgs[0];
-    return { ...p, thumb: primary?.url ?? null };
+    return { ...p, sold_out: Boolean(p.sold_out), thumb: primary?.url ?? null };
   });
 }
 
@@ -147,6 +149,7 @@ export async function getAdminProduct(id: string): Promise<AdminProduct | null> 
   return {
     ...product,
     price: Number(product.price),
+    sold_out: Boolean(product.sold_out),
     images: images ?? [],
     colors: colors ?? [],
     whatsapp: whatsapp
@@ -321,6 +324,7 @@ export async function createProduct(input: ProductFormInput, files: File[]) {
       badge: input.badge,
       active: input.active,
       featured: input.featured,
+      sold_out: input.sold_out,
       sizes: input.sizes,
       sort_order: sortOrder,
     })
@@ -355,6 +359,7 @@ export async function updateProduct(id: string, input: ProductFormInput, files: 
       badge: input.badge,
       active: input.active,
       featured: input.featured,
+      sold_out: input.sold_out,
       sizes: input.sizes,
     })
     .eq('id', id);
@@ -480,6 +485,7 @@ export function parseProductFormData(formData: FormData): ProductFormInput {
     badge: badgeRaw || null,
     active: formData.get('active') === 'on',
     featured: formData.get('featured') === 'on',
+    sold_out: formData.get('sold_out') === 'true',
     sizes: sizesRaw
       .split(',')
       .map((s) => s.trim())

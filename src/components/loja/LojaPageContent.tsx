@@ -16,6 +16,7 @@ import {
   type ProdutoLoja,
 } from '@/lib/loja-data';
 import { buildWhatsappUrl } from '@/lib/supabase/map-product';
+import { isProdutoEsgotado, PRODUTO_ESGOTADO_LABEL } from '@/lib/loja/product-availability';
 
 const ACCENT = '#932D6F';
 const { hero, filtros } = CONTEUDO_LOJA;
@@ -55,6 +56,7 @@ function ProdutoCard({
   const whatsappUrl = buildWhatsappUrl(produto, {
     cor: produto.cores[corAtiva]?.nome,
   });
+  const esgotado = isProdutoEsgotado(produto);
 
   return (
     // position:relative + Link overlay é o padrão para card clicável com botão interno
@@ -103,16 +105,29 @@ function ProdutoCard({
         />
 
         <div className="flex items-center justify-between">
-          <span className="font-serif text-xl font-bold text-primary">{produto.preco}</span>
-          <a
-            href={whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`Comprar ${produto.nome} via WhatsApp`}
-            className="pointer-events-auto relative z-10 flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white transition hover:brightness-95"
-          >
-            <WhatsAppIcon />
-          </a>
+          {esgotado ? (
+            <span className="font-sans text-sm font-semibold text-muted-fg">{PRODUTO_ESGOTADO_LABEL}</span>
+          ) : (
+            <span className="font-serif text-xl font-bold text-primary">{produto.preco}</span>
+          )}
+          {esgotado ? (
+            <span
+              aria-label="Produto esgotado"
+              className="pointer-events-none relative z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/10 text-muted-fg"
+            >
+              <WhatsAppIcon />
+            </span>
+          ) : (
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Comprar ${produto.nome} via WhatsApp`}
+              className="pointer-events-auto relative z-10 flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white transition hover:brightness-95"
+            >
+              <WhatsAppIcon />
+            </a>
+          )}
         </div>
       </div>
     </article>

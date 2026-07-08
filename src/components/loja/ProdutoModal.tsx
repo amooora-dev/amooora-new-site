@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type { ProdutoLoja } from '@/lib/loja-data';
+import { isProdutoEsgotado, PRODUTO_ESGOTADO_LABEL } from '@/lib/loja/product-availability';
 import { buildWhatsappUrl } from '@/lib/supabase/map-product';
 import { ColorSwatches } from '@/components/loja/product/ColorSwatches';
 import { ProductDescription } from '@/components/loja/product/ProductDescription';
@@ -47,6 +48,7 @@ export function ProdutoModal({ produto, onClose }: ProdutoModalProps) {
     const tamanho = produto.tamanhos[tamanhoSelecionado];
     return buildWhatsappUrl(produto, { cor, tamanho });
   }, [produto, corSelecionada, tamanhoSelecionado]);
+  const esgotado = isProdutoEsgotado(produto);
 
   return (
     <div
@@ -94,7 +96,11 @@ export function ProdutoModal({ produto, onClose }: ProdutoModalProps) {
               {produto.nome}
             </h2>
 
-            <p className="font-serif text-2xl font-bold text-primary">{produto.preco}</p>
+            {esgotado ? (
+              <p className="font-serif text-2xl font-bold text-muted-fg">{PRODUTO_ESGOTADO_LABEL}</p>
+            ) : (
+              <p className="font-serif text-2xl font-bold text-primary">{produto.preco}</p>
+            )}
 
             <ColorSwatches
               cores={produto.cores}
@@ -125,14 +131,23 @@ export function ProdutoModal({ produto, onClose }: ProdutoModalProps) {
 
             <ProductDescription html={produto.descricaoCompleta} />
 
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-auto w-full rounded-full bg-primary px-6 py-3 text-center font-sans text-sm font-semibold text-white transition hover:brightness-95"
-            >
-              Comprar via WhatsApp
-            </a>
+            {esgotado ? (
+              <span
+                aria-disabled="true"
+                className="mt-auto w-full cursor-not-allowed rounded-full bg-black/10 px-6 py-3 text-center font-sans text-sm font-semibold text-muted-fg"
+              >
+                Encomendar via WhatsApp
+              </span>
+            ) : (
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-auto w-full rounded-full bg-primary px-6 py-3 text-center font-sans text-sm font-semibold text-white transition hover:brightness-95"
+              >
+                Encomendar via WhatsApp
+              </a>
+            )}
           </div>
         </div>
       </div>

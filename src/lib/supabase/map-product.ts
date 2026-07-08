@@ -64,6 +64,7 @@ export function mapStoreProductToProdutoLoja(row: StoreProduct, index = 0): Prod
     categoria: CATEGORY_LABEL[row.category],
     preco: formatPrecoBRL(precoNumerico),
     precoNumerico,
+    esgotado: Boolean(row.sold_out),
     badge: row.badge ? formatProductBadge(row.badge) : null,
     desc: row.description_short,
     descricaoCompleta: row.description_full,

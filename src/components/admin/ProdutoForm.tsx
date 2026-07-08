@@ -52,6 +52,8 @@ export function ProdutoForm({
   const [name, setName] = useState(product?.name ?? '');
   const [slug, setSlug] = useState(product?.slug ?? '');
   const [badge, setBadge] = useState(product?.badge ?? '');
+  const [badgeInput, setBadgeInput] = useState('');
+  const [soldOut, setSoldOut] = useState(Boolean(product?.sold_out));
   const [slugTouched, setSlugTouched] = useState(Boolean(product?.slug));
   const [colors, setColors] = useState<AdminProductColor[]>(
     product?.colors?.length
@@ -82,6 +84,22 @@ export function ProdutoForm({
     setName(value);
     if (!slugTouched) setSlug(slugify(value));
   };
+
+  const handleBadgeAdd = () => {
+    const value = badgeInput.trim();
+    if (!value) return;
+    setBadge(value);
+    setBadgeInput('');
+  };
+
+  const badgeOptions = useMemo(() => {
+    const labels = [...availableBadges];
+    const selected = badge.trim();
+    if (selected && !labels.some((label) => label.toLowerCase() === selected.toLowerCase())) {
+      labels.unshift(selected);
+    }
+    return labels;
+  }, [availableBadges, badge]);
 
   const addColor = () => {
     setColors((c) => [...c, { name: '', hex_code: '#932D6F', available: true, sort_order: c.length }]);
@@ -132,6 +150,10 @@ export function ProdutoForm({
   }, [product?.id, serverImagesKey]);
 
   useEffect(() => {
+    setSoldOut(Boolean(product?.sold_out));
+  }, [product?.id, product?.sold_out]);
+
+  useEffect(() => {
     if (formState.error) submittingRef.current = false;
   }, [formState.error]);
 
@@ -139,6 +161,7 @@ export function ProdutoForm({
     if (formState.redirectTo) {
       submittingRef.current = false;
       if (fileInputRef.current) fileInputRef.current.value = '';
+      router.refresh();
       router.push(formState.redirectTo);
     }
   }, [formState.redirectTo, router]);
@@ -224,20 +247,55 @@ export function ProdutoForm({
           </div>
           <div>
             <label className={adminLabelClass} htmlFor="badge">Badge</label>
-            <input
-              id="badge"
-              name="badge"
-              list="badge-suggestions"
-              value={badge}
-              onChange={(e) => setBadge(e.target.value)}
-              placeholder="Nenhum — ou digite / escolha uma badge"
-              className={adminInputClass}
-            />
-            <datalist id="badge-suggestions">
-              {availableBadges.map((label) => (
-                <option key={label} value={label} />
-              ))}
-            </datalist>
+            <input type="hidden" name="badge" value={badge} readOnly />
+            <div className="flex gap-2">
+              <input
+                id="badge"
+                value={badgeInput}
+                onChange={(e) => setBadgeInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleBadgeAdd();
+                  }
+                }}
+                placeholder="Nova badge (Enter para adicionar)"
+                className={adminInputClass}
+                autoComplete="off"
+              />
+              <button
+                type="button"
+                onClick={handleBadgeAdd}
+                className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-white shadow-sm transition hover:brightness-95"
+                aria-label="Adicionar badge"
+              >
+                <span className="text-xl leading-none">+</span>
+              </button>
+            </div>
+            {!!badgeOptions.length && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {badgeOptions.map((label) => {
+                  const selected = badge.trim().toLowerCase() === label.trim().toLowerCase();
+                  return (
+                    <button
+                      key={label}
+                      type="button"
+                      onClick={() => {
+                        setBadge(label);
+                        setBadgeInput('');
+                      }}
+                      className={`rounded-full px-3 py-1 font-sans text-xs font-semibold transition ${
+                        selected
+                          ? 'bg-primary text-white shadow-sm'
+                          : 'bg-muted/60 text-ink hover:bg-muted'
+                      }`}
+                    >
+                      + {label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
             <p className="mt-1.5 font-sans text-xs text-muted-fg">
               Digite uma badge nova ou escolha uma existente. Ao salvar, ela fica disponível para outros produtos.
             </p>
@@ -263,6 +321,33 @@ export function ProdutoForm({
               defaultValue={product?.sizes?.join(', ') ?? 'P, M, G, GG'}
               className={adminInputClass}
             />
+          </div>
+          <div className="md:col-span-2">
+            <p className={adminLabelClass}>Disponibilidade</p>
+            <div className="flex flex-wrap gap-4">
+              <label className="flex items-center gap-2 font-sans text-sm">
+                <input
+                  type="radio"
+                  name="sold_out"
+                  value="false"
+                  checked={!soldOut}
+                  onChange={() => setSoldOut(false)}
+                  className="rounded-full"
+                />
+                Disponível
+              </label>
+              <label className="flex items-center gap-2 font-sans text-sm">
+                <input
+                  type="radio"
+                  name="sold_out"
+                  value="true"
+                  checked={soldOut}
+                  onChange={() => setSoldOut(true)}
+                  className="rounded-full"
+                />
+                Esgotado
+              </label>
+            </div>
           </div>
           <label className="flex items-center gap-2 font-sans text-sm">
             <input type="checkbox" name="active" defaultChecked={product?.active ?? true} className="rounded" />

@@ -20,6 +20,7 @@ type Row = {
   category: ProductCategory;
   badge: string | null;
   active: boolean;
+  sold_out: boolean;
   thumb: string | null;
 };
 
@@ -52,7 +53,7 @@ export function ProdutosTable({ products }: { products: Row[] }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-black/[0.06] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06),0_4px_12px_rgba(0,0,0,0.04)]">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[680px]">
+        <table className="w-full min-w-[920px]">
           <thead>
             <tr className="border-b border-black/[0.06] bg-[#FAFAFA] text-left">
               <th className="px-5 py-3.5 font-sans text-[11px] font-semibold uppercase tracking-wider text-muted-fg">
@@ -65,7 +66,13 @@ export function ProdutosTable({ products }: { products: Row[] }) {
                 Preço
               </th>
               <th className="px-5 py-3.5 font-sans text-[11px] font-semibold uppercase tracking-wider text-muted-fg">
-                Status
+                Badge
+              </th>
+              <th className="px-5 py-3.5 font-sans text-[11px] font-semibold uppercase tracking-wider text-muted-fg">
+                Disponibilidade
+              </th>
+              <th className="px-5 py-3.5 font-sans text-[11px] font-semibold uppercase tracking-wider text-muted-fg">
+                Visibilidade
               </th>
               <th className="px-5 py-3.5 font-sans text-[11px] font-semibold uppercase tracking-wider text-muted-fg">
                 Ações
@@ -88,19 +95,24 @@ export function ProdutosTable({ products }: { products: Row[] }) {
                         <div className="flex h-full items-center justify-center text-[10px] text-muted-fg">—</div>
                       )}
                     </div>
-                    <div className="min-w-0">
-                      <p className="truncate font-sans text-sm font-medium text-ink">{p.name}</p>
-                      {p.badge && (
-                        <span className="font-sans text-[10px] font-semibold uppercase tracking-wide text-primary">
-                          {p.badge}
-                        </span>
-                      )}
-                    </div>
+                    <p className="min-w-0 truncate font-sans text-sm font-medium text-ink">{p.name}</p>
                   </div>
                 </td>
                 <td className="px-5 py-4 font-sans text-sm text-muted-fg">{CATEGORY_LABEL[p.category]}</td>
                 <td className="px-5 py-4 font-sans text-sm font-semibold text-ink">
                   {Number(p.price).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                </td>
+                <td className="px-5 py-4">
+                  {p.badge ? (
+                    <AdminBadge>{p.badge}</AdminBadge>
+                  ) : (
+                    <span className="font-sans text-sm text-muted-fg">—</span>
+                  )}
+                </td>
+                <td className="px-5 py-4">
+                  <AdminBadge variant={p.sold_out ? 'muted' : 'success'}>
+                    {p.sold_out ? 'Esgotado' : 'Disponível'}
+                  </AdminBadge>
                 </td>
                 <td className="px-5 py-4">
                   <button

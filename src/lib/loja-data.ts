@@ -79,6 +79,7 @@ export type ProdutoLoja = {
   categoria: 'Camisetas' | 'Moletons' | 'Acessórios';
   preco: string;
   precoNumerico: number;
+  esgotado: boolean;
   badge: string | null;
   desc: string;
   descricaoCompleta: string;
@@ -104,8 +105,10 @@ export type CategoriaFiltro = (typeof CATEGORIAS_LOJA)[number];
 
 type ProdutoLojaBase = Omit<
   ProdutoLoja,
-  'uuid' | 'imagens' | 'precoNumerico' | 'whatsappPhone' | 'whatsappMessageTemplate' | 'shopUrl'
->;
+  'uuid' | 'imagens' | 'precoNumerico' | 'whatsappPhone' | 'whatsappMessageTemplate' | 'shopUrl' | 'esgotado'
+> & {
+  esgotado?: boolean;
+};
 
 const PRODUTOS_BASE: ProdutoLojaBase[] = [
   {
@@ -255,6 +258,7 @@ function enrichProduto(p: ProdutoLojaBase): ProdutoLoja {
   const produto: ProdutoLoja = {
     ...p,
     uuid: `static-${p.id}`,
+    esgotado: p.esgotado ?? false,
     imagens: [p.imagem],
     precoNumerico,
     whatsappPhone,

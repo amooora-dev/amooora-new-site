@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { ProdutoLoja } from '@/lib/loja-data';
 import { getBadgeBgClass } from '@/lib/loja/badge-display';
+import { isProdutoEsgotado, PRODUTO_ESGOTADO_LABEL } from '@/lib/loja/product-availability';
 import { buildWhatsappUrl } from '@/lib/supabase/map-product';
 import { SiteNav } from '@/components/layout/SiteNav';
 import { SiteFooter } from '@/components/layout/SiteFooter';
@@ -98,6 +99,7 @@ export function ProdutoDetalhePage({ produto, relacionados }: Props) {
     }),
     [produto, corIdx, tamanhoIdx]
   );
+  const esgotado = isProdutoEsgotado(produto);
 
   function handleShare() {
     if (navigator.share) {
@@ -187,8 +189,14 @@ export function ProdutoDetalhePage({ produto, relacionados }: Props) {
 
               {/* Preço */}
               <div>
-                <p className="font-serif text-3xl font-bold text-primary">{produto.preco}</p>
-                <p className="mt-1 font-sans text-xs text-muted-fg">Via WhatsApp · sem juros</p>
+                {esgotado ? (
+                  <p className="font-serif text-3xl font-bold text-muted-fg">{PRODUTO_ESGOTADO_LABEL}</p>
+                ) : (
+                  <>
+                    <p className="font-serif text-3xl font-bold text-primary">{produto.preco}</p>
+                    <p className="mt-1 font-sans text-xs text-muted-fg">Encomendas sob medida via WhatsApp</p>
+                  </>
+                )}
               </div>
 
               <div className="h-px bg-black/5" />
@@ -234,30 +242,40 @@ export function ProdutoDetalhePage({ produto, relacionados }: Props) {
               )}
 
               {/* CTA WhatsApp */}
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-3 rounded-2xl bg-primary px-6 py-4 font-sans text-base font-semibold text-white shadow-md transition hover:brightness-95 active:scale-[0.98]"
-              >
-                <WhatsAppIcon />
-                Comprar via WhatsApp
-              </a>
+              {esgotado ? (
+                <span
+                  aria-disabled="true"
+                  className="flex cursor-not-allowed items-center justify-center gap-3 rounded-2xl bg-black/10 px-6 py-4 font-sans text-base font-semibold text-muted-fg"
+                >
+                  <WhatsAppIcon />
+                  Encomendar via WhatsApp
+                </span>
+              ) : (
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-3 rounded-2xl bg-primary px-6 py-4 font-sans text-base font-semibold text-white shadow-md transition hover:brightness-95 active:scale-[0.98]"
+                >
+                  <WhatsAppIcon />
+                  Encomendar via WhatsApp
+                </a>
+              )}
 
               {/* Garantias */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex items-start gap-2 rounded-xl border border-black/5 bg-off-white p-3">
                   <TruckIcon />
                   <div>
-                    <p className="font-sans text-xs font-semibold text-ink">Envio rápido</p>
-                    <p className="font-sans text-[11px] text-muted-fg">Para todo o Brasil</p>
+                    <p className="font-sans text-xs font-semibold text-ink">Frete à combinar</p>
+                    <p className="font-sans text-[11px] text-muted-fg">Para toda São Paulo</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2 rounded-xl border border-black/5 bg-off-white p-3">
                   <ShieldIcon />
                   <div>
-                    <p className="font-sans text-xs font-semibold text-ink">Compra segura</p>
-                    <p className="font-sans text-[11px] text-muted-fg">Atendimento humano</p>
+                    <p className="font-sans text-xs font-semibold text-ink">Produto exclusivo</p>
+                    <p className="font-sans text-[11px] text-muted-fg">Confeccionado conforme encomenda</p>
                   </div>
                 </div>
               </div>
@@ -342,7 +360,11 @@ function RelatedCard({ produto }: { produto: ProdutoLoja }) {
       </div>
       <div className="p-3">
         <p className="mb-0.5 truncate font-sans text-sm font-medium text-ink">{produto.nome}</p>
-        <p className="font-serif text-base font-bold text-primary">{produto.preco}</p>
+        {isProdutoEsgotado(produto) ? (
+          <p className="font-sans text-sm font-semibold text-muted-fg">{PRODUTO_ESGOTADO_LABEL}</p>
+        ) : (
+          <p className="font-serif text-base font-bold text-primary">{produto.preco}</p>
+        )}
         {produto.cores.length > 1 && (
           <div className="mt-2 flex gap-1.5">
             {produto.cores.slice(0, 4).map((c) => (

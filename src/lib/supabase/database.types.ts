@@ -18,6 +18,7 @@ export type DbProduct = {
   badge: ProductBadge | null;
   active: boolean;
   featured: boolean;
+  sold_out: boolean;
   sizes: string[];
   sort_order: number;
   created_at: string;
@@ -81,6 +82,7 @@ export type StoreProduct = {
   category: ProductCategory;
   badge: ProductBadge | null;
   featured: boolean;
+  sold_out: boolean;
   sizes: string[];
   sort_order: number;
   created_at: string;
