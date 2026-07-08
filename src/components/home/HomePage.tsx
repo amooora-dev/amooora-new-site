@@ -120,7 +120,7 @@ function ParticleCanvas({ color, active }: ParticleCanvasProps) {
 }
 
 /* ── HERO - Direction A: Editorial clean ── */
-function HeroA({ accent, cta, particles, isMobile, dir }: HeroProps & CtaProps & { dir: 'A' | 'B' }) {
+function HeroA({ accent, particles, isMobile, dir }: HeroProps & { dir: 'A' | 'B' }) {
   const navOffset = isMobile ? 72 : 84;
   const heroBackground = C.hero.background;
 
@@ -195,9 +195,20 @@ function HeroA({ accent, cta, particles, isMobile, dir }: HeroProps & CtaProps &
           color: 'var(--ink)', marginBottom: 12,
           animation: 'fadeUp 0.8s 0.1s ease both', fontSize: isMobile ? '44px' : "70px"
         }}>
-          <span style={{ whiteSpace: 'nowrap' }}>{C.hero.titleLine1}</span><br />
-          <em style={{ color: accent, fontStyle: 'italic' }}>{C.hero.titleHighlight}</em><br />
-          {C.hero.titleLine3}
+          {isMobile ? (
+            <>
+              Um mundo<br />
+              Inteiro<br />
+              <em style={{ color: accent, fontStyle: 'italic' }}>de acolhimento</em><br />
+              e liberdade
+            </>
+          ) : (
+            <>
+              <span style={{ whiteSpace: 'nowrap' }}>{C.hero.titleLine1}</span><br />
+              <em style={{ color: accent, fontStyle: 'italic' }}>{C.hero.titleHighlight}</em><br />
+              {C.hero.titleLine3}
+            </>
+          )}
         </h1>
 
         <p style={{
@@ -208,30 +219,6 @@ function HeroA({ accent, cta, particles, isMobile, dir }: HeroProps & CtaProps &
         }}>
           {C.hero.description}
         </p>
-
-        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginTop: 28,
-          animation: 'fadeUp 0.8s 0.4s ease both', flexWrap: 'wrap' }}>
-          <Link href="#aplicativo" style={{
-            fontFamily: "var(--sans)", fontSize: 15, fontWeight: 600,
-            background: cta, color: 'white', padding: '12px 28px', borderRadius: 100,
-            textDecoration: 'none', boxShadow: `0 8px 32px ${cta}44`,
-            transition: 'all 0.25s'
-          }}
-          onMouseEnter={(e) => {e.currentTarget.style.transform = 'translateY(-3px)';e.currentTarget.style.boxShadow = `0 16px 48px ${cta}55`;}}
-          onMouseLeave={(e) => {e.currentTarget.style.transform = '';e.currentTarget.style.boxShadow = `0 8px 32px ${cta}44`;}}>
-            {C.hero.ctaPrimary}
-          </Link>
-          <Link href="#manifesto" style={{
-            fontFamily: "var(--sans)", fontSize: 15, fontWeight: 500,
-            color: accent, padding: '12px 28px', borderRadius: 100,
-            textDecoration: 'none', border: `1.5px solid ${accent}44`,
-            transition: 'all 0.25s'
-          }}
-          onMouseEnter={(e) => {e.currentTarget.style.background = `${accent}0d`;e.currentTarget.style.borderColor = accent;}}
-          onMouseLeave={(e) => {e.currentTarget.style.background = '';e.currentTarget.style.borderColor = `${accent}44`;}}>
-            {C.hero.ctaSecondary}
-          </Link>
-        </div>
 
       </div>
 
@@ -362,6 +349,17 @@ function VideoSection({ isMobile }: MobileProps) {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  const playVideo = () => {
+    const player = playerRef.current;
+    if (!player) return;
+    try {
+      player.mute();
+      player.playVideo();
+    } catch {
+      /* player ainda não disponível */
+    }
+  };
+
   // Init YouTube IFrame API
   useEffect(() => {
     const init = () => {
@@ -369,19 +367,32 @@ function VideoSection({ isMobile }: MobileProps) {
       playerRef.current = new window.YT!.Player(divRef.current, {
         videoId: 'PHO5TkLfpKg',
         playerVars: {
-          autoplay: 1, mute: 1, loop: 1,
-          playlist: 'PHO5TkLfpKg', controls: 0,
-          disablekb: 1, rel: 0, playsinline: 1,
-          modestbranding: 1, iv_load_policy: 3
+          autoplay: 1,
+          mute: 1,
+          loop: 1,
+          playlist: 'PHO5TkLfpKg',
+          controls: 0,
+          disablekb: 1,
+          rel: 0,
+          playsinline: 1,
+          modestbranding: 1,
+          iv_load_policy: 3,
+          origin: typeof window !== 'undefined' ? window.location.origin : '',
         },
         events: {
-          onReady: (e) => {e.target.mute();e.target.playVideo();setReady(true);},
+          onReady: (e) => {
+            e.target.mute();
+            e.target.playVideo();
+            setReady(true);
+            window.setTimeout(() => e.target.playVideo(), 400);
+            window.setTimeout(() => e.target.playVideo(), 1200);
+          },
           onStateChange: (e) => {
             if (e.data === 0) e.target.playVideo();
             if (e.data === 1) setPaused(false);
             if (e.data === 2) setPaused(true);
-          }
-        }
+          },
+        },
       });
     };
 
@@ -396,8 +407,33 @@ function VideoSection({ isMobile }: MobileProps) {
       }
       window.onYouTubeIframeAPIReady = init;
     }
-    return () => {if (playerRef.current?.destroy) playerRef.current.destroy();};
+    return () => { if (playerRef.current?.destroy) playerRef.current.destroy(); };
   }, []);
+
+  // Retoma o vídeo quando a seção entra na tela (essencial no mobile)
+  useEffect(() => {
+    if (!ready || !ref.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) playVideo();
+      },
+      { threshold: 0.2 }
+    );
+    observer.observe(ref.current);
+
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') playVideo();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+
+    playVideo();
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, [ready]);
 
   // React to mute state
   useEffect(() => {
@@ -1103,7 +1139,7 @@ export default function HomePage() {
   return (
     <div>
       {dir === 'A' ?
-      <HeroA accent={accent} cta={cta} particles={particles} isMobile={isMobile} dir={dir} /> :
+      <HeroA accent={accent} particles={particles} isMobile={isMobile} dir={dir} /> :
       <>
         <SiteNav accent={accent} dir={dir} isMobile={isMobile} />
         <HeroB accent={accent} particles={particles} />
