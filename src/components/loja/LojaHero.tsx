@@ -1,19 +1,9 @@
 import Image from 'next/image';
 import { CONTEUDO_LOJA, type LojaHeroModelo } from '@/lib/loja-data';
 import { LojaHeroCTAs } from '@/components/loja/LojaHeroCTAs';
+import { SectionLabel } from '@/components/ui/SectionLabel';
 
 const { hero } = CONTEUDO_LOJA;
-
-function SectionLabel({ children, light = false }: { children: React.ReactNode; light?: boolean }) {
-  return (
-    <div className={`mb-6 flex items-center gap-4 ${light ? 'text-white/60' : 'text-primary'}`}>
-      <div className={`h-0.5 w-12 ${light ? 'bg-white/60' : 'bg-primary'}`} />
-      <span className="font-sans text-xs font-semibold uppercase tracking-[0.2em]">
-        {children}
-      </span>
-    </div>
-  );
-}
 
 function HeroCTAs({ variant }: { variant: 'dark' | 'light' }) {
   return <LojaHeroCTAs variant={variant} />;
@@ -35,7 +25,7 @@ function HeroModelo1({ navOffset }: { navOffset: number }) {
         aria-hidden="true"
       />
       <div
-        className="absolute inset-0 bg-gradient-to-r from-[#1a1a1a]/85 via-[#3a184f]/70 to-[#3a184f]/40"
+        className="absolute inset-0 bg-gradient-to-r from-ink/85 via-secondary/70 to-secondary/40"
         aria-hidden="true"
       />
 
@@ -134,7 +124,7 @@ function HeroModelo2({ navOffset, isMobile }: { navOffset: number; isMobile: boo
 
         <div className="flex flex-col justify-center text-center lg:text-left">
           <SectionLabel>{hero.label}</SectionLabel>
-          <h1 className="mb-4 font-serif text-4xl font-bold leading-[1.05] text-[#3a184f] md:text-5xl lg:text-[56px]">
+          <h1 className="mb-4 font-serif text-4xl font-bold leading-[1.05] text-ink-mid md:text-5xl lg:text-[56px]">
             {hero.titulo}
           </h1>
           <p className="mb-6 font-serif text-xl italic text-primary md:text-2xl">{hero.subtitulo}</p>

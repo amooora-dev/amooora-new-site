@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import type { ProdutoLoja } from '@/lib/loja-data';
 import { getBadgeBgClass } from '@/lib/loja/badge-display';
 import { isProdutoEsgotado, PRODUTO_ESGOTADO_LABEL } from '@/lib/loja/product-availability';
@@ -13,8 +14,6 @@ import { SiteFooter } from '@/components/layout/SiteFooter';
 import { ColorSwatches } from '@/components/loja/product/ColorSwatches';
 import { ProductDescription } from '@/components/loja/product/ProductDescription';
 import { GalleryPageLayout } from '@/components/loja/product/GalleryPageLayout';
-
-const ACCENT = '#932D6F';
 
 function ChevronRight({ className = 'h-4 w-4' }: { className?: string }) {
   return (
@@ -82,16 +81,9 @@ export function ProdutoDetalhePage({ produto, relacionados }: Props) {
   const [imgAtiva, setImgAtiva] = useState(0);
   const [corIdx, setCorIdx] = useState(0);
   const [tamanhoIdx, setTamanhoIdx] = useState(0);
-  const [isMobile, setIsMobile] = useState(false);
+  const isMobile = useIsMobile(768);
   const [copied, setCopied] = useState(false);
   const [wishlist, setWishlist] = useState(false);
-
-  useEffect(() => {
-    const sync = () => setIsMobile(window.innerWidth < 768);
-    sync();
-    window.addEventListener('resize', sync);
-    return () => window.removeEventListener('resize', sync);
-  }, []);
 
   useEffect(() => {
     trackViewItem({
@@ -124,7 +116,7 @@ export function ProdutoDetalhePage({ produto, relacionados }: Props) {
 
   return (
     <div className="min-h-screen bg-white">
-      <SiteNav accent={ACCENT} isMobile={isMobile} layout="default" page="loja" />
+      <SiteNav isMobile={isMobile} layout="default" page="loja" />
 
       <div className="pt-[72px] md:pt-[84px]">
         {/* Breadcrumb */}
@@ -394,7 +386,7 @@ export function ProdutoDetalhePage({ produto, relacionados }: Props) {
         )}
       </div>
 
-      <SiteFooter accent={ACCENT} isMobile={isMobile} page="loja" />
+      <SiteFooter isMobile={isMobile} page="loja" />
     </div>
   );
 }

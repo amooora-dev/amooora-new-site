@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { useIsMobile } from '@/lib/hooks/useIsMobile';
 import { SiteNav } from '@/components/layout/SiteNav';
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import { ColorSwatches } from '@/components/loja/product/ColorSwatches';
@@ -19,19 +20,7 @@ import { buildWhatsappUrl } from '@/lib/supabase/map-product';
 import { trackLinkClick, trackWhatsappClick } from '@/lib/analytics';
 import { isProdutoEsgotado, PRODUTO_ESGOTADO_LABEL } from '@/lib/loja/product-availability';
 
-const ACCENT = '#932D6F';
 const { hero, filtros } = CONTEUDO_LOJA;
-
-function SectionLabel({ children, light = false }: { children: React.ReactNode; light?: boolean }) {
-  return (
-    <div className={`mb-6 flex items-center gap-4 ${light ? 'text-white/60' : 'text-primary'}`}>
-      <div className={`h-0.5 w-12 ${light ? 'bg-white/60' : 'bg-primary'}`} />
-      <span className="font-sans text-xs font-semibold uppercase tracking-[0.2em]">
-        {children}
-      </span>
-    </div>
-  );
-}
 
 function WhatsAppIcon() {
   return (
@@ -165,24 +154,16 @@ export function LojaPageContent({
   dataSource: 'supabase' | 'static';
   dataError: string | null;
 }) {
-  const [isMobile, setIsMobile] = useState(false);
+  const isMobile = useIsMobile();
   const [filtro, setFiltro] = useState<CategoriaFiltro>('Todos');
   const searchParams = useSearchParams();
 
   useEffect(() => {
     const slug = searchParams.get('produto');
     if (slug) {
-      // redireciona para a página de detalhe se acessado via ?produto=slug (compatibilidade)
       window.location.replace(`/loja/${slug}`);
     }
   }, [searchParams]);
-
-  useEffect(() => {
-    const sync = () => setIsMobile(window.innerWidth <= 900);
-    sync();
-    window.addEventListener('resize', sync);
-    return () => window.removeEventListener('resize', sync);
-  }, []);
 
   const produtosFiltrados = filtrarProdutos(produtos, filtro);
   const navOffset = isMobile ? 72 : 84;
@@ -190,9 +171,7 @@ export function LojaPageContent({
   return (
     <main className="min-h-screen bg-white">
       <SiteNav
-        accent={ACCENT}
         isMobile={isMobile}
-        dir="A"
         layout="hero"
         page="loja"
         navOverDark={lojaNavOverDark(hero.modelo)}
@@ -312,7 +291,7 @@ export function LojaPageContent({
         </div>
       </section>
 
-      <SiteFooter accent={ACCENT} isMobile={isMobile} page="loja" />
+      <SiteFooter isMobile={isMobile} page="loja" />
     </main>
   );
 }

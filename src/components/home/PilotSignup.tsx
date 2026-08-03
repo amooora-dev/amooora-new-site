@@ -1,16 +1,15 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
 import { CONTEUDO_HOME as C } from '@/lib/conteudo-home';
 import { trackPilotSignup } from '@/lib/analytics';
+import { PrimaryButton } from '@/components/ui/PrimaryButton';
+import { EmailInput } from '@/components/ui/EmailInput';
+import { pa } from '@/lib/style-utils';
+import type { MobileProps } from '@/components/home/types';
 
-type PilotSignupProps = {
-  accent: string;
-  cta: string;
-  isMobile: boolean;
-};
-
-export function PilotSignup({ accent, cta, isMobile }: PilotSignupProps) {
+export function PilotSignup({ isMobile }: MobileProps) {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -20,8 +19,6 @@ export function PilotSignup({ accent, cta, isMobile }: PilotSignupProps) {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
-
-    // TODO: enviar para o BD quando a API estiver pronta
     console.info('[pilot-signup]', { email: email.trim() });
     trackPilotSignup();
     setSubmitted(true);
@@ -29,110 +26,47 @@ export function PilotSignup({ accent, cta, isMobile }: PilotSignupProps) {
   };
 
   return (
-    <div style={{ marginTop: 36 }}>
-      <p style={{
-        fontFamily: "var(--sans)",
-        fontSize: 'clamp(15px,1.4vw,17px)',
-        fontWeight: 400,
-        lineHeight: 1.7,
-        color: '#717182',
-        maxWidth: 480,
-        marginBottom: 20,
-      }}>
+    <div className="mt-9">
+      <p
+        className="mb-5 max-w-[480px] font-sans font-normal leading-[1.7] text-muted-fg"
+        style={{ fontSize: 'clamp(15px,1.4vw,17px)' }}
+      >
         {pilot.text}
       </p>
 
-      <button
-        type="button"
-        onClick={() => setOpen((v) => {
-          if (v) setSubmitted(false);
-          return !v;
-        })}
-        style={{
-          fontFamily: "var(--sans)",
-          fontSize: 15,
-          fontWeight: 600,
-          background: cta,
-          color: 'white',
-          padding: '12px 28px',
-          borderRadius: 100,
-          border: 'none',
-          cursor: 'pointer',
-          boxShadow: `0 8px 32px ${cta}44`,
-          transition: 'all 0.25s',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'translateY(-2px)';
-          e.currentTarget.style.boxShadow = `0 12px 40px ${cta}55`;
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = '';
-          e.currentTarget.style.boxShadow = `0 8px 32px ${cta}44`;
-        }}
+      <PrimaryButton
+        onClick={() => setOpen((v) => { if (v) setSubmitted(false); return !v; })}
+        className="px-7 text-[15px]"
+        style={{ padding: '12px 28px' }}
       >
         {pilot.cta}
-      </button>
+      </PrimaryButton>
 
       {open && (
-        <div style={{
-          marginTop: 20,
-          padding: isMobile ? 16 : 20,
-          borderRadius: 12,
-          border: `1px solid ${accent}22`,
-          background: `${accent}06`,
-          animation: 'fadeUp 0.3s ease both',
-        }}>
+        <div
+          className="mt-5 animate-fadeUp rounded-xl"
+          style={{
+            padding: isMobile ? 16 : 20,
+            border: `1px solid ${pa(13)}`,
+            background: pa(2),
+          }}
+        >
           {submitted ? (
-            <p style={{
-              fontFamily: "var(--sans)",
-              fontSize: 15,
-              fontWeight: 500,
-              color: accent,
-              lineHeight: 1.6,
-            }}>
+            <p className="font-sans text-[15px] font-medium leading-[1.6] text-primary">
               {pilot.success}
             </p>
           ) : (
-            <form onSubmit={handleSubmit} style={{
-              display: 'flex',
-              gap: 10,
-              flexDirection: 'column',
-            }}>
-              <input
-                type="email"
-                required
+            <form onSubmit={handleSubmit} className="flex flex-col gap-2.5">
+              <EmailInput
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={pilot.placeholder}
-                aria-label={pilot.placeholder}
-                style={{
-                  minHeight: 48,
-                  borderRadius: 8,
-                  border: '1px solid #e8eaf2',
-                  padding: '0 16px',
-                  fontFamily: "var(--sans)",
-                  fontSize: 16,
-                  color: '#0f1b3d',
-                  outline: 'none',
-                  width: '100%',
-                  background: 'white',
-                }}
+                required
+                className="w-full"
               />
               <button
                 type="submit"
-                style={{
-                  alignSelf: 'flex-start',
-                  minHeight: 48,
-                  padding: '0 24px',
-                  borderRadius: 100,
-                  border: 'none',
-                  background: cta,
-                  color: 'white',
-                  fontFamily: "var(--sans)",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                }}
+                className="self-start min-h-[48px] cursor-pointer rounded-full border-none bg-primary px-6 font-sans text-sm font-semibold text-white"
               >
                 {pilot.submit}
               </button>
