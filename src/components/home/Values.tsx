@@ -1,25 +1,15 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import type { CSSProperties } from 'react';
 import Image from 'next/image';
 import { CONTEUDO_HOME as C } from '@/lib/conteudo-home';
 import { SectionLabel } from '@/components/ui/SectionLabel';
+import { useInViewReveal } from '@/lib/hooks/useInViewReveal';
 import { pa } from '@/lib/style-utils';
 import type { MobileProps } from '@/components/home/types';
 
 export function Values({ isMobile }: MobileProps) {
-  const ref = useRef<HTMLElement>(null);
-  const [visible, setVisible] = useState(false);
-  const [hovered, setHovered] = useState<number | null>(null);
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setVisible(true); },
-      { threshold: 0.1 }
-    );
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, []);
+  const { ref, visible } = useInViewReveal<HTMLElement>();
 
   const vals = C.values.items;
 
@@ -36,12 +26,8 @@ export function Values({ isMobile }: MobileProps) {
       >
         {isMobile && C.values.image && (
           <div
-            className="mb-10 flex justify-center"
-            style={{
-              opacity: visible ? 1 : 0,
-              transform: visible ? 'none' : 'translateY(20px)',
-              transition: 'all 0.8s ease',
-            }}
+            data-visible={visible}
+            className="mb-10 flex justify-center opacity-0 translate-y-5 transition-all duration-[800ms] ease-out data-[visible=true]:opacity-100 data-[visible=true]:translate-y-0"
           >
             <Image
               src={C.values.image}
@@ -59,8 +45,8 @@ export function Values({ isMobile }: MobileProps) {
         )}
 
         <div
-          className="mb-[72px]"
-          style={{ opacity: visible ? 1 : 0, transition: 'all 0.7s ease' }}
+          data-visible={visible}
+          className="mb-[72px] opacity-0 transition-opacity duration-700 ease-out data-[visible=true]:opacity-100"
         >
           <div className="mb-5">
             <SectionLabel label={C.values.label} />
@@ -75,41 +61,31 @@ export function Values({ isMobile }: MobileProps) {
           style={{ gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 0 }}
         >
           {vals.map((v, i) => {
-            const isHov = hovered === i;
+            const delay = `${(0.05 * i).toFixed(2)}s`;
             return (
               <div
                 key={i}
-                onMouseEnter={() => setHovered(i)}
-                onMouseLeave={() => setHovered(null)}
+                data-visible={visible}
+                className="group grid opacity-0 translate-y-5 cursor-default transition-[opacity,transform] duration-[600ms] ease-out [transition-delay:var(--delay)] hover:bg-[var(--hover-bg)] data-[visible=true]:opacity-100 data-[visible=true]:translate-y-0"
                 style={{
-                  display: 'grid',
                   gridTemplateColumns: '72px 1fr',
                   padding: '32px 40px 32px 0',
                   borderTop: `1px solid ${pa(10)}`,
                   borderRight: !isMobile && i % 2 === 0 ? `1px solid ${pa(10)}` : 'none',
                   paddingRight: !isMobile && i % 2 === 0 ? 40 : 0,
                   paddingLeft: !isMobile && i % 2 === 1 ? 40 : 0,
-                  background: isHov ? pa(4) : 'transparent',
-                  transition: 'background 0.25s',
-                  cursor: 'default',
-                  opacity: visible ? 1 : 0,
-                  transform: visible ? 'none' : 'translateY(20px)',
-                  transitionDelay: `${0.05 * i}s`,
-                  transitionProperty: 'opacity, transform, background',
-                  transitionDuration: '0.6s, 0.6s, 0.25s',
-                }}
+                  '--delay': delay,
+                  '--hover-bg': pa(4),
+                } as CSSProperties}
               >
                 <div
-                  className="select-none pt-1 font-serif text-5xl font-black leading-none tracking-[-0.04em] transition-colors duration-[250ms]"
-                  style={{ color: isHov ? 'var(--primary)' : pa(13) }}
+                  className="select-none pt-1 font-serif text-5xl font-black leading-none tracking-[-0.04em] text-[var(--num-color)] transition-colors duration-[250ms] group-hover:text-primary"
+                  style={{ '--num-color': pa(13) } as CSSProperties}
                 >
                   {String(i + 1).padStart(2, '0')}
                 </div>
                 <div>
-                  <h3
-                    className="mb-2.5 font-sans text-[clamp(14px,1.2vw,16px)] font-semibold leading-[1.8] transition-colors duration-[250ms]"
-                    style={{ color: isHov ? 'var(--primary)' : 'var(--muted-fg)' }}
-                  >
+                  <h3 className="mb-2.5 font-sans text-[clamp(14px,1.2vw,16px)] font-semibold leading-[1.8] text-muted-fg transition-colors duration-[250ms] group-hover:text-primary">
                     {v.title}
                   </h3>
                   <p className="font-sans text-sm font-light leading-[1.75] text-muted-fg">

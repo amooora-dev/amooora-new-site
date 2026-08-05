@@ -1,25 +1,16 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import { CONTEUDO_HOME as C } from '@/lib/conteudo-home';
 import { trackLinkClick } from '@/lib/analytics';
 import { SectionLabel } from '@/components/ui/SectionLabel';
+import { useInViewReveal } from '@/lib/hooks/useInViewReveal';
 import { pa } from '@/lib/style-utils';
 import type { MobileProps } from '@/components/home/types';
 
 export function Gallery({ isMobile }: MobileProps) {
-  const ref = useRef<HTMLElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setVisible(true); },
-      { threshold: 0.1 }
-    );
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, []);
+  const { ref, visible } = useInViewReveal<HTMLElement>();
 
   const photos = C.gallery.photos;
 
@@ -35,8 +26,8 @@ export function Gallery({ isMobile }: MobileProps) {
         style={{ maxWidth: 1200, padding: isMobile ? '0 20px' : '0 48px' }}
       >
         <div
-          className="mb-12"
-          style={{ opacity: visible ? 1 : 0, transition: 'all 0.7s ease' }}
+          data-visible={visible}
+          className="mb-12 opacity-0 transition-opacity duration-700 ease-out data-[visible=true]:opacity-100"
         >
           <div className="mb-6">
             <SectionLabel label={C.gallery.label} />
@@ -53,50 +44,32 @@ export function Gallery({ isMobile }: MobileProps) {
             gridTemplateRows: isMobile ? 'repeat(2, 200px)' : '280px',
           }}
         >
-          {photos.map((src, i) => (
-            <div
-              key={i}
-              className="relative overflow-hidden rounded-2xl bg-muted"
-              style={{
-                opacity: visible ? 1 : 0,
-                transform: visible ? 'none' : 'scale(0.96)',
-                transition: `all 0.7s ${0.05 * i}s ease`,
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'scale(1.02)';
-                e.currentTarget.style.zIndex = '2';
-                e.currentTarget.style.boxShadow = `0 20px 60px ${pa(20)}`;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = '';
-                e.currentTarget.style.zIndex = '';
-                e.currentTarget.style.boxShadow = '';
-              }}
-            >
+          {photos.map((src, i) => {
+            const delay = `${(0.05 * i).toFixed(2)}s`;
+            return (
               <div
-                className="h-full w-full bg-cover bg-center"
-                style={{ backgroundImage: `url(${src})` }}
-              />
-            </div>
-          ))}
+                key={i}
+                data-visible={visible}
+                className="relative z-0 overflow-hidden rounded-2xl bg-muted opacity-0 scale-95 transition-all duration-700 ease-out [transition-delay:var(--delay)] hover:z-[2] hover:scale-[1.02] hover:shadow-[0_20px_60px_var(--hover-shadow)] data-[visible=true]:opacity-100 data-[visible=true]:scale-100"
+                style={{ '--delay': delay, '--hover-shadow': pa(20) } as CSSProperties}
+              >
+                <div
+                  className="h-full w-full bg-cover bg-center"
+                  style={{ backgroundImage: `url(${src})` }}
+                />
+              </div>
+            );
+          })}
         </div>
 
         <div
-          className="mt-12 text-center"
-          style={{ opacity: visible ? 1 : 0, transition: 'all 0.7s 0.5s ease' }}
+          data-visible={visible}
+          className="mt-12 text-center opacity-0 transition-opacity duration-700 delay-500 ease-out data-[visible=true]:opacity-100"
         >
           <Link
             href={C.gallery.ctaUrl}
-            className="inline-block rounded-full bg-primary font-sans text-[15px] font-semibold text-white no-underline transition-all duration-[250ms]"
-            style={{ padding: '14px 32px', boxShadow: `0 8px 32px ${pa(27)}` }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = `0 12px 40px ${pa(33)}`;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = '';
-              e.currentTarget.style.boxShadow = `0 8px 32px ${pa(27)}`;
-            }}
+            className="inline-block rounded-full bg-primary px-8 py-3.5 font-sans text-[15px] font-semibold text-white no-underline transition-all duration-[250ms] hover:-translate-y-0.5 hover:shadow-[0_12px_40px_var(--hover-shadow)]"
+            style={{ boxShadow: `0 8px 32px ${pa(27)}`, '--hover-shadow': pa(33) } as CSSProperties}
             onClick={() => trackLinkClick({
               linkText: C.gallery.cta,
               linkUrl: C.gallery.ctaUrl,

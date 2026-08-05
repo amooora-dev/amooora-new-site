@@ -1,11 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import { CONTEUDO_HOME as C } from '@/lib/conteudo-home';
 import { TextWithBreaks } from '@/components/ui/TextWithBreaks';
 import { PilotSignup } from '@/components/home/PilotSignup';
 import { SectionLabel } from '@/components/ui/SectionLabel';
+import { AccordionToggle } from '@/components/ui/AccordionToggle';
+import { useInViewReveal } from '@/lib/hooks/useInViewReveal';
 import { pa } from '@/lib/style-utils';
 import type { MobileProps } from '@/components/home/types';
 
@@ -26,12 +28,8 @@ function AppAccordion({ items, open, setOpen, variant }: AppAccordionProps) {
         return (
           <div
             key={i}
-            style={isMobileCard ? {
-              background: '#fff',
-              borderRadius: 12,
-              boxShadow: '0 2px 12px rgba(96,16,59,0.06)',
-              overflow: 'hidden',
-            } : {
+            className={isMobileCard ? 'overflow-hidden rounded-xl bg-white shadow-[0_2px_12px_rgba(96,16,59,0.06)]' : undefined}
+            style={isMobileCard ? undefined : {
               borderTop: `1px solid ${pa(13)}`,
               borderBottom: i === items.length - 1 ? `1px solid ${pa(13)}` : 'none',
             }}
@@ -47,15 +45,7 @@ function AppAccordion({ items, open, setOpen, variant }: AppAccordionProps) {
               >
                 {item.label}
               </span>
-              <span
-                className="flex shrink-0 items-center justify-center rounded-full text-lg font-light transition-all duration-[220ms]"
-                style={{
-                  width: 28, height: 28,
-                  background: isOpen ? 'var(--primary)' : pa(8),
-                  color: isOpen ? 'white' : 'var(--primary)',
-                  transform: isOpen ? 'rotate(45deg)' : 'none',
-                }}
-              >+</span>
+              <AccordionToggle open={isOpen} />
             </button>
 
             {isOpen && (
@@ -86,18 +76,8 @@ function AppAccordion({ items, open, setOpen, variant }: AppAccordionProps) {
 }
 
 export function AppSection({ isMobile }: MobileProps) {
-  const ref = useRef<HTMLElement>(null);
-  const [visible, setVisible] = useState(false);
+  const { ref, visible } = useInViewReveal<HTMLElement>();
   const [open, setOpen] = useState<number | null>(null);
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setVisible(true); },
-      { threshold: 0.1 }
-    );
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, []);
 
   const items = C.app.items;
   const introFull = C.app.intro.slice(0, 2);
@@ -133,12 +113,8 @@ export function AppSection({ isMobile }: MobileProps) {
       >
         <div className="mx-auto" style={{ maxWidth: 1200, paddingInline: 20 }}>
           <div
-            className="text-center"
-            style={{
-              opacity: visible ? 1 : 0,
-              transform: visible ? 'none' : 'translateY(24px)',
-              transition: 'all 0.7s ease',
-            }}
+            data-visible={visible}
+            className="text-center opacity-0 translate-y-6 transition-all duration-700 ease-out data-[visible=true]:opacity-100 data-[visible=true]:translate-y-0"
           >
             <div className="mb-6 flex items-center justify-center gap-3">
               <SectionLabel label={C.app.label} centered />
@@ -187,11 +163,8 @@ export function AppSection({ isMobile }: MobileProps) {
     >
       <div className="mx-auto" style={{ maxWidth: 1200, paddingInline: 48 }}>
         <div
-          style={{
-            opacity: visible ? 1 : 0,
-            transform: visible ? 'none' : 'translateY(24px)',
-            transition: 'all 0.7s ease',
-          }}
+          data-visible={visible}
+          className="opacity-0 translate-y-6 transition-all duration-700 ease-out data-[visible=true]:opacity-100 data-[visible=true]:translate-y-0"
         >
           {sectionLabel}
           <h2 className="mb-3 font-serif text-[clamp(28px,3.5vw,50px)] font-black leading-[1.1] text-ink">
@@ -209,11 +182,8 @@ export function AppSection({ isMobile }: MobileProps) {
 
         <div className="grid items-start" style={{ gridTemplateColumns: '1fr 1fr', gap: 80 }}>
           <div
-            style={{
-              opacity: visible ? 1 : 0,
-              transform: visible ? 'none' : 'translateY(24px)',
-              transition: 'all 0.7s ease',
-            }}
+            data-visible={visible}
+            className="opacity-0 translate-y-6 transition-all duration-700 ease-out data-[visible=true]:opacity-100 data-[visible=true]:translate-y-0"
           >
             {introSplit.map((paragraph, i) => (
               <p
@@ -229,12 +199,8 @@ export function AppSection({ isMobile }: MobileProps) {
           </div>
 
           <div
-            className="flex items-start justify-center"
-            style={{
-              opacity: visible ? 1 : 0,
-              transform: visible ? 'none' : 'translateX(40px)',
-              transition: 'all 1s 0.2s ease',
-            }}
+            data-visible={visible}
+            className="flex items-start justify-center opacity-0 translate-x-10 transition-all duration-1000 delay-200 ease-out data-[visible=true]:opacity-100 data-[visible=true]:translate-x-0"
           >
             {mockupImage}
           </div>

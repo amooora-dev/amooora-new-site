@@ -1,24 +1,17 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
+import type { CSSProperties } from 'react';
 import { CONTEUDO_HOME as C } from '@/lib/conteudo-home';
 import { SectionLabel } from '@/components/ui/SectionLabel';
+import { AccordionToggle } from '@/components/ui/AccordionToggle';
+import { useInViewReveal } from '@/lib/hooks/useInViewReveal';
 import { pa } from '@/lib/style-utils';
 import type { MobileProps } from '@/components/home/types';
 
 export function FAQ({ isMobile }: MobileProps) {
-  const ref = useRef<HTMLElement>(null);
-  const [visible, setVisible] = useState(false);
+  const { ref, visible } = useInViewReveal<HTMLElement>();
   const [open, setOpen] = useState<number | null>(null);
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setVisible(true); },
-      { threshold: 0.1 }
-    );
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, []);
 
   const items = C.faq.items;
 
@@ -34,15 +27,15 @@ export function FAQ({ isMobile }: MobileProps) {
         style={{ maxWidth: 860, padding: isMobile ? '0 20px' : '0 48px' }}
       >
         <div
-          className="mb-6"
-          style={{ opacity: visible ? 1 : 0, transition: 'all 0.7s ease' }}
+          data-visible={visible}
+          className="mb-6 opacity-0 transition-opacity duration-700 ease-out data-[visible=true]:opacity-100"
         >
           <SectionLabel label={C.faq.label} />
         </div>
 
         <h2
-          className="mb-14 font-serif text-[clamp(28px,3.5vw,48px)] font-black text-ink"
-          style={{ opacity: visible ? 1 : 0, transition: 'all 0.7s 0.1s ease' }}
+          data-visible={visible}
+          className="mb-14 font-serif text-[clamp(28px,3.5vw,48px)] font-black text-ink opacity-0 transition-opacity duration-700 delay-100 ease-out data-[visible=true]:opacity-100"
         >
           {C.faq.title}
         </h2>
@@ -50,15 +43,17 @@ export function FAQ({ isMobile }: MobileProps) {
         <div className="flex flex-col gap-0.5">
           {items.map((item, i) => {
             const isOpen = open === i;
+            const delay = `${(0.05 * i).toFixed(2)}s`;
             return (
               <div
                 key={i}
+                data-visible={visible}
+                className="opacity-0 transition-opacity duration-[600ms] ease-out [transition-delay:var(--delay)] data-[visible=true]:opacity-100"
                 style={{
                   borderTop: `1px solid ${pa(13)}`,
                   borderBottom: i === items.length - 1 ? `1px solid ${pa(13)}` : 'none',
-                  opacity: visible ? 1 : 0,
-                  transition: `all 0.6s ${0.05 * i}s ease`,
-                }}
+                  '--delay': delay,
+                } as CSSProperties}
               >
                 <button
                   onClick={() => setOpen(isOpen ? null : i)}
@@ -70,16 +65,7 @@ export function FAQ({ isMobile }: MobileProps) {
                   >
                     {item.q}
                   </span>
-                  <span
-                    className="flex shrink-0 items-center justify-center rounded-full text-lg font-light transition-all duration-[250ms]"
-                    style={{
-                      width: 28,
-                      height: 28,
-                      background: isOpen ? 'var(--primary)' : pa(8),
-                      color: isOpen ? 'white' : 'var(--primary)',
-                      transform: isOpen ? 'rotate(45deg)' : 'none',
-                    }}
-                  >+</span>
+                  <AccordionToggle open={isOpen} />
                 </button>
 
                 {isOpen && (

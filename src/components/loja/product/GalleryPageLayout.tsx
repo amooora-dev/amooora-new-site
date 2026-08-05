@@ -2,30 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-
-function ChevronLeft({ className = 'h-5 w-5' }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} aria-hidden>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-    </svg>
-  );
-}
-
-function ChevronRight({ className = 'h-5 w-5' }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} aria-hidden>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-    </svg>
-  );
-}
-
-function ZoomIcon() {
-  return (
-    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} aria-hidden>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-    </svg>
-  );
-}
+import { ChevronLeftIcon, ChevronRightIcon, ZoomIcon } from '@/components/icons';
 
 type GalleryPageLayoutProps = {
   imagens: string[];
@@ -108,7 +85,7 @@ export function GalleryPageLayout({ imagens, alt, activeIndex, onIndexChange }: 
                   aria-label="Foto anterior"
                   className="absolute left-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-secondary text-white shadow-md transition hover:brightness-110"
                 >
-                  <ChevronLeft />
+                  <ChevronLeftIcon />
                 </button>
                 <button
                   type="button"
@@ -116,7 +93,7 @@ export function GalleryPageLayout({ imagens, alt, activeIndex, onIndexChange }: 
                   aria-label="Próxima foto"
                   className="absolute right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-secondary text-white shadow-md transition hover:brightness-110"
                 >
-                  <ChevronRight />
+                  <ChevronRightIcon />
                 </button>
                 <span className="absolute bottom-3 left-3 rounded-full bg-black/50 px-2.5 py-1 font-sans text-[11px] font-semibold text-white backdrop-blur-sm">
                   {activeIndex + 1}/{total}
@@ -167,7 +144,7 @@ export function GalleryPageLayout({ imagens, alt, activeIndex, onIndexChange }: 
                 aria-label="Foto anterior"
                 className="absolute left-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/25"
               >
-                <ChevronLeft className="h-6 w-6" />
+                <ChevronLeftIcon className="h-6 w-6" />
               </button>
               <button
                 type="button"
@@ -175,7 +152,7 @@ export function GalleryPageLayout({ imagens, alt, activeIndex, onIndexChange }: 
                 aria-label="Próxima foto"
                 className="absolute right-4 top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white transition hover:bg-white/25"
               >
-                <ChevronRight className="h-6 w-6" />
+                <ChevronRightIcon className="h-6 w-6" />
               </button>
             </>
           )}

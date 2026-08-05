@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+import type { FormEvent } from 'react';
 import { CONTEUDO_HOME as C } from '@/lib/conteudo-home';
 import { trackNewsletterSignup } from '@/lib/analytics';
 import { PrimaryButton } from '@/components/ui/PrimaryButton';
@@ -7,6 +9,15 @@ import { EmailInput } from '@/components/ui/EmailInput';
 import type { MobileProps } from '@/components/home/types';
 
 export function Newsletter({ isMobile }: MobileProps) {
+  const [email, setEmail] = useState('');
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) return;
+    trackNewsletterSignup();
+    setEmail('');
+  };
+
   return (
     <section
       className="bg-white"
@@ -33,10 +44,7 @@ export function Newsletter({ isMobile }: MobileProps) {
         </p>
 
         <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            trackNewsletterSignup();
-          }}
+          onSubmit={handleSubmit}
           className="flex gap-2.5"
           style={{
             flexDirection: isMobile ? 'column' : 'row',
@@ -47,9 +55,10 @@ export function Newsletter({ isMobile }: MobileProps) {
           }}
         >
           <EmailInput
-            value=""
-            onChange={() => {}}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder={C.newsletter.placeholder}
+            required
             className={isMobile ? 'w-full' : 'flex-1 min-w-0'}
           />
           <PrimaryButton

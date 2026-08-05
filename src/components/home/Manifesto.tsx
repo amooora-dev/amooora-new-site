@@ -1,11 +1,14 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import type { CSSProperties } from 'react';
 import Image from 'next/image';
 import { CONTEUDO_HOME as C } from '@/lib/conteudo-home';
 import { TextWithBreaks } from '@/components/ui/TextWithBreaks';
 import { SectionLabel } from '@/components/ui/SectionLabel';
+import { useInViewReveal } from '@/lib/hooks/useInViewReveal';
 import type { ManifestoParagraph, MobileProps } from '@/components/home/types';
+
+const REVEAL_UP = 'opacity-0 translate-y-[30px] transition-all duration-[800ms] ease-out data-[visible=true]:opacity-100 data-[visible=true]:translate-y-0';
 
 function renderParagraph(
   p: ManifestoParagraph,
@@ -14,15 +17,13 @@ function renderParagraph(
   delayOffset = 0,
   isLast = false
 ) {
+  const delay = (0.1 + delayOffset + i * 0.12).toFixed(2) + 's';
   return (
     <div
       key={i}
-      style={{
-        marginBottom: isLast ? 0 : p.big ? 28 : 16,
-        opacity: visible ? 1 : 0,
-        transform: visible ? 'none' : 'translateY(30px)',
-        transition: `all 0.8s ${0.1 + delayOffset + i * 0.12}s ease`,
-      }}
+      data-visible={visible}
+      className={`${REVEAL_UP} [transition-delay:var(--delay)] ${isLast ? 'mb-0' : p.big ? 'mb-7' : 'mb-4'}`}
+      style={{ '--delay': delay } as CSSProperties}
     >
       {p.big ? (
         <p className="font-serif text-[clamp(28px,4vw,54px)] font-bold leading-[1.15] tracking-[-0.02em] text-ink">
@@ -38,17 +39,7 @@ function renderParagraph(
 }
 
 export function Manifesto({ isMobile }: MobileProps) {
-  const sectionRef = useRef<HTMLElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) setVisible(true); },
-      { threshold: 0.2 }
-    );
-    if (sectionRef.current) obs.observe(sectionRef.current);
-    return () => obs.disconnect();
-  }, []);
+  const { ref: sectionRef, visible } = useInViewReveal<HTMLElement>(0.2);
 
   const paragraphs = C.manifesto.paragraphs;
   const leadingParagraphs = paragraphs.slice(0, -1);
@@ -56,12 +47,8 @@ export function Manifesto({ isMobile }: MobileProps) {
 
   const labelBlock = (
     <div
-      className="mb-8"
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? 'none' : 'translateY(20px)',
-        transition: 'all 0.7s ease',
-      }}
+      data-visible={visible}
+      className="mb-8 opacity-0 translate-y-5 transition-all duration-700 ease-out data-[visible=true]:opacity-100 data-[visible=true]:translate-y-0"
     >
       <SectionLabel label={C.manifesto.label} />
     </div>
@@ -69,15 +56,8 @@ export function Manifesto({ isMobile }: MobileProps) {
 
   const imageBlock = (
     <div
-      style={{
-        display: 'flex',
-        justifyContent: isMobile ? 'center' : 'flex-end',
-        alignItems: 'flex-start',
-        opacity: visible ? 1 : 0,
-        transform: visible ? 'none' : 'translateX(24px)',
-        transition: 'all 0.9s 0.2s ease',
-        marginBottom: isMobile ? 32 : 0,
-      }}
+      data-visible={visible}
+      className={`flex items-start opacity-0 translate-x-6 transition-all duration-[900ms] delay-200 ease-out data-[visible=true]:opacity-100 data-[visible=true]:translate-x-0 ${isMobile ? 'justify-center mb-8' : 'justify-end mb-0'}`}
     >
       <Image
         src={C.manifesto.image}

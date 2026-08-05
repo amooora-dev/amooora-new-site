@@ -2,22 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-
-function ChevronLeft({ className = 'h-5 w-5' }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-    </svg>
-  );
-}
-
-function ChevronRight({ className = 'h-5 w-5' }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-    </svg>
-  );
-}
+import { ChevronLeftIcon, ChevronRightIcon } from '@/components/icons';
 
 type ProductImageGalleryProps = {
   imagens: string[];
@@ -176,7 +161,7 @@ export function ProductImageGallery({
                 isCard ? 'hidden md:flex' : 'flex'
               } ${isModal ? 'md:left-4' : ''}`}
             >
-              <ChevronLeft className={isModal ? 'h-6 w-6' : 'h-5 w-5'} />
+              <ChevronLeftIcon className={isModal ? 'h-6 w-6' : 'h-5 w-5'} />
             </button>
             <button
               type="button"
@@ -189,7 +174,7 @@ export function ProductImageGallery({
                 isCard ? 'hidden md:flex' : 'flex'
               } ${isModal ? 'md:right-4' : ''}`}
             >
-              <ChevronRight className={isModal ? 'h-6 w-6' : 'h-5 w-5'} />
+              <ChevronRightIcon className={isModal ? 'h-6 w-6' : 'h-5 w-5'} />
             </button>
 
             <span className="absolute bottom-3 right-3 z-20 rounded-full bg-black/55 px-2.5 py-1 font-sans text-[11px] font-semibold text-white backdrop-blur-sm">
