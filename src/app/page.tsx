@@ -10,7 +10,7 @@ import {
 import { CONTEUDO_HOME as C } from '@/lib/conteudo-home';
 
 export const metadata: Metadata = createPageMetadata({
-  title: 'Amooora — Um mundo inteiro de acolhimento e liberdade',
+  title: C.site.title,
   description:
     'Somos a plataforma referência para a comunidade sáfica. Chegamos para somar, criar e espalhar conteúdo, informação e serviços com a nossa cara.',
   path: '/',

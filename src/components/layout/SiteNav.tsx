@@ -1,64 +1,131 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import Link from 'next/link';
-import { AmoooraLogoHeader } from '@/components/brand/AmoooraLogoHeader';
-import { CONTEUDO_HOME as C } from '@/lib/conteudo-home';
-import { trackLinkClick, type LinkClickLocation } from '@/lib/analytics';
-import { pa } from '@/lib/style-utils';
+import { AmoooraLogoHeader } from "@/components/brand/AmoooraLogoHeader";
+import { trackLinkClick, type LinkClickLocation } from "@/lib/analytics";
+import { CONTEUDO_HOME as C } from "@/lib/conteudo-home";
+import { useIsMobile } from "@/lib/hooks/useIsMobile";
+import { pa } from "@/lib/style-utils";
+import Link from "next/link";
+import { useCallback, useEffect, useState } from "react";
 
 type SiteNavProps = {
-  isMobile: boolean;
-  layout?: 'default' | 'hero';
-  page?: 'home' | 'loja';
+  layout?: "default" | "hero";
+  page?: "home" | "loja";
   navOverDark?: boolean;
 };
 
-type NavLinkId = (typeof C.nav.links)[number]['id'];
+type NavLinkId = (typeof C.nav.links)[number]["id"];
 
-function navHref(id: string, page: 'home' | 'loja') {
-  if (id === 'loja') return '/loja';
-  return page === 'home' ? `#${id}` : `/#${id}`;
+function navHref(id: string, page: "home" | "loja") {
+  if (id === "loja") return "/loja";
+  return page === "home" ? `#${id}` : `/#${id}`;
 }
 
-function trackNavLink(label: string, href: string, location: LinkClickLocation, sectionId?: string) {
+function trackNavLink(
+  label: string,
+  href: string,
+  location: LinkClickLocation,
+  sectionId?: string,
+) {
   trackLinkClick({
     linkText: label,
     linkUrl: href,
-    linkType: sectionId === 'loja' || !href.includes('#') ? 'nav_route' : 'nav_anchor',
+    linkType:
+      sectionId === "loja" || !href.includes("#") ? "nav_route" : "nav_anchor",
     location,
     sectionId,
   });
 }
 
-function navLinkType(id: string, href: string): 'nav_anchor' | 'nav_route' {
-  return id === 'loja' || !href.includes('#') ? 'nav_route' : 'nav_anchor';
+function navLinkType(id: string, href: string): "nav_anchor" | "nav_route" {
+  return id === "loja" || !href.includes("#") ? "nav_route" : "nav_anchor";
 }
 
-function HomeMenuIcon({ className = 'h-5 w-5' }: { className?: string }) {
+function HomeMenuIcon({ className = "h-5 w-5" }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M3 10.75 12 3l9 7.75" />
-      <path d="M5.5 9.5V20h13V9.5" />
-      <path d="M9.5 20v-6h5v6" />
+    <svg
+      className={className}
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
+      strokeWidth={1.75}
+      strokeLinecap='round'
+      strokeLinejoin='round'
+      aria-hidden='true'
+    >
+      <path d='M3 10.75 12 3l9 7.75' />
+      <path d='M5.5 9.5V20h13V9.5' />
+      <path d='M9.5 20v-6h5v6' />
     </svg>
   );
 }
 
-function NavIcon({ id, className = 'h-5 w-5' }: { id: NavLinkId; className?: string }) {
-  const props = { className, fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor', strokeWidth: 1.75, 'aria-hidden': true as const };
+function NavIcon({
+  id,
+  className = "h-5 w-5",
+}: {
+  id: NavLinkId;
+  className?: string;
+}) {
+  const props = {
+    className,
+    fill: "none",
+    viewBox: "0 0 24 24",
+    stroke: "currentColor",
+    strokeWidth: 1.75,
+    "aria-hidden": true as const,
+  };
   switch (id) {
-    case 'manifesto':
-      return <svg {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>;
-    case 'aplicativo':
-      return <svg {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>;
-    case 'valores':
-      return <svg {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>;
-    case 'loja':
-      return <svg {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>;
-    case 'faq':
-      return <svg {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
+    case "manifesto":
+      return (
+        <svg {...props}>
+          <path
+            strokeLinecap='round'
+            strokeLinejoin='round'
+            d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253'
+          />
+        </svg>
+      );
+    case "aplicativo":
+      return (
+        <svg {...props}>
+          <path
+            strokeLinecap='round'
+            strokeLinejoin='round'
+            d='M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z'
+          />
+        </svg>
+      );
+    case "valores":
+      return (
+        <svg {...props}>
+          <path
+            strokeLinecap='round'
+            strokeLinejoin='round'
+            d='M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z'
+          />
+        </svg>
+      );
+    case "loja":
+      return (
+        <svg {...props}>
+          <path
+            strokeLinecap='round'
+            strokeLinejoin='round'
+            d='M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z'
+          />
+        </svg>
+      );
+    case "faq":
+      return (
+        <svg {...props}>
+          <path
+            strokeLinecap='round'
+            strokeLinejoin='round'
+            d='M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'
+          />
+        </svg>
+      );
     default:
       return null;
   }
@@ -66,23 +133,38 @@ function NavIcon({ id, className = 'h-5 w-5' }: { id: NavLinkId; className?: str
 
 function MenuToggleIcon({ open }: { open: boolean }) {
   return (
-    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth={1.75} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      className='h-5 w-5'
+      viewBox='0 0 24 24'
+      fill='none'
+      stroke='currentColor'
+      strokeWidth={1.75}
+      strokeLinecap='round'
+      strokeLinejoin='round'
+      aria-hidden='true'
+    >
       {open ? (
-        <><path d="M18 6 6 18" /><path d="M6 6l12 12" /></>
+        <>
+          <path d='M18 6 6 18' />
+          <path d='M6 6l12 12' />
+        </>
       ) : (
-        <><path d="M3 6h18" /><path d="M3 12h18" /><path d="M3 18h18" /></>
+        <>
+          <path d='M3 6h18' />
+          <path d='M3 12h18' />
+          <path d='M3 18h18' />
+        </>
       )}
     </svg>
   );
 }
 
 export function SiteNav({
-  isMobile,
-  layout = 'default',
-  page = 'home',
+  layout = "default",
+  page = "home",
   navOverDark,
 }: SiteNavProps) {
+  const isMobile = useIsMobile();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -90,65 +172,79 @@ export function SiteNav({
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
     if (!isMobile || !open) return;
     const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = prev; };
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
   }, [isMobile, open]);
 
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeMenu(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeMenu();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [open, closeMenu]);
 
-  useEffect(() => { closeMenu(); }, [page, closeMenu]);
+  useEffect(() => {
+    closeMenu();
+  }, [page, closeMenu]);
 
-  const overDarkHero = (navOverDark ?? page === 'loja') && page === 'loja' && !scrolled;
-  const ctaHref = page === 'home' ? '#aplicativo' : '/#aplicativo';
+  const overDarkHero =
+    (navOverDark ?? page === "loja") && page === "loja" && !scrolled;
+  const ctaHref = page === "home" ? "#aplicativo" : "/#aplicativo";
   const logoHeight = isMobile ? 34 : 44;
   const links = C.nav.links;
 
-  const trackNavItem = (link: (typeof links)[number], location: LinkClickLocation) => {
+  const trackNavItem = (
+    link: (typeof links)[number],
+    location: LinkClickLocation,
+  ) => {
     const href = navHref(link.id, page);
     trackLinkClick({
       linkText: link.label,
       linkUrl: href,
       linkType: navLinkType(link.id, href),
       location,
-      sectionId: link.id !== 'loja' ? link.id : undefined,
+      sectionId: link.id !== "loja" ? link.id : undefined,
     });
   };
 
   const navBg = overDarkHero
-    ? 'transparent'
-    : scrolled ? 'rgba(255,255,255,0.95)' : '#ffffff';
+    ? "transparent"
+    : scrolled
+      ? "rgba(255,255,255,0.95)"
+      : "#ffffff";
 
-  const desktopLinkColor = overDarkHero ? '#ffffff' : '#1a1a1a';
+  const desktopLinkColor = overDarkHero ? "#ffffff" : "#1a1a1a";
 
   const ctaButton = !isMobile ? (
     <Link
       href={ctaHref}
-      className="rounded-full font-sans text-[13px] font-semibold text-white no-underline transition-[transform,box-shadow] duration-200"
+      className='rounded-full font-sans text-[13px] font-semibold text-white no-underline transition-[transform,box-shadow] duration-200'
       style={{
-        background: 'var(--primary)',
-        padding: '10px 22px',
-        whiteSpace: 'nowrap',
+        background: "var(--primary)",
+        padding: "10px 22px",
+        whiteSpace: "nowrap",
         boxShadow: `0 4px 20px ${pa(27)}`,
       }}
-      onClick={() => trackNavLink(C.nav.ctaDownload, ctaHref, 'header_cta', 'aplicativo')}
+      onClick={() =>
+        trackNavLink(C.nav.ctaDownload, ctaHref, "header_cta", "aplicativo")
+      }
       onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-2px)';
+        e.currentTarget.style.transform = "translateY(-2px)";
         e.currentTarget.style.boxShadow = `0 8px 28px ${pa(40)}`;
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.transform = '';
+        e.currentTarget.style.transform = "";
         e.currentTarget.style.boxShadow = `0 4px 20px ${pa(27)}`;
       }}
     >
@@ -156,17 +252,20 @@ export function SiteNav({
     </Link>
   ) : (
     <button
-      type="button"
+      type='button'
       onClick={() => setOpen((v) => !v)}
-      aria-label={open ? 'Fechar menu' : 'Abrir menu'}
+      aria-label={open ? "Fechar menu" : "Abrir menu"}
       aria-expanded={open}
-      aria-controls="mobile-nav-drawer"
-      className="flex cursor-pointer items-center justify-center rounded-full"
+      aria-controls='mobile-nav-drawer'
+      className='flex cursor-pointer items-center justify-center rounded-full'
       style={{
-        width: 44, height: 44,
-        border: overDarkHero ? '1px solid rgba(255,255,255,0.6)' : `1px solid ${pa(27)}`,
-        background: overDarkHero ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.85)',
-        color: overDarkHero ? '#ffffff' : 'var(--primary)',
+        width: 44,
+        height: 44,
+        border: overDarkHero
+          ? "1px solid rgba(255,255,255,0.6)"
+          : `1px solid ${pa(27)}`,
+        background: overDarkHero ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.85)",
+        color: overDarkHero ? "#ffffff" : "var(--primary)",
       }}
     >
       <MenuToggleIcon open={open} />
@@ -176,50 +275,72 @@ export function SiteNav({
   return (
     <>
       <nav
-        className="font-sans"
+        className='font-sans'
         style={{
-          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 100,
           background: navBg,
-          backdropFilter: scrolled && !overDarkHero ? 'blur(12px)' : 'none',
-          borderBottom: scrolled && !overDarkHero ? `1px solid ${pa(10)}` : 'none',
-          transition: 'all 0.4s ease',
+          backdropFilter: scrolled && !overDarkHero ? "blur(12px)" : "none",
+          borderBottom:
+            scrolled && !overDarkHero ? `1px solid ${pa(10)}` : "none",
+          transition: "all 0.4s ease",
         }}
-        aria-label="Principal"
+        aria-label='Principal'
       >
         <div
           style={{
             maxWidth: 1200,
-            margin: '0 auto',
+            margin: "0 auto",
             padding: scrolled
-              ? (isMobile ? '12px 16px' : '14px 48px')
-              : (isMobile ? '16px 16px' : '20px 48px'),
-            display: 'grid',
-            gridTemplateColumns: isMobile ? '1fr auto' : 'auto 1fr auto',
-            alignItems: 'center',
+              ? isMobile
+                ? "12px 16px"
+                : "14px 48px"
+              : isMobile
+                ? "16px 16px"
+                : "20px 48px",
+            display: "grid",
+            gridTemplateColumns: isMobile ? "1fr auto" : "auto 1fr auto",
+            alignItems: "center",
             gap: isMobile ? 12 : 32,
-            position: 'relative',
+            position: "relative",
           }}
         >
           <Link
-            href="/"
-            className="justify-self-start"
-            style={{ background: 'transparent', boxShadow: 'none' }}
-            onClick={() => { closeMenu(); trackNavLink('Amooora', '/', 'header_logo'); }}
+            href='/'
+            className='justify-self-start'
+            style={{ background: "transparent", boxShadow: "none" }}
+            onClick={() => {
+              closeMenu();
+              trackNavLink("Amooora", "/", "header_logo");
+            }}
           >
             <AmoooraLogoHeader height={logoHeight} priority />
           </Link>
 
-          {!isMobile && layout === 'hero' && (
-            <div className="flex items-center justify-center justify-self-center gap-7">
+          {!isMobile && layout === "hero" && (
+            <div className='flex items-center justify-center justify-self-center gap-7'>
               {links.map((link) => (
                 <Link
                   key={link.id}
                   href={navHref(link.id, page)}
-                  className="font-sans text-sm font-medium no-underline transition-opacity duration-200 hover:opacity-100"
-                  style={{ color: desktopLinkColor, opacity: overDarkHero ? 0.9 : 0.7, whiteSpace: 'nowrap' }}
-                  onClick={() => trackNavItem(link, 'header_desktop')}
-                  onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.opacity = overDarkHero ? '0.9' : '0.7'; }}
+                  className='font-sans text-sm font-medium no-underline transition-opacity duration-200 hover:opacity-100'
+                  style={{
+                    color: desktopLinkColor,
+                    opacity: overDarkHero ? 0.9 : 0.7,
+                    whiteSpace: "nowrap",
+                  }}
+                  onClick={() => trackNavItem(link, "header_desktop")}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.opacity = "1";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = overDarkHero
+                      ? "0.9"
+                      : "0.7";
+                  }}
                 >
                   {link.label}
                 </Link>
@@ -227,17 +348,24 @@ export function SiteNav({
             </div>
           )}
 
-          {!isMobile && layout === 'default' && (
-            <div className="flex items-center justify-self-end gap-7" style={{ gridColumn: '2 / -1' }}>
+          {!isMobile && layout === "default" && (
+            <div
+              className='flex items-center justify-self-end gap-7'
+              style={{ gridColumn: "2 / -1" }}
+            >
               {links.map((link) => (
                 <Link
                   key={link.id}
                   href={navHref(link.id, page)}
-                  className="font-sans text-sm font-medium no-underline transition-opacity duration-200"
+                  className='font-sans text-sm font-medium no-underline transition-opacity duration-200'
                   style={{ color: desktopLinkColor, opacity: 0.7 }}
-                  onClick={() => trackNavItem(link, 'header_desktop')}
-                  onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.7'; }}
+                  onClick={() => trackNavItem(link, "header_desktop")}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.opacity = "1";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = "0.7";
+                  }}
                 >
                   {link.label}
                 </Link>
@@ -246,8 +374,8 @@ export function SiteNav({
             </div>
           )}
 
-          {(isMobile || layout === 'hero') && (
-            <div className="justify-self-end">{ctaButton}</div>
+          {(isMobile || layout === "hero") && (
+            <div className='justify-self-end'>{ctaButton}</div>
           )}
         </div>
       </nav>
@@ -256,51 +384,59 @@ export function SiteNav({
       {isMobile && (
         <div
           className={`fixed inset-0 z-[110] transition-opacity duration-300 ${
-            open ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
+            open
+              ? "pointer-events-auto opacity-100"
+              : "pointer-events-none opacity-0"
           }`}
           aria-hidden={!open}
         >
           <button
-            type="button"
-            className="absolute inset-0 bg-black/45"
-            aria-label="Fechar menu"
+            type='button'
+            className='absolute inset-0 bg-black/45'
+            aria-label='Fechar menu'
             tabIndex={open ? 0 : -1}
             onClick={closeMenu}
           />
 
           <div
-            id="mobile-nav-drawer"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Menu de navegação"
+            id='mobile-nav-drawer'
+            role='dialog'
+            aria-modal='true'
+            aria-label='Menu de navegação'
             className={`absolute right-0 top-0 flex h-full w-[min(100%,320px)] flex-col bg-white shadow-2xl transition-transform duration-300 ease-out ${
-              open ? 'translate-x-0' : 'translate-x-full'
+              open ? "translate-x-0" : "translate-x-full"
             }`}
           >
-            <div className="flex items-center justify-between border-b border-black/5 px-5 py-4">
-              <span className="font-sans text-sm font-semibold uppercase tracking-[0.15em] text-primary">
+            <div className='flex items-center justify-between border-b border-black/5 px-5 py-4'>
+              <span className='font-sans text-sm font-semibold uppercase tracking-[0.15em] text-primary'>
                 Menu
               </span>
               <button
-                type="button"
+                type='button'
                 onClick={closeMenu}
-                aria-label="Fechar menu"
-                className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-primary transition hover:bg-primary/5"
+                aria-label='Fechar menu'
+                className='flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-primary transition hover:bg-primary/5'
               >
                 <MenuToggleIcon open />
               </button>
             </div>
 
-            <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Seções do site">
-              <ul className="space-y-1">
+            <nav
+              className='flex-1 overflow-y-auto px-3 py-4'
+              aria-label='Seções do site'
+            >
+              <ul className='space-y-1'>
                 <li>
                   <Link
-                    href="/"
-                    onClick={() => { closeMenu(); trackNavLink('Amooora', '/', 'header_mobile'); }}
-                    className="flex min-h-[52px] items-center gap-3 rounded-xl px-3 font-sans text-[15px] font-medium text-ink transition hover:bg-primary/5 active:bg-primary/10"
+                    href='/'
+                    onClick={() => {
+                      closeMenu();
+                      trackNavLink("Amooora", "/", "header_mobile");
+                    }}
+                    className='flex min-h-[52px] items-center gap-3 rounded-xl px-3 font-sans text-[15px] font-medium text-ink transition hover:bg-primary/5 active:bg-primary/10'
                   >
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                      <HomeMenuIcon className="h-5 w-5" />
+                    <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary'>
+                      <HomeMenuIcon className='h-5 w-5' />
                     </span>
                     Amooora
                   </Link>
@@ -309,10 +445,13 @@ export function SiteNav({
                   <li key={link.id}>
                     <Link
                       href={navHref(link.id, page)}
-                      onClick={() => { closeMenu(); trackNavItem(link, 'header_mobile'); }}
-                      className="flex min-h-[52px] items-center gap-3 rounded-xl px-3 font-sans text-[15px] font-medium text-ink transition hover:bg-primary/5 active:bg-primary/10"
+                      onClick={() => {
+                        closeMenu();
+                        trackNavItem(link, "header_mobile");
+                      }}
+                      className='flex min-h-[52px] items-center gap-3 rounded-xl px-3 font-sans text-[15px] font-medium text-ink transition hover:bg-primary/5 active:bg-primary/10'
                     >
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                      <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary'>
                         <NavIcon id={link.id} />
                       </span>
                       {link.label}
@@ -322,14 +461,33 @@ export function SiteNav({
               </ul>
             </nav>
 
-            <div className="border-t border-black/5 p-5">
+            <div className='border-t border-black/5 p-5'>
               <Link
                 href={ctaHref}
-                onClick={() => { closeMenu(); trackNavLink(C.nav.ctaDownload, ctaHref, 'header_cta', 'aplicativo'); }}
-                className="flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-primary font-sans text-sm font-semibold text-white shadow-md transition hover:brightness-95"
+                onClick={() => {
+                  closeMenu();
+                  trackNavLink(
+                    C.nav.ctaDownload,
+                    ctaHref,
+                    "header_cta",
+                    "aplicativo",
+                  );
+                }}
+                className='flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-primary font-sans text-sm font-semibold text-white shadow-md transition hover:brightness-95'
               >
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75} aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                <svg
+                  className='h-5 w-5'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  stroke='currentColor'
+                  strokeWidth={1.75}
+                  aria-hidden='true'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    d='M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4'
+                  />
                 </svg>
                 {C.nav.ctaDownload}
               </Link>
