@@ -4,8 +4,8 @@ import type { CSSProperties } from 'react';
 import Image from 'next/image';
 import { CONTEUDO_HOME as C } from '@/lib/conteudo-home';
 import { SectionLabel } from '@/components/ui/SectionLabel';
+import { SectionShell } from '@/components/ui/SectionShell';
 import { useInViewReveal } from '@/lib/hooks/useInViewReveal';
-import { pa } from '@/lib/style-utils';
 import type { MobileProps } from '@/components/home/types';
 
 export function Values({ isMobile }: MobileProps) {
@@ -14,16 +14,8 @@ export function Values({ isMobile }: MobileProps) {
   const vals = C.values.items;
 
   return (
-    <section
-      id="valores"
-      ref={ref}
-      className="overflow-hidden bg-white"
-      style={{ padding: isMobile ? '80px 0' : '120px 0' }}
-    >
-      <div
-        className="mx-auto"
-        style={{ maxWidth: 1200, padding: isMobile ? '0 20px' : '0 48px' }}
-      >
+    <section id="valores" ref={ref} className="section-pad overflow-hidden bg-white">
+      <SectionShell>
         {isMobile && C.values.image && (
           <div
             data-visible={visible}
@@ -34,12 +26,7 @@ export function Values({ isMobile }: MobileProps) {
               alt="Nossos Valores Amooora"
               width={360}
               height={360}
-              style={{
-                width: '100%',
-                maxWidth: isMobile ? 280 : 360,
-                height: 'auto',
-                objectFit: 'contain',
-              }}
+              className="h-auto w-full max-w-[280px] object-contain md:max-w-[360px]"
             />
           </div>
         )}
@@ -56,32 +43,21 @@ export function Values({ isMobile }: MobileProps) {
           </h2>
         </div>
 
-        <div
-          className="grid"
-          style={{ gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 0 }}
-        >
+        <div className={`grid gap-0 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
           {vals.map((v, i) => {
             const delay = `${(0.05 * i).toFixed(2)}s`;
+            const isLeftCol = !isMobile && i % 2 === 0;
+            const isRightCol = !isMobile && i % 2 === 1;
             return (
               <div
                 key={i}
                 data-visible={visible}
-                className="group grid opacity-0 translate-y-5 cursor-default transition-[opacity,transform] duration-[600ms] ease-out [transition-delay:var(--delay)] hover:bg-[var(--hover-bg)] data-[visible=true]:opacity-100 data-[visible=true]:translate-y-0"
-                style={{
-                  gridTemplateColumns: '72px 1fr',
-                  padding: '32px 40px 32px 0',
-                  borderTop: `1px solid ${pa(10)}`,
-                  borderRight: !isMobile && i % 2 === 0 ? `1px solid ${pa(10)}` : 'none',
-                  paddingRight: !isMobile && i % 2 === 0 ? 40 : 0,
-                  paddingLeft: !isMobile && i % 2 === 1 ? 40 : 0,
-                  '--delay': delay,
-                  '--hover-bg': pa(4),
-                } as CSSProperties}
+                className={`group grid cursor-default grid-cols-[72px_1fr] border-t border-primary-10 py-8 opacity-0 translate-y-5 transition-[opacity,transform,background-color] duration-[600ms] ease-out [transition-delay:var(--delay)] hover:bg-primary-4 data-[visible=true]:translate-y-0 data-[visible=true]:opacity-100 ${
+                  isLeftCol ? 'border-r border-primary-10 pr-10 pl-0' : ''
+                } ${isRightCol ? 'pr-0 pl-10' : 'pr-10 pl-0'}`}
+                style={{ '--delay': delay } as CSSProperties}
               >
-                <div
-                  className="select-none pt-1 font-serif text-5xl font-black leading-none tracking-[-0.04em] text-[var(--num-color)] transition-colors duration-[250ms] group-hover:text-primary"
-                  style={{ '--num-color': pa(13) } as CSSProperties}
-                >
+                <div className="select-none pt-1 font-serif text-5xl font-black leading-none tracking-[-0.04em] text-primary-13 transition-colors duration-[250ms] group-hover:text-primary">
                   {String(i + 1).padStart(2, '0')}
                 </div>
                 <div>
@@ -96,7 +72,7 @@ export function Values({ isMobile }: MobileProps) {
             );
           })}
         </div>
-      </div>
+      </SectionShell>
     </section>
   );
 }

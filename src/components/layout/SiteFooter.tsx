@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { CONTEUDO_HOME as C } from '@/lib/conteudo-home';
 import { PrivacyModal } from '@/components/layout/PrivacyModal';
 import { trackLinkClick } from '@/lib/analytics';
-import { pa } from '@/lib/style-utils';
 
 type SiteFooterProps = {
   isMobile: boolean;
@@ -53,36 +52,22 @@ export function SiteFooter({ isMobile, page = 'home' }: SiteFooterProps) {
 
   return (
     <>
-      <footer
-        className="bg-primary text-white"
-        style={{ padding: isMobile ? '40px 20px 20px' : '48px 48px 24px' }}
-      >
-        <div className="mx-auto" style={{ maxWidth: 1200 }}>
-          <div
-            className="grid"
-            style={{
-              gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr',
-              gap: isMobile ? 28 : 40,
-              marginBottom: isMobile ? 20 : 28,
-            }}
-          >
-            {/* Coluna esquerda: logo + descrição + redes */}
+      <footer className="bg-primary px-5 pb-5 pt-10 text-white md:px-12 md:pb-6 md:pt-12">
+        <div className="mx-auto max-w-[1200px]">
+          <div className="mb-5 grid grid-cols-1 gap-7 md:mb-7 md:grid-cols-[2fr_1fr] md:gap-10">
             <div>
               <Image
                 src="/images/logo.png"
                 alt="Amooora"
                 width={1984}
                 height={1467}
-                style={{ height: 52, width: 'auto', objectFit: 'contain', marginBottom: 12, filter: 'brightness(0) invert(1)' }}
+                className="mb-3 h-[52px] w-auto object-contain brightness-0 invert"
               />
               <p className="max-w-[320px] font-sans text-sm font-light leading-[1.8] text-white/50">
                 {C.footer.description}
               </p>
 
-              <div
-                className="flex flex-row flex-wrap items-center gap-4"
-                style={{ marginTop: isMobile ? 24 : 16 }}
-              >
+              <div className="mt-6 flex flex-row flex-wrap items-center gap-4 md:mt-4">
                 <a
                   href={C.footer.instagramUrl}
                   target="_blank"
@@ -122,12 +107,11 @@ export function SiteFooter({ isMobile, page = 'home' }: SiteFooterProps) {
               </div>
             </div>
 
-            {/* Coluna direita: nav */}
             <div>
               <div className="mb-3 font-sans text-[11px] font-semibold uppercase tracking-[0.15em] text-white/30">
                 {C.footer.navLabel}
               </div>
-              <div className="grid gap-x-6" style={{ gridTemplateColumns: '1fr 1fr' }}>
+              <div className="grid grid-cols-2 gap-x-6">
                 <div>
                   {navCol1.map((link) => (
                     <FooterNavLink key={link.label} label={link.label} id={link.id} page={page} />
@@ -156,19 +140,10 @@ export function SiteFooter({ isMobile, page = 'home' }: SiteFooterProps) {
             </div>
           </div>
 
-          {/* Bottom bar */}
-          <div
-            className="flex flex-wrap items-center justify-between gap-2 border-t border-white/[0.08]"
-            style={{
-              paddingTop: isMobile ? 16 : 20,
-              flexDirection: isMobile ? 'column' : 'row',
-              alignItems: isMobile ? 'flex-start' : 'center',
-              gap: isMobile ? 8 : 12,
-            }}
-          >
+          <div className="flex flex-col flex-wrap items-start justify-between gap-2 border-t border-white/[0.08] pt-4 md:flex-row md:items-center md:gap-3 md:pt-5">
             <span className="font-sans text-xs text-white/30">{C.footer.copyright}</span>
             {!isMobile && (
-              <span className="font-serif text-xs italic" style={{ color: 'var(--primary)', filter: 'brightness(1.4)', opacity: 0.6 }}>
+              <span className="footer-signature font-serif text-xs italic">
                 {C.footer.signature}
               </span>
             )}

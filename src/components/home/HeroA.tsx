@@ -7,46 +7,33 @@ import { SectionLabel } from '@/components/ui/SectionLabel';
 import type { MobileProps } from '@/components/home/types';
 
 export function HeroA({ isMobile }: MobileProps) {
-  const navOffset = isMobile ? 72 : 84;
   const heroBackground = C.hero.background;
 
   return (
     <section
-      className="relative flex flex-col items-center overflow-hidden bg-white"
-      style={{
-        minHeight: isMobile ? 'min(88svh, 780px)' : 'min(100vh, 920px)',
-        paddingTop: navOffset,
-      }}
+      className={`relative flex flex-col items-center overflow-hidden bg-white ${
+        isMobile
+          ? 'min-h-[min(88svh,780px)] pt-[72px]'
+          : 'min-h-[min(100vh,920px)] pt-[84px]'
+      }`}
     >
       {isMobile ? (
         <>
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 z-0"
-            style={{
-              backgroundImage: `url(${heroBackground})`,
-              backgroundRepeat: 'no-repeat',
-              backgroundSize: 'min(165vw, 960px) auto',
-              backgroundPosition: '38% top',
-              clipPath: 'inset(0 42% 0 0)',
-            }}
+            className="hero-bg-mobile-split hero-bg-mobile-left"
+            style={{ backgroundImage: `url(${heroBackground})` }}
           />
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 z-0"
-            style={{
-              backgroundImage: `url(${heroBackground})`,
-              backgroundRepeat: 'no-repeat',
-              backgroundSize: 'min(165vw, 960px) auto',
-              backgroundPosition: '50% top',
-              clipPath: 'inset(0 0 0 42%)',
-            }}
+            className="hero-bg-mobile-split hero-bg-mobile-right"
+            style={{ backgroundImage: `url(${heroBackground})` }}
           />
         </>
       ) : (
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 z-0 bg-cover bg-center"
+          className="hero-bg-desktop"
           style={{ backgroundImage: `url(${heroBackground})` }}
         />
       )}
@@ -54,11 +41,9 @@ export function HeroA({ isMobile }: MobileProps) {
       <SiteNav isMobile={isMobile} layout="hero" />
 
       <div
-        className="relative z-[5] mx-auto flex w-full flex-1 flex-col items-center justify-start text-center"
-        style={{
-          maxWidth: 560,
-          padding: isMobile ? '0 20px 48px' : '0 32px 64px',
-        }}
+        className={`relative z-[5] mx-auto flex w-full max-w-[560px] flex-1 flex-col items-center justify-start text-center ${
+          isMobile ? 'px-5 pb-12' : 'px-8 pb-16'
+        }`}
       >
         <div className="mb-3 flex justify-center animate-fadeIn">
           <Image
@@ -67,11 +52,7 @@ export function HeroA({ isMobile }: MobileProps) {
             width={260}
             height={260}
             priority
-            style={{
-              objectFit: 'contain',
-              width: isMobile ? 200 : 240,
-              height: isMobile ? 200 : 240,
-            }}
+            className={`object-contain ${isMobile ? 'h-[200px] w-[200px]' : 'h-[240px] w-[240px]'}`}
           />
         </div>
 
@@ -80,12 +61,9 @@ export function HeroA({ isMobile }: MobileProps) {
         </div>
 
         <h1
-          className="font-serif font-black leading-[1.0] tracking-[-0.03em] text-ink animate-fadeUp"
-          style={{
-            fontSize: isMobile ? 44 : 70,
-            marginBottom: 12,
-            animationDelay: '0.1s',
-          }}
+          className={`mb-3 font-serif font-black leading-[1.0] tracking-[-0.03em] text-ink animate-fadeUp [animation-delay:0.1s] ${
+            isMobile ? 'text-[44px]' : 'text-[70px]'
+          }`}
         >
           {isMobile ? (
             <>
@@ -103,10 +81,7 @@ export function HeroA({ isMobile }: MobileProps) {
           )}
         </h1>
 
-        <p
-          className="mx-auto mt-5 max-w-[460px] font-sans text-[clamp(14px,1.2vw,16px)] font-light leading-[1.7] text-muted-fg animate-fadeUp"
-          style={{ animationDelay: '0.25s' }}
-        >
+        <p className="mx-auto mt-5 max-w-[460px] font-sans text-[clamp(14px,1.2vw,16px)] font-light leading-[1.7] text-muted-fg animate-fadeUp [animation-delay:0.25s]">
           {C.hero.description}
         </p>
       </div>

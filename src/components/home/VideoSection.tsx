@@ -154,22 +154,21 @@ export function VideoSection({ isMobile }: MobileProps) {
   return (
     <section
       ref={ref}
-      className="relative flex select-none items-center justify-center overflow-hidden"
-      style={{ height: isMobile ? '56.25vw' : '70vh' }}
+      className={`relative flex select-none items-center justify-center overflow-hidden ${
+        isMobile ? 'h-[56.25vw]' : 'h-[70vh]'
+      }`}
     >
       {/* Camada de vídeo — pointer-events: none para o click não chegar no iframe */}
       <div
-        className="absolute inset-0 z-0 overflow-hidden"
-        style={{
-          transform: `translateY(${isMobile ? 0 : offset}px)`,
-          pointerEvents: 'none',
-        }}
+        className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+        style={{ transform: `translateY(${isMobile ? 0 : offset}px)` }}
       >
         <div
           ref={divRef}
-          style={isMobile
-            ? { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }
-            : { position: 'absolute', top: '-20%', left: '-10%', width: '120%', height: '140%', border: 'none' }
+          className={
+            isMobile
+              ? 'absolute inset-0 border-none'
+              : 'absolute -left-[10%] -top-[20%] h-[140%] w-[120%] border-none'
           }
         />
       </div>

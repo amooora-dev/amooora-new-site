@@ -6,6 +6,7 @@ type AmoooraLogoHeaderProps = {
 
 /**
  * Logo horizontal do header — PNG com fundo transparente.
+ * `height` é dinâmico (mobile/desktop), por isso permanece em style.
  */
 export function AmoooraLogoHeader({ height, className = '', priority = false }: AmoooraLogoHeaderProps) {
   return (
@@ -18,15 +19,8 @@ export function AmoooraLogoHeader({ height, className = '', priority = false }: 
       decoding="async"
       fetchPriority={priority ? 'high' : 'auto'}
       draggable={false}
-      className={className}
-      style={{
-        height,
-        width: 'auto',
-        display: 'block',
-        background: 'transparent',
-        boxShadow: 'none',
-        filter: 'none',
-      }}
+      className={`block w-auto bg-transparent shadow-none ${className}`.trim()}
+      style={{ height }}
     />
   );
 }

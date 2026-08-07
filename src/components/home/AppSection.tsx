@@ -7,8 +7,8 @@ import { TextWithBreaks } from '@/components/ui/TextWithBreaks';
 import { PilotSignup } from '@/components/home/PilotSignup';
 import { SectionLabel } from '@/components/ui/SectionLabel';
 import { AccordionToggle } from '@/components/ui/AccordionToggle';
+import { SectionShell } from '@/components/ui/SectionShell';
 import { useInViewReveal } from '@/lib/hooks/useInViewReveal';
-import { pa } from '@/lib/style-utils';
 import type { MobileProps } from '@/components/home/types';
 
 type AppAccordionProps = {
@@ -25,23 +25,25 @@ function AppAccordion({ items, open, setOpen, variant }: AppAccordionProps) {
     <div className={isMobileCard ? 'flex flex-col gap-3' : 'flex flex-col'}>
       {items.map((item, i) => {
         const isOpen = open === i;
+        const isLast = i === items.length - 1;
         return (
           <div
             key={i}
-            className={isMobileCard ? 'overflow-hidden rounded-xl bg-white shadow-[0_2px_12px_rgba(96,16,59,0.06)]' : undefined}
-            style={isMobileCard ? undefined : {
-              borderTop: `1px solid ${pa(13)}`,
-              borderBottom: i === items.length - 1 ? `1px solid ${pa(13)}` : 'none',
-            }}
+            className={
+              isMobileCard
+                ? 'overflow-hidden rounded-xl bg-white shadow-primary-card'
+                : `border-t border-primary-13 ${isLast ? 'border-b border-primary-13' : ''}`
+            }
           >
             <button
               onClick={() => setOpen(isOpen ? null : i)}
-              className="flex w-full cursor-pointer items-center justify-between gap-3 border-none bg-transparent text-left"
-              style={{ padding: isMobileCard ? '18px 20px' : '18px 0' }}
+              className={`flex w-full cursor-pointer items-center justify-between gap-3 border-none bg-transparent text-left ${
+                isMobileCard ? 'px-5 py-[18px]' : 'px-0 py-[18px]'
+              }`}
             >
               <span
-                className="font-sans text-[clamp(14px,1.2vw,16px)] font-semibold transition-colors duration-200"
-                style={{ color: isOpen ? 'var(--primary)' : 'var(--muted-fg)' }}
+                data-open={isOpen}
+                className="font-sans text-[clamp(14px,1.2vw,16px)] font-semibold text-muted-fg transition-colors duration-200 data-[open=true]:text-primary"
               >
                 {item.label}
               </span>
@@ -49,18 +51,13 @@ function AppAccordion({ items, open, setOpen, variant }: AppAccordionProps) {
             </button>
 
             {isOpen && (
-              <div
-                className="animate-fadeUp"
-                style={{ padding: isMobileCard ? '0 20px 20px' : '0 0 20px' }}
-              >
+              <div className={`animate-fadeUp ${isMobileCard ? 'px-5 pb-5' : 'px-0 pb-5'}`}>
                 {item.blocks.map((b, bi) => (
                   <div
                     key={bi}
-                    className="py-3.5 pl-4"
-                    style={{
-                      borderLeft: '2px solid var(--primary)',
-                      marginBottom: bi < item.blocks.length - 1 ? 12 : 0,
-                    }}
+                    className={`border-l-2 border-primary py-3.5 pl-4 ${
+                      bi < item.blocks.length - 1 ? 'mb-3' : 'mb-0'
+                    }`}
                   >
                     <p className="mb-1.5 font-sans text-[13px] font-semibold text-ink">{b.q}</p>
                     <p className="font-sans text-[13px] font-light leading-[1.7] text-muted-fg">{b.a}</p>
@@ -83,7 +80,11 @@ export function AppSection({ isMobile }: MobileProps) {
   const introFull = C.app.intro.slice(0, 2);
   const introSplit = C.app.intro.slice(2);
 
-  const sectionLabel = <div className="mb-6"><SectionLabel label={C.app.label} /></div>;
+  const sectionLabel = (
+    <div className="mb-6">
+      <SectionLabel label={C.app.label} />
+    </div>
+  );
 
   const mockupImage = (
     <Image
@@ -91,30 +92,22 @@ export function AppSection({ isMobile }: MobileProps) {
       alt="Amooora App"
       width={520}
       height={1040}
-      style={{
-        width: '100%',
-        maxWidth: isMobile ? 320 : 520,
-        height: 'auto',
-        objectFit: 'contain',
-        filter: isMobile ? 'none' : 'drop-shadow(0 32px 64px rgba(147,45,111,0.25))',
-        animation: isMobile ? 'none' : 'floatY 5s ease-in-out infinite',
-      }}
+      className={`h-auto w-full object-contain ${
+        isMobile
+          ? 'max-w-[320px]'
+          : 'max-w-[520px] animate-floatY drop-shadow-[0_32px_64px_rgba(147,45,111,0.25)]'
+      }`}
     />
   );
 
   if (isMobile) {
     const { mobile } = C.app;
     return (
-      <section
-        id="aplicativo"
-        ref={ref}
-        className="relative overflow-hidden bg-off-white"
-        style={{ padding: '80px 0' }}
-      >
-        <div className="mx-auto" style={{ maxWidth: 1200, paddingInline: 20 }}>
+      <section id="aplicativo" ref={ref} className="section-pad relative overflow-hidden bg-off-white">
+        <SectionShell>
           <div
             data-visible={visible}
-            className="text-center opacity-0 translate-y-6 transition-all duration-700 ease-out data-[visible=true]:opacity-100 data-[visible=true]:translate-y-0"
+            className="translate-y-6 text-center opacity-0 transition-all duration-700 ease-out data-[visible=true]:translate-y-0 data-[visible=true]:opacity-100"
           >
             <div className="mb-6 flex items-center justify-center gap-3">
               <SectionLabel label={C.app.label} centered />
@@ -124,20 +117,17 @@ export function AppSection({ isMobile }: MobileProps) {
               {C.app.title}
             </h2>
 
-            <p className="mx-auto mb-10 font-sans text-[clamp(14px,1.2vw,16px)] font-light leading-[1.8] text-muted-fg" style={{ textAlign: 'center' }}>
+            <p className="mx-auto mb-10 text-center font-sans text-[clamp(14px,1.2vw,16px)] font-light leading-[1.8] text-muted-fg">
               {mobile.intro}
             </p>
 
             <div className="mb-10 flex justify-center">{mockupImage}</div>
 
-            <span
-              className="mb-4 inline-block rounded-full font-sans text-sm font-semibold text-primary"
-              style={{ background: pa(8), padding: '10px 22px' }}
-            >
+            <span className="mb-4 inline-block rounded-full bg-primary-8 px-[22px] py-2.5 font-sans text-sm font-semibold text-primary">
               {mobile.comingSoonTitle}
             </span>
 
-            <p className="mb-10 font-sans text-[clamp(14px,1.2vw,16px)] font-light leading-[1.8] text-muted-fg" style={{ textAlign: 'center' }}>
+            <p className="mb-10 text-center font-sans text-[clamp(14px,1.2vw,16px)] font-light leading-[1.8] text-muted-fg">
               {mobile.comingSoonSubtitle}
             </p>
           </div>
@@ -149,22 +139,17 @@ export function AppSection({ isMobile }: MobileProps) {
             <AppAccordion items={items} open={open} setOpen={setOpen} variant="mobile" />
             <PilotSignup isMobile={isMobile} />
           </div>
-        </div>
+        </SectionShell>
       </section>
     );
   }
 
   return (
-    <section
-      id="aplicativo"
-      ref={ref}
-      className="relative overflow-hidden bg-off-white"
-      style={{ padding: '120px 0' }}
-    >
-      <div className="mx-auto" style={{ maxWidth: 1200, paddingInline: 48 }}>
+    <section id="aplicativo" ref={ref} className="section-pad relative overflow-hidden bg-off-white">
+      <SectionShell>
         <div
           data-visible={visible}
-          className="opacity-0 translate-y-6 transition-all duration-700 ease-out data-[visible=true]:opacity-100 data-[visible=true]:translate-y-0"
+          className="translate-y-6 opacity-0 transition-all duration-700 ease-out data-[visible=true]:translate-y-0 data-[visible=true]:opacity-100"
         >
           {sectionLabel}
           <h2 className="mb-3 font-serif text-[clamp(28px,3.5vw,50px)] font-black leading-[1.1] text-ink">
@@ -180,16 +165,17 @@ export function AppSection({ isMobile }: MobileProps) {
           ))}
         </div>
 
-        <div className="grid items-start" style={{ gridTemplateColumns: '1fr 1fr', gap: 80 }}>
+        <div className="grid grid-cols-2 items-start gap-20">
           <div
             data-visible={visible}
-            className="opacity-0 translate-y-6 transition-all duration-700 ease-out data-[visible=true]:opacity-100 data-[visible=true]:translate-y-0"
+            className="translate-y-6 opacity-0 transition-all duration-700 ease-out data-[visible=true]:translate-y-0 data-[visible=true]:opacity-100"
           >
             {introSplit.map((paragraph, i) => (
               <p
                 key={i}
-                className="font-sans text-[clamp(14px,1.2vw,16px)] font-light leading-[1.8] text-muted-fg"
-                style={{ marginBottom: i === introSplit.length - 1 ? 40 : 20 }}
+                className={`font-sans text-[clamp(14px,1.2vw,16px)] font-light leading-[1.8] text-muted-fg ${
+                  i === introSplit.length - 1 ? 'mb-10' : 'mb-5'
+                }`}
               >
                 <TextWithBreaks text={paragraph} />
               </p>
@@ -200,12 +186,12 @@ export function AppSection({ isMobile }: MobileProps) {
 
           <div
             data-visible={visible}
-            className="flex items-start justify-center opacity-0 translate-x-10 transition-all duration-1000 delay-200 ease-out data-[visible=true]:opacity-100 data-[visible=true]:translate-x-0"
+            className="flex translate-x-10 items-start justify-center opacity-0 transition-all duration-1000 delay-200 ease-out data-[visible=true]:translate-x-0 data-[visible=true]:opacity-100"
           >
             {mockupImage}
           </div>
         </div>
-      </div>
+      </SectionShell>
     </section>
   );
 }
