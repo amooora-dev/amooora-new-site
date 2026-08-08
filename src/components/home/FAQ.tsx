@@ -1,32 +1,23 @@
 "use client";
 
-import { AccordionToggle } from "@/components/ui/AccordionToggle";
-import { SectionLabel } from "@/components/ui/SectionLabel";
-import { CONTEUDO_HOME as C } from "@/lib/conteudo-home";
-import { useInViewReveal } from "@/lib/hooks/useInViewReveal";
-import { useIsMobile } from "@/lib/hooks/useIsMobile";
-import { pa } from "@/lib/style-utils";
-import type { CSSProperties } from "react";
-import { useState } from "react";
+import { useState } from 'react';
+import type { CSSProperties } from 'react';
+import { CONTEUDO_HOME as C } from '@/lib/conteudo-home';
+import { SectionLabel } from '@/components/ui/SectionLabel';
+import { AccordionToggle } from '@/components/ui/AccordionToggle';
+import { SectionShell } from '@/components/ui/SectionShell';
+import { useInViewReveal } from '@/lib/hooks/useInViewReveal';
+import type { MobileProps } from '@/components/home/types';
 
-export function Faq() {
-  const isMobile = useIsMobile();
+export function FAQ(_props: MobileProps) {
   const { ref, visible } = useInViewReveal<HTMLElement>();
   const [open, setOpen] = useState<number | null>(null);
 
   const items = C.faq.items;
 
   return (
-    <section
-      id='faq'
-      ref={ref}
-      className='bg-white'
-      style={{ padding: isMobile ? "80px 0 24px" : "120px 0 32px" }}
-    >
-      <div
-        className='mx-auto'
-        style={{ maxWidth: 860, padding: isMobile ? "0 20px" : "0 48px" }}
-      >
+    <section id="faq" ref={ref} className="section-pad bg-white pb-6 md:pb-8">
+      <SectionShell narrow>
         <div
           data-visible={visible}
           className='mb-6 opacity-0 transition-opacity duration-700 ease-out data-[visible=true]:opacity-100'
@@ -45,29 +36,23 @@ export function Faq() {
           {items.map((item, i) => {
             const isOpen = open === i;
             const delay = `${(0.05 * i).toFixed(2)}s`;
+            const isLast = i === items.length - 1;
             return (
               <div
                 key={i}
                 data-visible={visible}
-                className='opacity-0 transition-opacity duration-[600ms] ease-out [transition-delay:var(--delay)] data-[visible=true]:opacity-100'
-                style={
-                  {
-                    borderTop: `1px solid ${pa(13)}`,
-                    borderBottom:
-                      i === items.length - 1 ? `1px solid ${pa(13)}` : "none",
-                    "--delay": delay,
-                  } as CSSProperties
-                }
+                className={`border-t border-primary-13 opacity-0 transition-opacity duration-[600ms] ease-out [transition-delay:var(--delay)] data-[visible=true]:opacity-100 ${
+                  isLast ? 'border-b border-primary-13' : ''
+                }`}
+                style={{ '--delay': delay } as CSSProperties}
               >
                 <button
                   onClick={() => setOpen(isOpen ? null : i)}
                   className='flex w-full cursor-pointer items-center justify-between gap-4 border-none bg-transparent py-5 text-left'
                 >
                   <span
-                    className='font-sans text-[clamp(14px,1.2vw,16px)] font-semibold transition-colors duration-200'
-                    style={{
-                      color: isOpen ? "var(--primary)" : "var(--muted-fg)",
-                    }}
+                    data-open={isOpen}
+                    className="font-sans text-[clamp(14px,1.2vw,16px)] font-semibold text-muted-fg transition-colors duration-200 data-[open=true]:text-primary"
                   >
                     {item.q}
                   </span>
@@ -83,7 +68,7 @@ export function Faq() {
             );
           })}
         </div>
-      </div>
+      </SectionShell>
     </section>
   );
 }

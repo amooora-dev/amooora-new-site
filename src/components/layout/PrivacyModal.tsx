@@ -18,99 +18,50 @@ export function PrivacyModal({ onClose }: PrivacyModalProps) {
     };
   }, [onClose]);
 
-  const bodyText: React.CSSProperties = {
-    fontFamily: 'var(--sans)',
-    fontSize: 'clamp(14px,1.2vw,16px)',
-    fontWeight: 300,
-    color: '#717182',
-    lineHeight: 1.8,
-  };
-
-  const sectionTitle: React.CSSProperties = {
-    fontFamily: 'var(--sans)',
-    fontSize: 'clamp(14px,1.2vw,16px)',
-    fontWeight: 600,
-    color: '#717182',
-    lineHeight: 1.8,
-    marginBottom: 8,
-    marginTop: 28,
-  };
-
   return (
     <div
       onClick={onClose}
-      style={{
-        position: 'fixed', inset: 0, zIndex: 1000,
-        background: 'rgba(58,24,79,0.5)',
-        backdropFilter: 'blur(4px)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: '20px',
-      }}
+      className="fixed inset-0 z-[1000] flex items-center justify-center bg-secondary/50 p-5 backdrop-blur-sm"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        style={{
-          background: '#fff',
-          borderRadius: 20,
-          width: '100%',
-          maxWidth: 680,
-          maxHeight: '88vh',
-          overflowY: 'auto',
-          padding: 'clamp(24px,4vw,48px)',
-          position: 'relative',
-        }}
+        className="relative max-h-[88vh] w-full max-w-[680px] overflow-y-auto rounded-[20px] bg-white p-6 md:p-12"
       >
-        {/* Fechar */}
         <button
           onClick={onClose}
           aria-label="Fechar"
-          style={{
-            position: 'sticky', top: 0, float: 'right',
-            width: 32, height: 32, borderRadius: '50%',
-            background: 'rgba(147,45,111,0.08)',
-            border: 'none', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: 'var(--primary)', fontSize: 18, lineHeight: 1,
-            flexShrink: 0,
-          }}
+          className="sticky top-0 float-right flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border-none bg-primary-8 text-lg leading-none text-primary"
         >
           ✕
         </button>
 
-        {/* Eyebrow */}
-        <p style={{
-          fontFamily: 'var(--sans)', fontSize: 11, fontWeight: 600,
-          letterSpacing: '0.2em', textTransform: 'uppercase',
-          color: 'var(--primary)', marginBottom: 12,
-        }}>
+        <p className="mb-3 font-sans text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">
           Política de Privacidade
         </p>
 
-        {/* Título */}
-        <h2 style={{
-          fontFamily: 'var(--serif)', fontSize: 'clamp(24px,3vw,36px)',
-          fontWeight: 700, color: 'var(--secondary)',
-          lineHeight: 1.15, marginBottom: 8,
-        }}>
+        <h2 className="mb-2 font-serif text-[clamp(24px,3vw,36px)] font-bold leading-[1.15] text-secondary">
           {P.title}
         </h2>
 
-        {/* Última atualização */}
-        <p style={{ ...bodyText, fontSize: 13, marginBottom: 16 }}>
+        <p className="mb-4 font-sans text-[13px] font-light leading-[1.8] text-muted-fg">
           Última atualização: {P.lastUpdate}
         </p>
 
-        {/* Intro */}
         {P.intro.map((paragraph) => (
-          <p key={paragraph} style={{ ...bodyText, marginBottom: 12 }}>{paragraph}</p>
+          <p key={paragraph} className="mb-3 font-sans text-[clamp(14px,1.2vw,16px)] font-light leading-[1.8] text-muted-fg">
+            {paragraph}
+          </p>
         ))}
 
-        {/* Seções */}
         {P.sections.map((section) => (
           <div key={section.title}>
-            <p style={sectionTitle}>{section.title}</p>
+            <p className="mb-2 mt-7 font-sans text-[clamp(14px,1.2vw,16px)] font-semibold leading-[1.8] text-muted-fg">
+              {section.title}
+            </p>
             {section.paragraphs.map((p) => (
-              <p key={p} style={{ ...bodyText, marginBottom: 8 }}>{p}</p>
+              <p key={p} className="mb-2 font-sans text-[clamp(14px,1.2vw,16px)] font-light leading-[1.8] text-muted-fg">
+                {p}
+              </p>
             ))}
           </div>
         ))}

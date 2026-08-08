@@ -5,7 +5,6 @@ import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { trackPilotSignup } from "@/lib/analytics";
 import { CONTEUDO_HOME as C } from "@/lib/conteudo-home";
 import { useIsMobile } from "@/lib/hooks/useIsMobile";
-import { pa } from "@/lib/style-utils";
 import type { FormEvent } from "react";
 import { useState } from "react";
 
@@ -28,10 +27,7 @@ export function PilotSignup() {
 
   return (
     <div className='mt-9'>
-      <p
-        className='mb-5 max-w-[480px] font-sans font-normal leading-[1.7] text-muted-fg'
-        style={{ fontSize: "clamp(15px,1.4vw,17px)" }}
-      >
+      <p className='mb-5 max-w-[480px] font-sans text-[clamp(15px,1.4vw,17px)] font-normal leading-[1.7] text-muted-fg'>
         {pilot.text}
       </p>
 
@@ -42,20 +38,16 @@ export function PilotSignup() {
             return !v;
           })
         }
-        className='px-7 text-[15px]'
-        style={{ padding: "12px 28px" }}
+        className='px-7 py-3 text-[15px]'
       >
         {pilot.cta}
       </PrimaryButton>
 
       {open && (
         <div
-          className='mt-5 animate-fadeUp rounded-xl'
-          style={{
-            padding: isMobile ? 16 : 20,
-            border: `1px solid ${pa(13)}`,
-            background: pa(2),
-          }}
+          className={`mt-5 animate-fadeUp rounded-xl border border-primary-13 bg-primary-2 ${
+            isMobile ? "p-4" : "p-5"
+          }`}
         >
           {submitted ? (
             <p className='font-sans text-[15px] font-medium leading-[1.6] text-primary'>
@@ -72,7 +64,7 @@ export function PilotSignup() {
               />
               <button
                 type='submit'
-                className='self-start min-h-[48px] cursor-pointer rounded-full border-none bg-primary px-6 font-sans text-sm font-semibold text-white'
+                className='min-h-12 cursor-pointer self-start rounded-full border-none bg-primary px-6 font-sans text-sm font-semibold text-white'
               >
                 {pilot.submit}
               </button>

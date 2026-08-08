@@ -9,7 +9,18 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: 'var(--primary)',
+        primary: {
+          DEFAULT: 'var(--primary)',
+          2: 'var(--primary-2)',
+          4: 'var(--primary-4)',
+          8: 'var(--primary-8)',
+          10: 'var(--primary-10)',
+          13: 'var(--primary-13)',
+          20: 'var(--primary-20)',
+          27: 'var(--primary-27)',
+          33: 'var(--primary-33)',
+          40: 'var(--primary-40)',
+        },
         secondary: 'var(--secondary)',
         accent: 'var(--accent)',
         tertiary: 'var(--tertiary)',
@@ -24,6 +35,14 @@ const config: Config = {
       fontFamily: {
         serif: ['var(--font-playfair)', 'Playfair Display', 'Georgia', 'serif'],
         sans: ['var(--font-rubik)', 'Rubik', 'system-ui', 'sans-serif'],
+      },
+      boxShadow: {
+        'primary-cta': '0 8px 32px var(--primary-27)',
+        'primary-cta-hover': '0 12px 40px var(--primary-33)',
+        'primary-nav': '0 4px 20px var(--primary-27)',
+        'primary-nav-hover': '0 8px 28px var(--primary-40)',
+        'primary-card': '0 2px 12px var(--primary-8)',
+        'primary-photo': '0 20px 60px var(--primary-20)',
       },
       keyframes: {
         fadeUp: {

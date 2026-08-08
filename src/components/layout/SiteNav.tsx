@@ -4,7 +4,6 @@ import { AmoooraLogoHeader } from "@/components/brand/AmoooraLogoHeader";
 import { trackLinkClick, type LinkClickLocation } from "@/lib/analytics";
 import { CONTEUDO_HOME as C } from "@/lib/conteudo-home";
 import { useIsMobile } from "@/lib/hooks/useIsMobile";
-import { pa } from "@/lib/style-utils";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
@@ -218,35 +217,17 @@ export function SiteNav({
     });
   };
 
-  const navBg = overDarkHero
-    ? "transparent"
-    : scrolled
-      ? "rgba(255,255,255,0.95)"
-      : "#ffffff";
-
-  const desktopLinkColor = overDarkHero ? "#ffffff" : "#1a1a1a";
+  const desktopLinkClass = overDarkHero
+    ? "whitespace-nowrap font-sans text-sm font-medium text-white no-underline opacity-90 transition-opacity duration-200 hover:opacity-100"
+    : "whitespace-nowrap font-sans text-sm font-medium text-ink no-underline opacity-70 transition-opacity duration-200 hover:opacity-100";
 
   const ctaButton = !isMobile ? (
     <Link
       href={ctaHref}
-      className='rounded-full font-sans text-[13px] font-semibold text-white no-underline transition-[transform,box-shadow] duration-200'
-      style={{
-        background: "var(--primary)",
-        padding: "10px 22px",
-        whiteSpace: "nowrap",
-        boxShadow: `0 4px 20px ${pa(27)}`,
-      }}
+      className='whitespace-nowrap rounded-full bg-primary px-[22px] py-2.5 font-sans text-[13px] font-semibold text-white no-underline shadow-primary-nav transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-primary-nav-hover'
       onClick={() =>
         trackNavLink(C.nav.ctaDownload, ctaHref, "header_cta", "aplicativo")
       }
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-2px)";
-        e.currentTarget.style.boxShadow = `0 8px 28px ${pa(40)}`;
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "";
-        e.currentTarget.style.boxShadow = `0 4px 20px ${pa(27)}`;
-      }}
     >
       {C.nav.ctaDownload}
     </Link>
@@ -257,16 +238,11 @@ export function SiteNav({
       aria-label={open ? "Fechar menu" : "Abrir menu"}
       aria-expanded={open}
       aria-controls='mobile-nav-drawer'
-      className='flex cursor-pointer items-center justify-center rounded-full'
-      style={{
-        width: 44,
-        height: 44,
-        border: overDarkHero
-          ? "1px solid rgba(255,255,255,0.6)"
-          : `1px solid ${pa(27)}`,
-        background: overDarkHero ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.85)",
-        color: overDarkHero ? "#ffffff" : "var(--primary)",
-      }}
+      className={`flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border ${
+        overDarkHero
+          ? "border-white/60 bg-black/20 text-white"
+          : "border-primary-27 bg-white/85 text-primary"
+      }`}
     >
       <MenuToggleIcon open={open} />
     </button>
@@ -275,43 +251,25 @@ export function SiteNav({
   return (
     <>
       <nav
-        className='font-sans'
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          zIndex: 100,
-          background: navBg,
-          backdropFilter: scrolled && !overDarkHero ? "blur(12px)" : "none",
-          borderBottom:
-            scrolled && !overDarkHero ? `1px solid ${pa(10)}` : "none",
-          transition: "all 0.4s ease",
-        }}
+        className={`fixed inset-x-0 top-0 z-[100] font-sans transition-all duration-[400ms] ${
+          overDarkHero
+            ? "border-transparent bg-transparent"
+            : scrolled
+              ? "border-b border-primary-10 bg-white/95 backdrop-blur-[12px]"
+              : "border-transparent bg-white"
+        }`}
         aria-label='Principal'
       >
         <div
-          style={{
-            maxWidth: 1200,
-            margin: "0 auto",
-            padding: scrolled
-              ? isMobile
-                ? "12px 16px"
-                : "14px 48px"
-              : isMobile
-                ? "16px 16px"
-                : "20px 48px",
-            display: "grid",
-            gridTemplateColumns: isMobile ? "1fr auto" : "auto 1fr auto",
-            alignItems: "center",
-            gap: isMobile ? 12 : 32,
-            position: "relative",
-          }}
+          className={`relative mx-auto grid max-w-[1200px] items-center ${
+            isMobile
+              ? `grid-cols-[1fr_auto] gap-3 ${scrolled ? "px-4 py-3" : "px-4 py-4"}`
+              : `grid-cols-[auto_1fr_auto] gap-8 ${scrolled ? "px-12 py-3.5" : "px-12 py-5"}`
+          }`}
         >
           <Link
             href='/'
-            className='justify-self-start'
-            style={{ background: "transparent", boxShadow: "none" }}
+            className='justify-self-start bg-transparent shadow-none'
             onClick={() => {
               closeMenu();
               trackNavLink("Amooora", "/", "header_logo");
@@ -326,21 +284,8 @@ export function SiteNav({
                 <Link
                   key={link.id}
                   href={navHref(link.id, page)}
-                  className='font-sans text-sm font-medium no-underline transition-opacity duration-200 hover:opacity-100'
-                  style={{
-                    color: desktopLinkColor,
-                    opacity: overDarkHero ? 0.9 : 0.7,
-                    whiteSpace: "nowrap",
-                  }}
+                  className={desktopLinkClass}
                   onClick={() => trackNavItem(link, "header_desktop")}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.opacity = "1";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.opacity = overDarkHero
-                      ? "0.9"
-                      : "0.7";
-                  }}
                 >
                   {link.label}
                 </Link>
@@ -349,23 +294,13 @@ export function SiteNav({
           )}
 
           {!isMobile && layout === "default" && (
-            <div
-              className='flex items-center justify-self-end gap-7'
-              style={{ gridColumn: "2 / -1" }}
-            >
+            <div className='col-[2/-1] flex items-center justify-self-end gap-7'>
               {links.map((link) => (
                 <Link
                   key={link.id}
                   href={navHref(link.id, page)}
-                  className='font-sans text-sm font-medium no-underline transition-opacity duration-200'
-                  style={{ color: desktopLinkColor, opacity: 0.7 }}
+                  className={desktopLinkClass}
                   onClick={() => trackNavItem(link, "header_desktop")}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.opacity = "1";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.opacity = "0.7";
-                  }}
                 >
                   {link.label}
                 </Link>
@@ -380,7 +315,6 @@ export function SiteNav({
         </div>
       </nav>
 
-      {/* Mobile — drawer + overlay */}
       {isMobile && (
         <div
           className={`fixed inset-0 z-[110] transition-opacity duration-300 ${
@@ -415,7 +349,7 @@ export function SiteNav({
                 type='button'
                 onClick={closeMenu}
                 aria-label='Fechar menu'
-                className='flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-primary transition hover:bg-primary/5'
+                className='flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-primary transition hover:bg-primary-4'
               >
                 <MenuToggleIcon open />
               </button>
@@ -433,9 +367,9 @@ export function SiteNav({
                       closeMenu();
                       trackNavLink("Amooora", "/", "header_mobile");
                     }}
-                    className='flex min-h-[52px] items-center gap-3 rounded-xl px-3 font-sans text-[15px] font-medium text-ink transition hover:bg-primary/5 active:bg-primary/10'
+                    className='flex min-h-[52px] items-center gap-3 rounded-xl px-3 font-sans text-[15px] font-medium text-ink transition hover:bg-primary-4 active:bg-primary-8'
                   >
-                    <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary'>
+                    <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-10 text-primary'>
                       <HomeMenuIcon className='h-5 w-5' />
                     </span>
                     Amooora
@@ -449,9 +383,9 @@ export function SiteNav({
                         closeMenu();
                         trackNavItem(link, "header_mobile");
                       }}
-                      className='flex min-h-[52px] items-center gap-3 rounded-xl px-3 font-sans text-[15px] font-medium text-ink transition hover:bg-primary/5 active:bg-primary/10'
+                      className='flex min-h-[52px] items-center gap-3 rounded-xl px-3 font-sans text-[15px] font-medium text-ink transition hover:bg-primary-4 active:bg-primary-8'
                     >
-                      <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary'>
+                      <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-10 text-primary'>
                         <NavIcon id={link.id} />
                       </span>
                       {link.label}

@@ -22,6 +22,17 @@
   --ink-soft:   #717182;
   --serif: var(--font-playfair, 'Playfair Display'), 'Playfair Display', Georgia, serif;
   --sans: var(--font-rubik, Rubik), Rubik, system-ui, sans-serif;
+
+  /* Opacidades da marca — uso via Tailwind (bg-primary-8, border-primary-13, etc.) */
+  --primary-2:  color-mix(in srgb, var(--primary) 2%, transparent);
+  --primary-4:  color-mix(in srgb, var(--primary) 4%, transparent);
+  --primary-8:  color-mix(in srgb, var(--primary) 8%, transparent);
+  --primary-10: color-mix(in srgb, var(--primary) 10%, transparent);
+  --primary-13: color-mix(in srgb, var(--primary) 13%, transparent);
+  --primary-20: color-mix(in srgb, var(--primary) 20%, transparent);
+  --primary-27: color-mix(in srgb, var(--primary) 27%, transparent);
+  --primary-33: color-mix(in srgb, var(--primary) 33%, transparent);
+  --primary-40: color-mix(in srgb, var(--primary) 40%, transparent);
 }
 
 html {
@@ -41,27 +52,7 @@ body {
 ::-webkit-scrollbar-track { background: var(--off-white); }
 ::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 2px; }
 
-/* Canvas particles */
-#particle-canvas {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.6;
-  z-index: 0;
-}
-
-.animate-up { animation: fadeUp 0.8s ease both; }
-.animate-in { animation: fadeIn 0.6s ease both; }
-
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-}
-
-/* Descrição rica do produto (modal) */
+/* Descrição rica do produto */
 .product-description p { margin-bottom: 0.75rem; }
 .product-description p:last-child { margin-bottom: 0; }
 .product-description strong,
@@ -81,4 +72,45 @@ body {
   padding-left: 1rem;
   margin: 0.75rem 0;
   color: var(--ink-mid);
+}
+
+@layer components {
+  /* Shell padrão das seções da home */
+  .section-shell {
+    @apply mx-auto w-full max-w-[1200px] px-5 md:px-12;
+  }
+  .section-shell-narrow {
+    @apply mx-auto w-full max-w-[860px] px-5 md:px-12;
+  }
+  .section-pad {
+    @apply py-20 md:py-[120px];
+  }
+
+  /* Hero — fundos complexos (URL ainda via style) */
+  .hero-bg-desktop {
+    @apply pointer-events-none absolute inset-0 z-0 bg-cover bg-center;
+  }
+  .hero-bg-mobile-split {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-repeat: no-repeat;
+    background-size: min(165vw, 960px) auto;
+  }
+  .hero-bg-mobile-left {
+    background-position: 38% top;
+    clip-path: inset(0 42% 0 0);
+  }
+  .hero-bg-mobile-right {
+    background-position: 50% top;
+    clip-path: inset(0 0 0 42%);
+  }
+
+  /* Assinatura do footer */
+  .footer-signature {
+    color: var(--primary);
+    filter: brightness(1.4);
+    opacity: 0.6;
+  }
 }

@@ -1,16 +1,17 @@
 "use client";
 
-import type { ManifestoParagraph } from "@/components/home/types";
-import { SectionLabel } from "@/components/ui/SectionLabel";
-import { TextWithBreaks } from "@/components/ui/TextWithBreaks";
-import { CONTEUDO_HOME as C } from "@/lib/conteudo-home";
-import { useInViewReveal } from "@/lib/hooks/useInViewReveal";
-import { useIsMobile } from "@/lib/hooks/useIsMobile";
-import Image from "next/image";
-import type { CSSProperties } from "react";
+import type { CSSProperties } from 'react';
+import Image from 'next/image';
+import { CONTEUDO_HOME as C } from '@/lib/conteudo-home';
+import { TextWithBreaks } from '@/components/ui/TextWithBreaks';
+import { SectionLabel } from '@/components/ui/SectionLabel';
+import { SectionShell } from '@/components/ui/SectionShell';
+import { useInViewReveal } from '@/lib/hooks/useInViewReveal';
+import type { ManifestoParagraph, MobileProps } from '@/components/home/types';
+import { useIsMobile } from '@/lib/hooks/useIsMobile';
 
 const REVEAL_UP =
-  "opacity-0 translate-y-[30px] transition-all duration-[800ms] ease-out data-[visible=true]:opacity-100 data-[visible=true]:translate-y-0";
+  'opacity-0 translate-y-[30px] transition-all duration-[800ms] ease-out data-[visible=true]:opacity-100 data-[visible=true]:translate-y-0';
 
 function renderParagraph(
   p: ManifestoParagraph,
@@ -51,7 +52,7 @@ export function Manifesto() {
   const labelBlock = (
     <div
       data-visible={visible}
-      className='mb-8 opacity-0 translate-y-5 transition-all duration-700 ease-out data-[visible=true]:opacity-100 data-[visible=true]:translate-y-0'
+      className="mb-8 translate-y-5 opacity-0 transition-all duration-700 ease-out data-[visible=true]:translate-y-0 data-[visible=true]:opacity-100"
     >
       <SectionLabel label={C.manifesto.label} />
     </div>
@@ -60,38 +61,23 @@ export function Manifesto() {
   const imageBlock = (
     <div
       data-visible={visible}
-      className={`flex items-start opacity-0 translate-x-6 transition-all duration-[900ms] delay-200 ease-out data-[visible=true]:opacity-100 data-[visible=true]:translate-x-0 ${isMobile ? "justify-center mb-8" : "justify-end mb-0"}`}
+      className={`flex items-start translate-x-6 opacity-0 transition-all duration-[900ms] delay-200 ease-out data-[visible=true]:translate-x-0 data-[visible=true]:opacity-100 ${
+        isMobile ? 'mb-8 justify-center' : 'mb-0 justify-end'
+      }`}
     >
       <Image
         src={C.manifesto.image}
         alt='Manifesto Amooora'
         width={440}
         height={440}
-        style={{
-          width: "100%",
-          maxWidth: isMobile ? 320 : 440,
-          height: "auto",
-          objectFit: "contain",
-          borderRadius: 4,
-        }}
+        className={`h-auto w-full rounded object-contain ${isMobile ? 'max-w-[320px]' : 'max-w-[440px]'}`}
       />
     </div>
   );
 
   return (
-    <section
-      id='manifesto'
-      ref={sectionRef}
-      className='relative overflow-hidden bg-white'
-      style={{ padding: isMobile ? "80px 0" : "120px 0" }}
-    >
-      <div
-        className='relative z-[2] mx-auto'
-        style={{
-          maxWidth: 1200,
-          padding: isMobile ? "0 20px" : "0 48px",
-        }}
-      >
+    <section id="manifesto" ref={sectionRef} className="section-pad relative overflow-hidden bg-white">
+      <SectionShell className="relative z-[2]">
         {isMobile ? (
           <>
             {imageBlock}
@@ -101,29 +87,18 @@ export function Manifesto() {
             )}
           </>
         ) : (
-          <div
-            className='grid items-start gap-14'
-            style={{ gridTemplateColumns: "1.05fr 0.95fr" }}
-          >
+          <div className="grid grid-cols-[1.05fr_0.95fr] items-start gap-14">
             <div>
               {labelBlock}
               {leadingParagraphs.map((p, i) => renderParagraph(p, i, visible))}
-              <div
-                style={{ width: "calc(100% + 56px + (100% * 0.95 / 1.05))" }}
-              >
-                {renderParagraph(
-                  closingParagraph,
-                  paragraphs.length - 1,
-                  visible,
-                  0,
-                  true,
-                )}
+              <div className="w-[calc(100%+56px+(100%*0.95/1.05))]">
+                {renderParagraph(closingParagraph, paragraphs.length - 1, visible, 0, true)}
               </div>
             </div>
             {imageBlock}
           </div>
         )}
-      </div>
+      </SectionShell>
     </section>
   );
 }
