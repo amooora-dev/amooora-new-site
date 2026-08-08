@@ -31,11 +31,7 @@ export function Gallery() {
         </div>
 
         <div
-          className={`grid gap-3 ${
-            isMobile
-              ? "grid-cols-2 grid-rows-[repeat(2,200px)]"
-              : "grid-cols-4 grid-rows-[280px]"
-          }`}
+          className={`grid gap-3 grid-cols-2 grid-rows-[repeat(2,200px)] md:grid-cols-4 md:grid-rows-[280px]`}
         >
           {photos.map((src, i) => {
             const delay = `${(0.05 * i).toFixed(2)}s`;
