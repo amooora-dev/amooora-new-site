@@ -28,6 +28,7 @@ export function PrivacyModal({ onClose }: PrivacyModalProps) {
         className="relative max-h-[88vh] w-full max-w-[680px] overflow-y-auto rounded-[20px] bg-white p-6 md:p-12"
       >
         <button
+          type="button"
           onClick={onClose}
           aria-label="Fechar"
           className="sticky top-0 float-right flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border-none bg-primary-8 text-lg leading-none text-primary"

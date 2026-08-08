@@ -4,59 +4,15 @@ import { PrivacyModal } from "@/components/layout/PrivacyModal";
 import { trackLinkClick } from "@/lib/analytics";
 import { CONTEUDO_HOME as C } from "@/lib/conteudo-home";
 import { useIsMobile } from "@/lib/hooks/useIsMobile";
+import { Mail } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { FooterNavLink } from "./SiteFooter/FooterLink";
 
 type SiteFooterProps = {
   page?: "home" | "loja";
 };
-
-function footerHref(id: string, page: "home" | "loja") {
-  if (!id) return "#";
-  if (id === "loja") return "/loja";
-  return page === "home" ? `#${id}` : `/#${id}`;
-}
-
-function FooterNavLink({
-  label,
-  id,
-  page,
-}: {
-  label: string;
-  id: string;
-  page: "home" | "loja";
-}) {
-  if (id) {
-    const href = footerHref(id, page);
-    return (
-      <Link
-        href={href}
-        className='mb-2 block font-sans text-sm text-white/60 no-underline transition-colors duration-200 hover:text-white'
-        onClick={() =>
-          trackLinkClick({
-            linkText: label,
-            linkUrl: href,
-            linkType:
-              id === "loja" || !href.includes("#") ? "nav_route" : "nav_anchor",
-            location: "footer",
-            sectionId: id !== "loja" ? id : undefined,
-          })
-        }
-      >
-        {label}
-      </Link>
-    );
-  }
-  return (
-    <a
-      href='#'
-      className='mb-2 block font-sans text-sm text-white/60 no-underline transition-colors duration-200 hover:text-white'
-    >
-      {label}
-    </a>
-  );
-}
 
 export function SiteFooter({ page = "home" }: SiteFooterProps) {
   const isMobile = useIsMobile();
@@ -133,20 +89,9 @@ export function SiteFooter({ page = "home" }: SiteFooterProps) {
                     })
                   }
                 >
-                  <svg
-                    width='16'
-                    height='16'
-                    viewBox='0 0 24 24'
-                    fill='none'
-                    stroke='currentColor'
-                    strokeWidth='1.8'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    className='shrink-0'
-                  >
-                    <rect x='2' y='4' width='20' height='16' rx='2' />
-                    <polyline points='2,4 12,13 22,4' />
-                  </svg>
+                  <Mail
+                    size={16}
+                  />
                   {C.footer.email}
                 </a>
               </div>
@@ -177,6 +122,7 @@ export function SiteFooter({ page = "home" }: SiteFooterProps) {
                     />
                   ))}
                   <button
+                  type="button"
                     onClick={() => {
                       setPrivacyOpen(true);
                       trackLinkClick({
