@@ -1,6 +1,7 @@
 "use client";
 
 import { useIsMobile } from "@/lib/hooks/useIsMobile";
+import { Volume2, VolumeOff } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 const YT_VIDEO_ID = "PHO5TkLfpKg";
@@ -53,6 +54,72 @@ export function VideoSection() {
     }
   };
 
+  const applyCurrentVideoCover = () => {
+    if (!isMobile) return;
+    applyMobileVideoCover(divRef.current);
+  };
+
+  const schedulePlaybackReinforcement = (player: YTPlayer, delay: number) => {
+    window.setTimeout(() => {
+      player.mute();
+      player.playVideo();
+      applyCurrentVideoCover();
+    }, delay);
+  };
+
+  const handlePlayerReady = (e: { target: YTPlayer }) => {
+    const player = e.target;
+    player.mute();
+    try {
+      player.unloadModule?.("captions");
+      player.setOption?.("captions", "track", {});
+    } catch {
+      /* legendas indisponíveis */
+    }
+    if (isMobile) {
+      applyMobileVideoCover(divRef.current);
+      window.setTimeout(() => applyMobileVideoCover(divRef.current), 100);
+    }
+    player.playVideo();
+    setReady(true);
+    setPaused(false);
+    [200, 600, 1200, 2500].forEach((delay) =>
+      schedulePlaybackReinforcement(player, delay),
+    );
+  };
+
+  const handlePlayerStateChange = (e: { data: number; target: YTPlayer }) => {
+    if (e.data === 0) e.target.playVideo();
+    if (e.data === 1) setPaused(false);
+    if (e.data === 2) setPaused(true);
+  };
+
+  const handleResize = () => {
+    applyMobileVideoCover(divRef.current);
+  };
+
+  const handleIntersection = (entry: IntersectionObserverEntry) => {
+    if (entry.isIntersecting) playVideo();
+  };
+
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === "visible") playVideo();
+  };
+
+  const resumePlayback = () => {
+    playVideo();
+  };
+
+  const retryPlayback = () => {
+    const player = playerRef.current;
+    if (!player?.getPlayerState) return;
+    const state = player.getPlayerState();
+    if (state !== 1) {
+      player.mute();
+      player.playVideo();
+    }
+  };
+
   useEffect(() => {
     const init = () => {
       if (!divRef.current) return;
@@ -73,42 +140,13 @@ export function VideoSection() {
           cc_load_policy: 0,
         },
         events: {
-          onReady: (e) => {
-            e.target.mute();
-            try {
-              e.target.unloadModule?.("captions");
-              e.target.setOption?.("captions", "track", {});
-            } catch {
-              /* legendas indisponíveis */
-            }
-            if (isMobile) {
-              applyMobileVideoCover(divRef.current);
-              window.setTimeout(
-                () => applyMobileVideoCover(divRef.current),
-                100,
-              );
-            }
-            e.target.playVideo();
-            setReady(true);
-            setPaused(false);
-            [200, 600, 1200, 2500].forEach((delay) => {
-              window.setTimeout(() => {
-                e.target.mute();
-                e.target.playVideo();
-                if (isMobile) applyMobileVideoCover(divRef.current);
-              }, delay);
-            });
-          },
-          onStateChange: (e) => {
-            if (e.data === 0) e.target.playVideo();
-            if (e.data === 1) setPaused(false);
-            if (e.data === 2) setPaused(true);
-          },
+          onReady: handlePlayerReady,
+          onStateChange: handlePlayerStateChange,
         },
       });
     };
 
-    if (window.YT && window.YT.Player) {
+    if (window.YT?.Player) {
       init();
     } else {
       if (!document.getElementById("yt-api")) {
@@ -126,52 +164,34 @@ export function VideoSection() {
 
   useEffect(() => {
     if (!isMobile || !divRef.current) return;
-    const onResize = () => applyMobileVideoCover(divRef.current);
-    onResize();
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [isMobile, ready]);
 
   useEffect(() => {
     if (!ready) return;
     playVideo();
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) playVideo();
-      },
+      ([entry]) => handleIntersection(entry),
       { threshold: 0.05 },
     );
     if (ref.current) observer.observe(ref.current);
-    const onVisible = () => {
-      if (document.visibilityState === "visible") playVideo();
-    };
-    document.addEventListener("visibilitychange", onVisible);
-    const resumeOnInteraction = () => playVideo();
-    document.addEventListener("touchstart", resumeOnInteraction, {
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    document.addEventListener("touchstart", resumePlayback, {
       passive: true,
     });
-    window.addEventListener("scroll", resumeOnInteraction, { passive: true });
-    const retryId = window.setInterval(
-      () => {
-        const player = playerRef.current;
-        if (!player?.getPlayerState) return;
-        const state = player.getPlayerState();
-        if (state !== 1) {
-          player.mute();
-          player.playVideo();
-        }
-      },
-      isMobile ? 700 : 1500,
-    );
+    window.addEventListener("scroll", resumePlayback, { passive: true });
+    const retryId = window.setInterval(retryPlayback, isMobile ? 700 : 1500);
     const stopRetryId = window.setTimeout(
       () => window.clearInterval(retryId),
       isMobile ? 12000 : 8000,
     );
     return () => {
       observer.disconnect();
-      document.removeEventListener("visibilitychange", onVisible);
-      document.removeEventListener("touchstart", resumeOnInteraction);
-      window.removeEventListener("scroll", resumeOnInteraction);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      document.removeEventListener("touchstart", resumePlayback);
+      window.removeEventListener("scroll", resumePlayback);
       window.clearInterval(retryId);
       window.clearTimeout(stopRetryId);
     };
@@ -190,28 +210,22 @@ export function VideoSection() {
   return (
     <section
       ref={ref}
-      className={`relative flex select-none items-center justify-center overflow-hidden ${
-        isMobile ? 'h-[56.25vw]' : 'h-[70vh]'
-      }`}
+      className='h-[56.25vw] md:h-[70vw] relative flex select-none items-center justify-center overflow-hidden'
     >
       {/* Camada de vídeo — pointer-events: none para o click não chegar no iframe */}
       <div
-        className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-        style={{ transform: `translateY(${isMobile ? 0 : offset}px)` }}
+        className={`pointer-events-none absolute inset-0 z-0 overflow-hidden translate-y-0 md:translate-y-[${offset}px]`}
       >
         <div
           ref={divRef}
-          className={
-            isMobile
-              ? 'absolute inset-0 border-none'
-              : 'absolute -left-[10%] -top-[20%] h-[140%] w-[120%] border-none'
-          }
+          className='absolute inset-0 border-none h-full w-full md:-left-[10%] md:-top-[20%] md:h-[140%] md:w-[120%]'
         />
       </div>
 
       {/* Controles */}
       <div className='absolute bottom-7 right-7 z-10 flex gap-2.5'>
         <button
+          type='button'
           onClick={(e) => {
             e.stopPropagation();
             if (!ready || !playerRef.current) return;
@@ -237,6 +251,7 @@ export function VideoSection() {
         </button>
 
         <button
+          type='button'
           onClick={(e) => {
             e.stopPropagation();
             setMuted((m) => !m);
@@ -245,39 +260,7 @@ export function VideoSection() {
           title={muted ? "Ativar som" : "Silenciar"}
         >
           <span className='relative inline-flex h-5 w-5 items-center justify-center'>
-            <svg
-              width='20'
-              height='20'
-              viewBox='0 0 24 24'
-              fill='none'
-              aria-hidden='true'
-            >
-              <path
-                d='M4 10H8L13 6V18L8 14H4V10Z'
-                stroke='white'
-                strokeWidth='1.8'
-                strokeLinejoin='round'
-              />
-              {!muted && (
-                <path
-                  d='M16 9C17.2 10 17.2 14 16 15'
-                  stroke='white'
-                  strokeWidth='1.8'
-                  strokeLinecap='round'
-                />
-              )}
-              {!muted && (
-                <path
-                  d='M18.5 7.5C21 9.8 21 14.2 18.5 16.5'
-                  stroke='white'
-                  strokeWidth='1.8'
-                  strokeLinecap='round'
-                />
-              )}
-            </svg>
-            {muted && (
-              <span className='absolute h-0.5 w-[18px] rotate-[-45deg] bg-white' />
-            )}
+            {muted ? <VolumeOff /> : <Volume2 />}
           </span>
         </button>
       </div>
