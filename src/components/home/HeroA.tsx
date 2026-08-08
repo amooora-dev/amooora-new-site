@@ -1,6 +1,6 @@
 "use client";
 
-import { SiteNav } from "@/components/layout/SiteNav";
+import { SiteNav } from "@/components/layout/SiteNav/SiteNav";
 import { SectionLabel } from "@/components/ui/SectionLabel";
 import { CONTEUDO_HOME as C } from "@/lib/conteudo-home";
 import { useIsMobile } from "@/lib/hooks/useIsMobile";
@@ -40,8 +40,8 @@ export function HeroA() {
           <Image
             src='/images/logo-hero.png'
             alt='Amooora'
-            width={260}
-            height={260}
+            width={240}
+            height={240}
             priority
             className='object-contain h-[200px] w-[200px] md:h-[240px] md:w-[240px]'
           />
