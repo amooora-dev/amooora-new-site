@@ -7,6 +7,7 @@ import { CONTEUDO_HOME as C } from "@/lib/conteudo-home";
 import { useInViewReveal } from "@/lib/hooks/useInViewReveal";
 import type { CSSProperties } from "react";
 import { useState } from "react";
+import { cn } from "../utils/twMerge";
 
 export function Faq() {
   const { ref, visible } = useInViewReveal<HTMLElement>();
@@ -38,14 +39,13 @@ export function Faq() {
             const isLast = i === items.length - 1;
             return (
               <div
-                key={i}
+                key={item.id}
                 data-visible={visible}
-                className={`border-t border-primary-13 opacity-0 transition-opacity duration-[600ms] ease-out [transition-delay:var(--delay)] data-[visible=true]:opacity-100 ${
-                  isLast ? "border-b border-primary-13" : ""
-                }`}
+                className={cn(`border-t border-primary-13 opacity-0 transition-opacity duration-[600ms] ease-out [transition-delay:var(--delay)] data-[visible=true]:opacity-100`, isLast ? "border-b border-primary-13" : "")}
                 style={{ "--delay": delay } as CSSProperties}
               >
                 <button
+                  type="button"
                   onClick={() => setOpen(isOpen ? null : i)}
                   className='flex w-full cursor-pointer items-center justify-between gap-4 border-none bg-transparent py-5 text-left'
                 >

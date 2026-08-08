@@ -157,34 +157,37 @@ export const CONTEUDO_HOME = {
 
     items: [
       {
+        id: 1,
         title: "Segurança essencial",
         desc: "Cada decisão parte do compromisso com a segurança. Um espaço protegido para navegar, se expressar e se relacionar com tranquilidade e confiança.",
       },
       {
+        id: 2,
         title: "Representatividade",
         desc: "Nossos conteúdos refletem as vozes e histórias da comunidade sáfica. Valorizamos a pluralidade e rejeitamos qualquer forma de apagamento.",
       },
       {
+        id: 3,
         title: "Liberdade de ser e amar",
         desc: "O amor sáfico é legítimo, belo e político. Defendemos o direito de viver identidade e afetos de forma plena, sem medo ou censura.",
       },
-      {
+      {id: 4,
         title: "Conexões com propósito",
         desc: "Facilitamos encontros reais e significativos — pessoais, profissionais ou coletivos — baseados no respeito e cuidado mútuo.",
       },
-      {
+      {id: 5,
         title: "Saúde íntima",
         desc: "Falamos sobre saúde íntima como autocuidado e empoderamento, com informações e serviços que respeitam corpos e desejos sáficos.",
       },
-      {
+      { id: 6,
         title: "Economia do cuidado",
         desc: "Incentivamos saberes, serviços e talentos dentro da comunidade — apoio jurídico, de saúde, psicológico e criativo com confiança.",
       },
-      {
+      {id: 7,
         title: "Construção coletiva",
         desc: "Valorizamos escuta ativa, participação e autonomia como formas de construir colaborativamente o futuro que queremos viver.",
       },
-      {
+      {id: 8,
         title: "Talento em movimento",
         desc: "Damos visibilidade a talentos e conectamos pessoas a oportunidades reais. Acreditamos no trabalho como ferramenta de autonomia, crescimento e transformação.",
       },
@@ -210,34 +213,42 @@ export const CONTEUDO_HOME = {
     title: "Perguntas frequentes",
     items: [
       {
+        id: 1,
         q: "A Amooora é uma rede social?",
         a: "Não exatamente. A Amooora é uma plataforma comunitária feita por e para a comunidade sáfica. Aqui, você encontra conexões, serviços, informações e acolhimento — tudo pensado para fortalecer a nossa existência coletiva.",
       },
       {
+        id: 2,
         q: "Qual é o público da Amooora?",
         a: "A Amooora é prioritariamente voltada para a comunidade sáfica — mulheres lésbicas, bissexuais, pansexuais, pessoas trans e não binárias que se relacionam com outras identidades femininas. Se você se reconhece nesse espaço, ele também é seu.",
       },
       {
+        id: 3,
         q: "Homens cis são bem-vindos na plataforma?",
         a: "A Amooora é um espaço seguro e afetivo construído especificamente para pessoas sáficas. Homens cis não fazem parte do público-alvo da plataforma e não podem se cadastrar.",
       },
       {
+        id: 4,
         q: "Mulheres héteros são bem-vindas?",
         a: "Em um primeiro momento, a Amooora é voltada apenas para a comunidade sáfica. Mas em breve abriremos nosso portal de serviços para que mulheres héteros possam acessar nosso catálogo.",
       },
       {
+        id: 5,
         q: "A Amooora é um app de namoro?",
         a: "Você quer namorar alguém? A Amooora possibilita matches, mas a proposta vai além. Sugerimos lugares seguros para encontros, conteúdos educativos e espaços de escuta e pertencimento.",
       },
       {
+        id: 6,
         q: "É seguro usar a Amooora?",
         a: "Sim. Segurança é um valor inegociável para nós. Cuidamos da proteção de dados, investimos em moderação e criamos ambientes pensados para minimizar riscos e violências digitais.",
       },
       {
+        id: 7,
         q: "Preciso pagar para usar a plataforma?",
         a: "Não. É só chegar! Mas teremos alguns serviços que só poderão ser acessados mediante assinatura.",
       },
       {
+        id: 8,
         q: "Posso divulgar meus serviços na plataforma?",
         a: "Sim! A Amooora conta com um espaço onde é possível divulgar seus trabalhos, avaliar experiências e contratar com segurança dentro da comunidade.",
       },
