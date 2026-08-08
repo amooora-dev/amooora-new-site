@@ -7,6 +7,7 @@ import { useInViewReveal } from "@/lib/hooks/useInViewReveal";
 import { useIsMobile } from "@/lib/hooks/useIsMobile";
 import Image from "next/image";
 import type { CSSProperties } from "react";
+import { cn } from "../utils/twMerge";
 
 export function Values() {
   const isMobile = useIsMobile();
@@ -48,9 +49,7 @@ export function Values() {
           </h2>
         </div>
 
-        <div
-          className={`grid gap-0 ${isMobile ? "grid-cols-1" : "grid-cols-2"}`}
-        >
+        <div className={`grid grid-cols-1 md:grid-cols-2 gap-0`}>
           {vals.map((v, i) => {
             const delay = `${(0.05 * i).toFixed(2)}s`;
             const isLeftCol = !isMobile && i % 2 === 0;
@@ -59,9 +58,11 @@ export function Values() {
               <div
                 key={i}
                 data-visible={visible}
-                className={`group grid cursor-default grid-cols-[72px_1fr] border-t border-primary-10 py-8 opacity-0 translate-y-5 transition-[opacity,transform,background-color] duration-[600ms] ease-out [transition-delay:var(--delay)] hover:bg-primary-4 data-[visible=true]:translate-y-0 data-[visible=true]:opacity-100 ${
-                  isLeftCol ? "border-r border-primary-10 pr-10 pl-0" : ""
-                } ${isRightCol ? "pr-0 pl-10" : "pr-10 pl-0"}`}
+                className={cn(
+                  `group grid cursor-default grid-cols-[72px_1fr] border-t border-primary-10 py-8 opacity-0 translate-y-5 transition-[opacity,transform,background-color] duration-[600ms] ease-out [transition-delay:var(--delay)] hover:bg-primary-4 data-[visible=true]:translate-y-0 data-[visible=true]:opacity-100`,
+                  isLeftCol ? "border-r border-primary-10 pr-10 pl-0" : "",
+                  isRightCol ? "pr-0 pl-10" : "pr-10 pl-0",
+                )}
                 style={{ "--delay": delay } as CSSProperties}
               >
                 <div className='select-none pt-1 font-serif text-5xl font-black leading-none tracking-[-0.04em] text-primary-13 transition-colors duration-[250ms] group-hover:text-primary'>
