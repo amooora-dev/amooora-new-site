@@ -6,14 +6,8 @@ import { CONTEUDO_HOME as C } from "@/lib/conteudo-home";
 import { useIsMobile } from "@/lib/hooks/useIsMobile";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { SiteNavProps } from "../types/NavSite.type";
 
-type SiteNavProps = {
-  layout?: "default" | "hero";
-  page?: "home" | "loja";
-  navOverDark?: boolean;
-};
-
-type NavLinkId = (typeof C.nav.links)[number]["id"];
 
 function navHref(id: string, page: "home" | "loja") {
   if (id === "loja") return "/loja";
@@ -244,6 +238,7 @@ export function SiteNav({
           : "border-primary-27 bg-white/85 text-primary"
       }`}
     >
+      
       <MenuToggleIcon open={open} />
     </button>
   );
