@@ -99,10 +99,7 @@ export function AppSection() {
       alt='Amooora App'
       width={520}
       height={1040}
-      className={`h-auto w-full object-contain ${
-        isMobile
-          ? "max-w-[320px]"
-          : "max-w-[520px] animate-floatY drop-shadow-[0_32px_64px_rgba(147,45,111,0.25)]"
+      className={`h-auto w-full object-contain max-w-[320px] md:max-w-[520px] md:animate-floatY md:drop-shadow-[0_32px_64px_rgba(147,45,111,0.25)]"
       }`}
     />
   );
