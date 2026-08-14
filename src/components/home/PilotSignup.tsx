@@ -1,16 +1,17 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import type { FormEvent } from 'react';
-import { CONTEUDO_HOME as C } from '@/lib/conteudo-home';
-import { trackPilotSignup } from '@/lib/analytics';
-import { PrimaryButton } from '@/components/ui/PrimaryButton';
-import { EmailInput } from '@/components/ui/EmailInput';
-import type { MobileProps } from '@/components/home/types';
+import { EmailInput } from "@/components/ui/EmailInput";
+import { PrimaryButton } from "@/components/ui/PrimaryButton";
+import { trackPilotSignup } from "@/lib/analytics";
+import { CONTEUDO_HOME as C } from "@/lib/conteudo-home";
+import { useIsMobile } from "@/lib/hooks/useIsMobile";
+import type { FormEvent } from "react";
+import { useState } from "react";
 
-export function PilotSignup({ isMobile }: MobileProps) {
+export function PilotSignup() {
+  const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   const { pilot } = C.app;
@@ -18,21 +19,26 @@ export function PilotSignup({ isMobile }: MobileProps) {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
-    console.info('[pilot-signup]', { email: email.trim() });
+    console.info("[pilot-signup]", { email: email.trim() });
     trackPilotSignup();
     setSubmitted(true);
-    setEmail('');
+    setEmail("");
   };
 
   return (
-    <div className="mt-9">
-      <p className="mb-5 max-w-[480px] font-sans text-[clamp(15px,1.4vw,17px)] font-normal leading-[1.7] text-muted-fg">
+    <div className='mt-9'>
+      <p className='mb-5 max-w-[480px] font-sans text-[clamp(15px,1.4vw,17px)] font-normal leading-[1.7] text-muted-fg'>
         {pilot.text}
       </p>
 
       <PrimaryButton
-        onClick={() => setOpen((v) => { if (v) setSubmitted(false); return !v; })}
-        className="px-7 py-3 text-[15px]"
+        onClick={() =>
+          setOpen((v) => {
+            if (v) setSubmitted(false);
+            return !v;
+          })
+        }
+        className='px-7 py-3 text-[15px]'
       >
         {pilot.cta}
       </PrimaryButton>
@@ -40,25 +46,25 @@ export function PilotSignup({ isMobile }: MobileProps) {
       {open && (
         <div
           className={`mt-5 animate-fadeUp rounded-xl border border-primary-13 bg-primary-2 ${
-            isMobile ? 'p-4' : 'p-5'
+            isMobile ? "p-4" : "p-5"
           }`}
         >
           {submitted ? (
-            <p className="font-sans text-[15px] font-medium leading-[1.6] text-primary">
+            <p className='font-sans text-[15px] font-medium leading-[1.6] text-primary'>
               {pilot.success}
             </p>
           ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-2.5">
+            <form onSubmit={handleSubmit} className='flex flex-col gap-2.5'>
               <EmailInput
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={pilot.placeholder}
                 required
-                className="w-full"
+                className='w-full'
               />
               <button
-                type="submit"
-                className="min-h-12 cursor-pointer self-start rounded-full border-none bg-primary px-6 font-sans text-sm font-semibold text-white"
+                type='submit'
+                className='min-h-12 cursor-pointer self-start rounded-full border-none bg-primary px-6 font-sans text-sm font-semibold text-white'
               >
                 {pilot.submit}
               </button>

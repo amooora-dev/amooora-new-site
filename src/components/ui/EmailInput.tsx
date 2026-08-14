@@ -1,4 +1,5 @@
 import type { ChangeEvent } from 'react';
+import { cn } from '../utils/twMerge';
 
 type EmailInputProps = {
   value: string;
@@ -20,7 +21,7 @@ export function EmailInput({ value, onChange, placeholder, required, className =
       placeholder={placeholder}
       aria-label={placeholder}
       required={required}
-      className={`min-h-[48px] rounded-lg border border-black/10 bg-white px-4 font-sans text-base text-ink outline-none ${className}`}
+      className={cn(`min-h-[48px] rounded-lg border border-black/10 bg-white px-4 font-sans text-base text-ink outline-none`, className)}
     />
   );
 }
