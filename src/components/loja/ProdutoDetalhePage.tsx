@@ -19,7 +19,6 @@ import {
   trackViewItem,
   trackWhatsappClick,
 } from "@/lib/analytics";
-import { useIsMobile } from "@/lib/hooks/useIsMobile";
 import type { ProdutoLoja } from "@/lib/loja-data";
 import { getBadgeBgClass } from "@/lib/loja/badge-display";
 import {
@@ -41,7 +40,6 @@ export function ProdutoDetalhePage({ produto, relacionados }: Props) {
   const [imgAtiva, setImgAtiva] = useState(0);
   const [corIdx, setCorIdx] = useState(0);
   const [tamanhoIdx, setTamanhoIdx] = useState(0);
-  const isMobile = useIsMobile(768);
   const [copied, setCopied] = useState(false);
   const [wishlist, setWishlist] = useState(false);
 

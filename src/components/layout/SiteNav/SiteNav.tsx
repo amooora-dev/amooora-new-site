@@ -149,7 +149,9 @@ export function SiteNav({
               links={links}
               page={page}
               overDarkHero={overDarkHero}
-              Button={CtaButton}
+              ctaHref={ctaHref}
+              open={open}
+              setOpen={setOpen}
             />
           ) : null}
 
