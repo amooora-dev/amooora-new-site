@@ -181,7 +181,6 @@ export function LojaPageContent({
   return (
     <main className='min-h-screen bg-white'>
       <SiteNav
-        isMobile={isMobile}
         layout='hero'
         page='loja'
         navOverDark={lojaNavOverDark(hero.modelo)}
@@ -311,7 +310,7 @@ export function LojaPageContent({
         </div>
       </section>
 
-      <SiteFooter isMobile={isMobile} page='loja' />
+      <SiteFooter page='loja' />
     </main>
   );
 }
