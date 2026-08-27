@@ -5,12 +5,10 @@ import { SectionShell } from "@/components/ui/SectionShell";
 import { trackLinkClick } from "@/lib/analytics";
 import { CONTEUDO_HOME as C } from "@/lib/conteudo-home";
 import { useInViewReveal } from "@/lib/hooks/useInViewReveal";
-import { useIsMobile } from "@/lib/hooks/useIsMobile";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 
 export function Gallery() {
-  const isMobile = useIsMobile();
   const { ref, visible } = useInViewReveal<HTMLElement>();
 
   const photos = C.gallery.photos;

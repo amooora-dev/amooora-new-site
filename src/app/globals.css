@@ -109,8 +109,8 @@ body {
 
   /* Assinatura do footer */
   .footer-signature {
-    color: var(--primary);
+    color: white;
     filter: brightness(1.4);
-    opacity: 0.6;
+    opacity: 0.4;
   }
 }

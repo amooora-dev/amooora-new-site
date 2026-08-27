@@ -73,6 +73,7 @@ export function SiteNav({
   navOverDark,
 }: SiteNavProps) {
   const isMobile = useIsMobile();
+  const env = process.env.NODE_ENV || "production";
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -108,10 +109,12 @@ export function SiteNav({
 
   const overDarkHero = false; // (navOverDark ?? page === "loja") && page === "loja" && !scrolled;
   const ctaHref = page === "home" ? "#aplicativo" : "/#aplicativo";
-  const links = C.nav.links.map((link) => ({
-    ...link,
-    Icon: icons[link.id as keyof typeof icons],
-  }));
+  const links = C.nav.links
+    .map((link) => ({
+      ...link,
+      Icon: icons[link.id as keyof typeof icons],
+    }))
+    .filter((link) => env !== "production" || link.id !== "loja"); // hide loja link in prod envs`
 
   return (
     <>
