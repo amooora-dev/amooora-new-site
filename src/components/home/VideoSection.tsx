@@ -210,7 +210,7 @@ export function VideoSection() {
   return (
     <section
       ref={ref}
-      className='h-[56.25vw] md:h-[70vw] relative flex select-none items-center justify-center overflow-hidden'
+      className='h-[56.25vw] xl:h-[70vw] relative flex select-none items-center justify-center overflow-hidden'
     >
       {/* Camada de vídeo — pointer-events: none para o click não chegar no iframe */}
       <div
