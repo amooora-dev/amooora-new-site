@@ -18,8 +18,9 @@ export function SiteFooter({ page = "home" }: SiteFooterProps) {
   const isMobile = useIsMobile();
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const navLinks = C.footer.navLinks;
-  const navCol1 = navLinks.slice(0, 4);
-  const navCol2 = navLinks.slice(4);
+  const navCol1 = navLinks.filter((link) => link.id !== "faq");
+  const faqLink = navLinks.find((link) => link.id === "faq");
+
 
   return (
     <>
@@ -113,29 +114,31 @@ export function SiteFooter({ page = "home" }: SiteFooterProps) {
                   ))}
                 </div>
                 <div>
-                  {navCol2.map((link) => (
-                    <FooterNavLink
-                      key={link.label}
-                      label={link.label}
-                      id={link.id}
-                      page={page}
-                    />
-                  ))}
-                  <button
-                  type="button"
-                    onClick={() => {
-                      setPrivacyOpen(true);
-                      trackLinkClick({
-                        linkText: "Política de Privacidade",
-                        linkUrl: "/politica-de-cookies",
-                        linkType: "internal",
-                        location: "footer",
-                      });
-                    }}
-                    className='mb-0 cursor-pointer border-none bg-transparent p-0 text-left font-sans text-sm text-white/60 transition-colors duration-200 hover:text-white'
-                  >
-                    Política de Privacidade
-                  </button>
+                  <div className='mb-2 flex flex-wrap items-baseline gap-x-4 gap-y-1'>
+                    {faqLink ? (
+                      <FooterNavLink
+                        label={faqLink.label}
+                        id={faqLink.id}
+                        page={page}
+                        inline
+                      />
+                    ) : null}
+                    <button
+                      type='button'
+                      onClick={() => {
+                        setPrivacyOpen(true);
+                        trackLinkClick({
+                          linkText: "Política de Privacidade",
+                          linkUrl: "/politica-de-cookies",
+                          linkType: "internal",
+                          location: "footer",
+                        });
+                      }}
+                      className='cursor-pointer border-none bg-transparent p-0 text-left font-sans text-sm text-white/60 transition-colors duration-200 hover:text-white'
+                    >
+                      Política de Privacidade
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

@@ -12,13 +12,11 @@ export const CONTEUDO_HOME = {
   nav: {
     // label = texto no menu | id = âncora da seção (sem #, sem espaços)
     links: [
+      { label: "Amooora", id: "hero" },
       { label: "Manifesto", id: "manifesto" },
-      { label: "Aplicativo", id: "aplicativo" },
       { label: "Nossos Valores", id: "valores" },
-      { label: "Loja Amooora", id: "loja" },
       { label: "FAQ", id: "faq" },
     ],
-    ctaDownload: "Conhecer App",
   },
 
   hero: {
@@ -270,9 +268,7 @@ export const CONTEUDO_HOME = {
     navLinks: [
       { label: "Quem Somos", id: "" },
       { label: "Manifesto", id: "manifesto" },
-      { label: "Aplicativo", id: "aplicativo" },
       { label: "Nossos Valores", id: "valores" },
-      { label: "Loja Amooora", id: "loja" },
       { label: "FAQ", id: "faq" },
     ],
     appLabel: "App",

@@ -1,4 +1,3 @@
-import { LinkClickLocation } from "@/lib/analytics";
 import { CONTEUDO_HOME as C } from "@/lib/conteudo-home";
 import { ReactNode } from "react";
 
@@ -20,7 +19,6 @@ export type MobileMenuProps = {
   open: boolean;
   closeMenu: () => void;
   page: "home" | "loja";
-  ctaHref: string;
   navHref: (id: string, page: "home" | "loja") => string;
   links: LinkType[];
 };

@@ -7,15 +7,14 @@ import { useIsMobile } from "@/lib/hooks/useIsMobile";
 import {
   BookOpen,
   CircleQuestionMark,
-  Handbag,
   Heart,
-  Smartphone,
+  House,
 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { LinkType, SiteNavProps } from "../../types/NavSite.type";
 import { cn } from "../../utils/twMerge";
-import { CtaButton } from "./CtaNav";
+import { MenuToggleButton } from "./CtaNav";
 import { DesktopMenu } from "./DesktopMenu";
 import { MobileMenu } from "./MobileMenu";
 
@@ -60,10 +59,9 @@ export const trackNavItem = (
 };
 
 const icons = {
+  hero: House,
   manifesto: BookOpen,
-  aplicativo: Smartphone,
   valores: Heart,
-  loja: Handbag,
   faq: CircleQuestionMark,
 };
 
@@ -73,7 +71,6 @@ export function SiteNav({
   navOverDark,
 }: SiteNavProps) {
   const isMobile = useIsMobile();
-  const env = process.env.NODE_ENV || "production";
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -108,13 +105,10 @@ export function SiteNav({
   }, [page, closeMenu]);
 
   const overDarkHero = false; // (navOverDark ?? page === "loja") && page === "loja" && !scrolled;
-  const ctaHref = page === "home" ? "#aplicativo" : "/#aplicativo";
-  const links = C.nav.links
-    .map((link) => ({
-      ...link,
-      Icon: icons[link.id as keyof typeof icons],
-    }))
-    .filter((link) => env !== "production" || link.id !== "loja"); // hide loja link in prod envs`
+  const links = C.nav.links.map((link) => ({
+    ...link,
+    Icon: icons[link.id as keyof typeof icons],
+  }));
 
   return (
     <>
@@ -152,24 +146,18 @@ export function SiteNav({
               links={links}
               page={page}
               overDarkHero={overDarkHero}
-              ctaHref={ctaHref}
-              open={open}
-              setOpen={setOpen}
             />
           ) : null}
 
-          {(isMobile || layout === "hero") && (
+          {isMobile ? (
             <div className='justify-self-end'>
-              {
-                <CtaButton
-                  ctaHref={ctaHref}
-                  open={open}
-                  setOpen={setOpen}
-                  overDarkHero={overDarkHero}
-                />
-              }
+              <MenuToggleButton
+                open={open}
+                setOpen={setOpen}
+                overDarkHero={overDarkHero}
+              />
             </div>
-          )}
+          ) : null}
         </div>
       </nav>
 
@@ -178,7 +166,6 @@ export function SiteNav({
           open={open}
           closeMenu={closeMenu}
           page={page}
-          ctaHref={ctaHref}
           links={links}
           navHref={navHref}
         />

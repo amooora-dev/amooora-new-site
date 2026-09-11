@@ -1,7 +1,6 @@
 import { LinkType } from "@/components/types/NavSite.type";
 import { cn } from "@/components/utils/twMerge";
 import Link from "next/link";
-import { CtaButton } from "./CtaNav";
 import { navHref, trackNavItem } from "./SiteNav";
 
 export const DesktopMenu = ({
@@ -9,17 +8,11 @@ export const DesktopMenu = ({
   links,
   page,
   overDarkHero,
-  ctaHref,
-  open,
-  setOpen,
 }: {
   layout: "default" | "hero";
   links: LinkType[];
   page: "home" | "loja";
   overDarkHero?: boolean;
-  ctaHref: string;
-  open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   return (
     <div
@@ -46,14 +39,6 @@ export const DesktopMenu = ({
           {link.label}
         </Link>
       ))}
-      {layout === "default" ? (
-        <CtaButton
-          ctaHref={ctaHref}
-          open={open}
-          setOpen={setOpen}
-          overDarkHero={overDarkHero}
-        />
-      ) : null}
     </div>
   );
 };

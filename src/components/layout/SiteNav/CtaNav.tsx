@@ -1,33 +1,17 @@
 import { cn } from "@/components/utils/twMerge";
-import { CONTEUDO_HOME as C } from "@/lib/conteudo-home";
-import { useIsMobile } from "@/lib/hooks/useIsMobile";
 import { Menu, X } from "lucide-react";
-import Link from "next/link";
-import { trackNavLink } from "./SiteNav";
 
-export const CtaButton = ({
-  ctaHref,
+/** Botão hambúrguer do menu mobile (abre/fecha o drawer). */
+export const MenuToggleButton = ({
   open,
   setOpen,
   overDarkHero = false,
 }: {
-  ctaHref: string;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   overDarkHero?: boolean;
 }) => {
-  const isMobile = useIsMobile();
-  return !isMobile ? (
-    <Link
-      href={ctaHref}
-      className='whitespace-nowrap rounded-full bg-primary px-[22px] py-2.5 font-sans text-[13px] font-semibold text-white no-underline shadow-primary-nav transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 hover:shadow-primary-nav-hover'
-      onClick={() =>
-        trackNavLink(C.nav.ctaDownload, ctaHref, "header_cta", "aplicativo")
-      }
-    >
-      {C.nav.ctaDownload}
-    </Link>
-  ) : (
+  return (
     <button
       type='button'
       onClick={() => setOpen((prev) => !prev)}

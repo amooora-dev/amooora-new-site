@@ -11,7 +11,10 @@ export function HeroA() {
   const heroBackground = C.hero.background;
 
   return (
-    <section className='min-h-[min(88svh,780px)] pt-[72px] md:min-h-[min(100vh,920px)] md:pt-[84px] relative flex flex-col items-center overflow-hidden bg-white'>
+    <section
+      id='hero'
+      className='min-h-[min(88svh,780px)] pt-[72px] md:min-h-[min(100vh,920px)] md:pt-[84px] relative flex flex-col items-center overflow-hidden bg-white'
+    >
       {isMobile ? (
         <>
           <div

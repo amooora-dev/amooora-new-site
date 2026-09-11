@@ -11,7 +11,7 @@ type SectionLabelProps = {
  * Linha decorativa + label em caixa alta com espaçamento.
  * Usado no cabeçalho de seções da home e loja.
  * - `light`: versão branca para fundos escuros (loja hero, etc.)
- * - `centered`: centraliza a linha + label
+ * - `centered`: centraliza e espelha a linha nos dois lados (ex.: —— texto ——)
  */
 export function SectionLabel({
   label,
@@ -20,6 +20,14 @@ export function SectionLabel({
   light = false,
 }: SectionLabelProps) {
   const text = label ?? children;
+  const rule = (
+    <div
+      className={cn(
+        `h-px w-9 shrink-0`,
+        light ? "bg-white/60" : "bg-primary",
+      )}
+    />
+  );
 
   return (
     <div
@@ -29,15 +37,11 @@ export function SectionLabel({
         light ? "text-white/60" : "text-primary",
       )}
     >
-      <div
-        className={cn(
-          `h-px w-9 shrink-0`,
-          light ? "bg-white/60" : "bg-primary",
-        )}
-      />
+      {rule}
       <span className='font-sans text-[11px] font-semibold uppercase tracking-[0.2em]'>
         {text}
       </span>
+      {centered ? rule : null}
     </div>
   );
 }

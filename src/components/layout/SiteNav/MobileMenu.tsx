@@ -1,15 +1,13 @@
 import { MobileMenuProps } from "@/components/types/NavSite.type";
 import { cn } from "@/components/utils/twMerge";
-import { CONTEUDO_HOME as C } from "@/lib/conteudo-home";
-import { Download, House, X } from "lucide-react";
-import { trackNavItem, trackNavLink } from "./SiteNav";
+import { X } from "lucide-react";
 import Link from "next/link";
+import { trackNavItem } from "./SiteNav";
 
 export const MobileMenu = ({
   open,
   closeMenu,
   page,
-  ctaHref,
   navHref,
   links,
 }: MobileMenuProps) => {
@@ -60,21 +58,6 @@ export const MobileMenu = ({
           aria-label='Seções do site'
         >
           <ul className='space-y-1'>
-            <li>
-              <Link
-                href='/'
-                onClick={() => {
-                  closeMenu();
-                  trackNavLink("Amooora", "/", "header_mobile");
-                }}
-                className='flex min-h-[52px] items-center gap-3 rounded-xl px-3 font-sans text-[15px] font-medium text-ink transition hover:bg-primary-4 active:bg-primary-8'
-              >
-                <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-10 text-primary'>
-                  <House className='h-5 w-5' />
-                </span>{" "}
-                Amooora
-              </Link>
-            </li>
             {links.map((link) => (
               <li key={link.id}>
                 <Link
@@ -94,25 +77,6 @@ export const MobileMenu = ({
             ))}
           </ul>
         </nav>
-
-        <div className='border-t border-black/5 p-5'>
-          <Link
-            href={ctaHref}
-            onClick={() => {
-              closeMenu();
-              trackNavLink(
-                C.nav.ctaDownload,
-                ctaHref,
-                "header_cta",
-                "aplicativo",
-              );
-            }}
-            className='flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-primary font-sans text-sm font-semibold text-white shadow-md transition hover:brightness-95'
-          >
-            <Download className='h-4 w-4' />
-            {C.nav.ctaDownload}
-          </Link>
-        </div>
       </div>
     </div>
   );
